@@ -1,0 +1,9 @@
+/* SASS Mixins */
+
+@mixin grid-layout($columns, $gap) {
+  display: grid;
+  grid-template-columns: $columns;
+  gap: $gap;
+}
+
+/* Add other mixins here */

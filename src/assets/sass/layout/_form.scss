@@ -1,0 +1,57 @@
+// src/assets/sass/components/_authentication.scss
+
+.auth-form {
+  background: transparent;
+  border-radius: 4px;
+  border: none;
+  display: grid;
+  grid-gap: 5px;
+  grid-area: 1/5/span 1/spqn 4;
+  margin: 0 auto;
+  max-width: fit-content;
+  padding: 0;
+
+  h2 {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0;
+    width: 300px;
+  }
+
+  input {
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin: 0.25rem 0 0;
+    padding: 10px;
+    width: 100%;
+  }
+
+  button {
+    width: 150px;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
+
+  .error {
+    color: red;
+    margin-bottom: 10px;
+  }
+
+  .success {
+    color: green;
+    margin-bottom: 10px;
+  }
+}

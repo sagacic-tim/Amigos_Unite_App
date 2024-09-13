@@ -1,0 +1,29 @@
+.home {
+  display: inline-block;
+  grid-area: 2/1/5/5;
+
+  &__heading {
+    margin: 0 0.75rem 0.75rem;
+
+    &--title {
+      font-size: 3.2rem;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    &--intro {
+      line-height: 1.25;
+      padding: 0 0 0 1rem;
+    }
+  }
+
+  &__banner {
+
+    &--image {
+      margin: 0;
+      max-width: 100vw;
+      padding: 0;
+      width: 100vw;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+.event-location-connector-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+  
+    .location-details {
+      margin-top: 10px;
+    }
+  }
+  
+  .event-location-connector-list {
+    @include grid-layout(auto 1fr, 10px); // Using the grid layout mixin
+  }
