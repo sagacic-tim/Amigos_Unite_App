@@ -1,77 +1,116 @@
+// src/services/api.ts
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+axios.defaults.withCredentials = true;
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+
+// Global variables for managing CSRF tokens and token refresh states
+let csrfToken: string | null = null;
+let isRefreshing = false;
+let failedQueue: { resolve: (value: any) => void; reject: (reason?: any) => void }[] = [];
+
+// Axios instance setup
 const axiosInstance = axios.create({
   baseURL: baseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Ensure credentials (cookies) are sent with requests
+  withCredentials: true,  // Ensure cookies are sent with requests
 });
 
 // Function to extract the JWT token from the cookie
-const getTokenFromCookie = (): string | null => {
+export const getTokenFromCookie = (): string | null => {
   const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
   return tokenCookie ? tokenCookie.split('=')[1] : null;
+};
+
+// Function to refresh JWT token
+const refreshToken = async () => {
+  return axiosInstance.post('/api/v1/refresh');
 };
 
 // Function to verify the JWT token by making a request to the server
 export const verifyJwtToken = async (): Promise<boolean> => {
   try {
     const jwtToken = getTokenFromCookie(); // Extract the token from the cookie
-    if (jwtToken) {
-      const response = await axiosInstance.get('/api/v1/verify_token');
-      return response.status === 200; // Return true if token is valid
+    if (!jwtToken) {
+      console.warn('No JWT token present in cookies.');
+      return false;
     }
-    return false; // No JWT token present
+
+    const response = await axiosInstance.get('/api/v1/verify_token');
+    if (response.status === 200 && response.data.valid) {
+      return true; // Return true if the token is valid
+    } else {
+      console.warn('Token invalid, attempting to refresh...');
+      await refreshToken(); // Attempt to refresh the token if it is invalid
+      return true;
+    }
   } catch (error) {
     console.error("Token verification failed:", error);
     return false; // Token is invalid or verification failed
   }
 };
 
-let csrfToken: string | null = null;  // Variable to store the CSRF token
+// Function to handle failed request queue
+const processQueue = (error: AxiosError | null, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
-// Interceptor to store CSRF token from the response and handle errors
+// Axios response interceptor to handle CSRF and retry logic
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
-    // Capture CSRF token from response headers and store it
-    if (response.headers['x-csrf-token']) {
-      csrfToken = response.headers['x-csrf-token'];
+    // Retrieve the CSRF token from the response headers and set it in defaults
+    const csrfToken = response.headers['x-csrf-token'];
+    if (csrfToken) {
+      axiosInstance.defaults.headers['X-CSRF-Token'] = csrfToken;
     }
     return response;
   },
   async (error: AxiosError) => {
-    // Handle 401 Unauthorized errors (token expiry, unauthorized access)
-    if (error.response?.status === 401) {
-      console.error('Token expired or unauthorized:', error);
-      window.location.href = '/login';  // Optionally redirect to login or refresh token
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(token => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            return axiosInstance(originalRequest);
+          })
+          .catch(err => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response = await refreshToken();
+        const newToken = response.data.token;
+
+        axiosInstance.defaults.headers['Authorization'] = `Bearer ${newToken}`;
+        processQueue(null, newToken);
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        processQueue(err as AxiosError, null);
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     return Promise.reject(error);
   }
 );
-
-// Interceptor to add CSRF and JWT tokens to the request headers
-axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // Initialize headers if they are undefined
-  if (!config.headers) {
-    config.headers = new AxiosHeaders(); // Use AxiosHeaders instead of an empty object
-  }
-
-  // Add CSRF token to request headers if available
-  if (csrfToken) {
-    config.headers['X-CSRF-Token'] = csrfToken;
-  }
-
-  // Add JWT token to the request headers if available
-  const jwtToken = getTokenFromCookie();
-  if (jwtToken) {
-    config.headers.Authorization = `Bearer ${jwtToken}`; // Add JWT token to headers
-  }
-
-  return config;
-});
 
 // Centralized request method
 const request = async (method: InternalAxiosRequestConfig['method'], url: string, data?: any) => {

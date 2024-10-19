@@ -32,19 +32,30 @@ const Login: React.FC<{ isOpen: boolean; onClose: () => void; onLoginSuccess: ()
       });
 
       if (response.status === 200) {
-        // Handle successful login
-        const { csrf_token } = response.data.status;
-
-        // Store the CSRF token in a cookie or state
-        if (csrf_token) {
-          document.cookie = `csrf_token=${csrf_token}; Path=/`;
+        // Check for the content type of the response
+        const contentType = response.headers['content-type'];
+        if (!contentType || !contentType.includes('application/json')) {
+          setErrorMessage('Unexpected response format');
+          return;
         }
-
-        onLoginSuccess();
-        onClose(); // Close modal on successful login
+        console.log('Login response data:', response.data); // Log the entire response
+        const { csrf_token, jwt } = response.data.data || {};
+        if (jwt && csrf_token) {
+          console.log('JWT and CSRF token successfully extracted.');
+      
+          const secureFlag = window.location.protocol === 'https:' ? 'Secure; ' : '';
+          document.cookie = `jwt=${jwt}; Path=/; ${secureFlag}SameSite=None`;
+          document.cookie = `csrf_token=${csrf_token}; Path=/; ${secureFlag}SameSite=None`;
+          onLoginSuccess();
+          onClose();
+        } else {
+          console.error('Failed to extract tokens:', response.data);
+          setErrorMessage('Failed to retrieve authentication tokens.');
+        }
       } else {
         handleErrorResponse(response.status);
-      }
+      }           
+      
     } catch (error: any) {
       if (error.response) {
         handleErrorResponse(error.response.status);

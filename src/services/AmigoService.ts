@@ -14,15 +14,24 @@ interface AmigosResponse {
 // Fetch all amigos
 export const fetchAmigos = async (): Promise<Amigo[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/v1/amigos`, {
-      withCredentials: true,
+    // Make the request using axiosInstance
+    const response = await axiosInstance.get('/api/v1/amigos', {
+      withCredentials: true, // Ensure credentials are included
     });
 
-    // Return only the amigos array from the response
-    return response.data.amigos;
+    // Check if the expected data structure is returned
+    if (response.data && Array.isArray(response.data)) {
+      return response.data; // Return the response data directly if it is an array
+    } else if (response.data && response.data.amigos && Array.isArray(response.data.amigos)) {
+      // If the data structure is different, adjust as needed
+      return response.data.amigos;
+    } else {
+      console.error('Unexpected response structure:', response.data);
+      throw new Error('Failed to fetch amigos: Invalid response structure');
+    }
   } catch (error) {
     console.error('Error fetching amigos:', error);
-    throw error;
+    throw error; // Rethrow the error for higher-level handling
   }
 };
 

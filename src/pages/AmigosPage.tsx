@@ -1,19 +1,27 @@
-// src/pages/AmigosPage.tsx
 import React from 'react';
 import AmigoList from '../components/Amigos/AmigoList';
+import useAuth from '../hooks/useAuth'; // Import useAuth hook
 import '../assets/sass/layout/_form.scss';
 
-interface AmigosPageProps {
-  isLoggedIn: boolean;
-}
+const AmigosPage: React.FC = () => {
+  const { isLoggedIn } = useAuth(); // Check auth status directly
 
-const AmigosPage: React.FC<AmigosPageProps> = ({ isLoggedIn }) => {
+  // If the user is not logged in, return a login prompt
+  if (!isLoggedIn) {
+    return (
+      <section className="section-content">
+        <h1 className="page-title">Amigos Page</h1>
+        <p>Please log in to view the list of amigos.</p>
+      </section>
+    );
+  }
+
+  // If the user is logged in, render the amigos list
   return (
     <section className="section-content">
       <h1 className="page-title">Amigos Page</h1>
-      {isLoggedIn ? <p className="page-description">This page lists all the amigos currently registered with Amigos Unite.</p> : <p></p>}
-      {isLoggedIn ? <AmigoList /> : <p>Please log in to view the list of amigos.</p>}
-      {isLoggedIn ? <AmigoList /> : <p>This is the amigos page, visible only to logged-in users.</p>}
+      <p className="page-description">This page lists all the amigos currently registered with Amigos Unite.</p>
+      <AmigoList />
     </section>
   );
 };

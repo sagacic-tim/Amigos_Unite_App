@@ -1,6 +1,8 @@
+// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 
 export default defineConfig({
   plugins: [react()],
@@ -17,9 +19,15 @@ export default defineConfig({
     },
   },
   server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, '../amigos_unite_api/config/ssl/localhost.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, '../amigos_unite_api/config/ssl/localhost.crt')),
+    },
+    host: 'localhost',
+    port: 5173, // Vite's development server port
     proxy: {
-      '/rails': {
-        target: 'http://localhost:3001',
+      '/api': {
+        target: 'https://localhost:3001',
         changeOrigin: true,
       },
     },
