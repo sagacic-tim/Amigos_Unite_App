@@ -29,6 +29,7 @@ export default defineConfig({
       '/api': {
         target: 'https://localhost:3001',
         changeOrigin: true,
+        secure: false, // Set to true if using a trusted certificate
       },
     },
   },

@@ -29,6 +29,8 @@ const Login: React.FC<{ isOpen: boolean; onClose: () => void; onLoginSuccess: ()
           login_attribute: loginAttribute,
           password: password,
         },
+      }, {
+        withCredentials: true
       });
 
       if (response.status === 200) {
@@ -46,6 +48,10 @@ const Login: React.FC<{ isOpen: boolean; onClose: () => void; onLoginSuccess: ()
           const secureFlag = window.location.protocol === 'https:' ? 'Secure; ' : '';
           document.cookie = `jwt=${jwt}; Path=/; ${secureFlag}SameSite=None`;
           document.cookie = `csrf_token=${csrf_token}; Path=/; ${secureFlag}SameSite=None`;
+
+          // Debugging log
+          console.log('Cookies after login:', document.cookie);
+
           onLoginSuccess();
           onClose();
         } else {

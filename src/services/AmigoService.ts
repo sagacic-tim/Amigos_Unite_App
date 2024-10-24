@@ -4,7 +4,7 @@ import { Amigo } from '../types/AmigoTypes';
 import { get, post, put, del } from './api'; // Assuming these functions use axios
 import axiosInstance from './api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'; // Adjust accordingly
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:3001'; // Adjust accordingly
 
 // Define the response interface for fetchAmigos
 interface AmigosResponse {

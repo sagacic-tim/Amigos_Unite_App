@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHead
 
 axios.defaults.withCredentials = true;
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://localhost:3001';
 
 // Global variables for managing CSRF tokens and token refresh states
 let csrfToken: string | null = null;
@@ -21,7 +21,9 @@ const axiosInstance = axios.create({
 
 // Function to extract the JWT token from the cookie
 export const getTokenFromCookie = (): string | null => {
-  const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+  const cookieString = document.cookie;
+  console.log('Cookie String:', cookieString); // Debugging log
+  const tokenCookie = cookieString.split('; ').find(row => row.startsWith('jwt='));
   return tokenCookie ? tokenCookie.split('=')[1] : null;
 };
 
