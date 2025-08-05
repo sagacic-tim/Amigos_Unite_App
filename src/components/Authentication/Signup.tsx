@@ -1,5 +1,6 @@
+// src/components/Authentication/Signup.tsx
 import React, { useState } from 'react';
-import axiosInstance from '../../services/api';
+import { publicPost } from '../../services/apiHelper';
 import Modal from '../Common/Modal';
 import '../../assets/sass/components/_authentication.scss';
 
@@ -10,64 +11,43 @@ interface SignupProps {
 }
 
 const Signup: React.FC<SignupProps> = ({ isOpen, onClose, onSignupSuccess }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]     = useState('');
+  const [firstName, setFirstName]   = useState('');
+  const [lastName, setLastName]     = useState('');
+  const [userName, setUserName]     = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // To store and display error messages
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null);
-
-    if (!email || !password) {
+    if (!firstName || !lastName || !userName || !email || !password || !passwordConfirmation) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
-
     try {
-      setLoading(true); // Start loading
-      const response = await axiosInstance.post('/api/v1/signup', {
+      setLoading(true);
+      await publicPost<{ /* sign‑up response shape */ }>('/api/v1/signup', {
         amigo: {
-          email: email,
-          password: password,
-        },
-      });
-
-      if (response.status === 201) { // Check for successful signup
-        // Handle successful signup
-        const { csrf_token } = response.data.status;
-
-        // Store the CSRF token in a cookie or state
-        if (csrf_token) {
-          document.cookie = `csrf_token=${csrf_token}; Path=/`;
+          first_name:            firstName,
+          last_name:             lastName,
+          user_name:             userName,
+          email,
+          password,
+          password_confirmation: passwordConfirmation
         }
-
-        onSignupSuccess(); // Trigger success handler
-        onClose(); // Close modal on success
+      });
+      onSignupSuccess();
+      onClose();
+    } catch (err: any) {
+      if (err.response?.status === 422) {
+        setErrorMessage('Signup failed. Check your inputs.');
       } else {
-        handleErrorResponse(response.status);
-      }
-    } catch (error: any) {
-      if (error.response) {
-        handleErrorResponse(error.response.status);
-      } else {
-        setErrorMessage('An error occurred during signup. Please try again later.');
+        setErrorMessage('Something went wrong. Please try again.');
       }
     } finally {
-      setLoading(false); // Stop loading
-    }
-  };
-
-  const handleErrorResponse = (status: number) => {
-    switch (status) {
-      case 400:
-        setErrorMessage('Invalid signup details.');
-        break;
-      case 500:
-        setErrorMessage('Server error. Please try again later.');
-        break;
-      default:
-        setErrorMessage('An error occurred. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -75,12 +55,45 @@ const Signup: React.FC<SignupProps> = ({ isOpen, onClose, onSignupSuccess }) => 
     <Modal isOpen={isOpen} onClose={onClose}>
       <form className="auth-form" onSubmit={handleSubmit}>
         <label className="auth-form__label">
+          First Name:
+          <input
+            type="text"
+            className="auth-form__input"
+            value={firstName}
+            onChange={e => setFirstName(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </label>
+        <label className="auth-form__label">
+          Last Name:
+          <input
+            type="text"
+            className="auth-form__input"
+            value={lastName}
+            onChange={e => setLastName(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </label>
+        <label className="auth-form__label">
+          Username:
+          <input
+            type="text"
+            className="auth-form__input"
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </label>
+        <label className="auth-form__label">
           Email:
           <input
             type="email"
             className="auth-form__input"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             disabled={loading}
             required
           />
@@ -91,15 +104,27 @@ const Signup: React.FC<SignupProps> = ({ isOpen, onClose, onSignupSuccess }) => 
             type="password"
             className="auth-form__input"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </label>
+
+        <label className="auth-form__label">
+          Confirm Password:
+          <input
+            type="password"
+            className="auth-form__input"
+            value={passwordConfirmation}
+            onChange={e => setPasswordConfirmation(e.target.value)}
             disabled={loading}
             required
           />
         </label>
         <button type="submit" className="auth-form__button" disabled={loading}>
-          {loading ? 'Signing up...' : 'Signup'}
+          {loading ? 'Signing up…' : 'Signup'}
         </button>
-        {errorMessage && <p className="auth-form__error-message">{errorMessage}</p>} {/* Display any error message */}
+        {errorMessage && <p className="auth-form__error-message">{errorMessage}</p>}
       </form>
     </Modal>
   );

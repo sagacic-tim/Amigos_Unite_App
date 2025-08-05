@@ -10,13 +10,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: hsl(240, 75%, 10%, 0.5);
   z-index: 1000;
 }
 
 /* Modal Container Styles */
 .modal-content {
   background-color: #fff;
+  color: hsl(240, 50%, 15%);
   padding: 20px;
   border-radius: 5px;
   max-width: 500px;

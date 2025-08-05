@@ -1,123 +1,80 @@
 // src/hooks/useAuth.tsx
-import { useEffect, useState } from 'react';
-import axiosInstance from '../services/api';
-import { Amigo } from '../types/AmigoTypes'; // Import the Amigo type
-import { fetchAmigos } from '../services/AmigoService'; // Import the function to fetch amigos
+import { useState, useEffect, useCallback } from 'react'
+import publicApi from '../services/publicApi'
+import privateApi from '../services/privateApi'
+import { Amigo } from '../types/AmigoTypes'
 
-const getTokenFromCookie = (): string | null => {
-  const cookieString = document.cookie;
-  const tokenCookie = cookieString.split('; ').find(row => row.startsWith('jwt='));
-  return tokenCookie ? tokenCookie.split('=')[1] : null;
-};
-
+/**
+ * A hook to drive your auth flow:
+ * - fetch CSRF token with publicApi
+ * - verify or refresh JWT with publicApi
+ * - then load protected data (amigos) with privateApi
+ */
 const useAuth = (requireAuth = true) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [amigos, setAmigos] = useState<Amigo[]>([]); // Explicitly define the type as Amigo[]
-  const [error, setError] = useState<string | null>(null); // State to handle errors
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loading,   setLoading]   = useState(requireAuth)
+  const [amigos,    setAmigos]    = useState<Amigo[]>([])
+  const [error,     setError]     = useState<string | null>(null)
+
+  // 1) try verify_token → returns { valid: boolean }
+  const verifyToken = useCallback(async (): Promise<boolean> => {
+    try {
+      const res = await publicApi.get<{ valid: boolean }>('/api/v1/verify_token')
+      return res.data.valid
+    } catch {
+      return false
+    }
+  }, [])
+
+  // 2) if verify failed, post refresh_token
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    try {
+      await publicApi.post('/api/v1/refresh_token')
+      return true
+    } catch {
+      return false
+    }
+  }, [])
+
+  // 3) after we know we're authenticated, load the protected Amigos list
+  const loadAmigos = useCallback(async () => {
+    try {
+      const res = await privateApi.get<{ amigos: Amigo[] }>('/api/v1/amigos')
+      setAmigos(res.data.amigos)
+    } catch {
+      setError('Error fetching amigos.')
+    }
+  }, [])
 
   useEffect(() => {
+    // bail out immediately if this page doesn’t require auth
     if (!requireAuth) {
-      setLoading(false); // No need to check authentication
-      return;
+      setLoading(false)
+      return
     }
 
-    console.log('Checking authentication status...');
-    const checkToken = async () => {
-      const token = getTokenFromCookie();
-      console.log('Token from cookie:', token);
+    const init = async () => {
+      setLoading(true)
 
-      if (token) {
-        try {
-          const response = await axiosInstance.get('/api/v1/verify_token');
-          console.log('Token verification response:', response.data);
+      // always grab a fresh CSRF‑TOKEN cookie on entry
+      await publicApi.get('/api/v1/csrf').catch(console.error)
 
-          if (response.data.valid) {
-            setIsLoggedIn(true);
-            // Capture the CSRF token from response headers and set it as a default for Axios
-            const csrfToken = response.headers['x-csrf-token'];
-            if (csrfToken) {
-              axiosInstance.defaults.headers['X-CSRF-Token'] = csrfToken;
-            }
-            if (response.headers['x-csrf-token']) {
-              axiosInstance.defaults.headers['X-CSRF-Token'] = response.headers['x-csrf-token'];
-            }
-            // Load amigos data after successful login
-            loadAmigos();
-          } else {
-            console.log('Invalid token, attempting to refresh...');
-            await refreshToken();
-          }
-        } catch (error) {
-          console.error('Error during token verification:', error);
-          setIsLoggedIn(false);
-          clearAuthTokens(); // Clear tokens if there's an error during verification
-        }
-      } else {
-        console.warn('No JWT token found, skipping token verification.');
-        setIsLoggedIn(false);
-        clearAuthTokens(); // Clear tokens if no JWT token is found
+      // verify, then refresh if needed
+      let ok = await verifyToken()
+      if (!ok) ok = await refreshToken()
+
+      setIsLoggedIn(ok)
+      if (ok) {
+        await loadAmigos()
       }
 
-      setLoading(false); // Ensure loading is set to false at the end
-    };
+      setLoading(false)
+    }
 
-    const refreshToken = async () => {
-      try {
-        const response = await axiosInstance.post('/api/v1/refresh');
-        console.log('Token refreshed successfully:', response.data);
+    init()
+  }, [requireAuth, verifyToken, refreshToken, loadAmigos])
 
-        if (response.status === 200 && response.data.jwt) {
-          // Update JWT in cookies
-          document.cookie = `jwt=${response.data.jwt}; Path=/`;
+  return { isLoggedIn, loading, amigos, error }
+}
 
-          // Capture and set the CSRF token from the response headers
-          const csrfToken = response.headers['x-csrf-token'];
-          if (csrfToken) {
-            axiosInstance.defaults.headers['X-CSRF-Token'] = csrfToken;
-          }
-          if (response.headers['x-csrf-token']) {
-            axiosInstance.defaults.headers['X-CSRF-Token'] = response.headers['x-csrf-token'];
-          }
-          setIsLoggedIn(true);
-          console.log('isLoggedIn:', isLoggedIn);
-        } else {
-          setIsLoggedIn(false);
-          clearAuthTokens();
-        }
-      } catch (error) {
-        console.error('Error during token refresh:', error);
-        setIsLoggedIn(false);
-        clearAuthTokens();
-      }
-    };
-
-    const clearAuthTokens = () => {
-      document.cookie = 'jwt=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    };
-
-    const loadAmigos = async () => {
-      try {
-        setLoading(true);
-        const amigosData = await fetchAmigos();
-        console.log('Amigos data:', amigosData);
-        setAmigos(amigosData);
-      } catch (error: any) {
-        console.error('Error loading amigos:', error);
-        setError('Error fetching amigos. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkToken(); // Call it on component mount or page refresh
-  }, [requireAuth]);
-
-  // For debugging purposes, you can add these logs here as well
-  console.log('isLoggedIn:', isLoggedIn);
-  console.log('Token from cookie:', getTokenFromCookie());
-
-  return { isLoggedIn, loading, amigos, error };
-};
-
-export default useAuth;
+export default useAuth

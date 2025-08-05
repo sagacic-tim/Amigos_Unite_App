@@ -1,22 +1,23 @@
-// src/assets/sass/components/_authentication.scss
+  // src/assets/sass/components/_authentication.scss
 
-.auth-form {
+  .auth-form {
     &__label {
       display: block;
       font-weight: bold;
       margin-bottom: 1rem;
     }
-  
+    
     &__input {
+      background-color: hsl(240, 20%, 95%);
       border-radius: 4px;
-      border: 1px solid #ddd;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
+      border: 1px solid #ccc;
+      color: hsl(240, 30%, 55%);
+      padding: 10px;
       width: 100%;
     }
   
     &__button {
-      background: #007bff;
+      background-color: hsl(240, 75%, 45%) !important;
       border-radius: 4px;
       border: none;
       color: #fff;
@@ -28,6 +29,9 @@
       &:disabled {
         background-color: #ccc;
         cursor: not-allowed;
+      }
+      &:hover {
+        background-color: hsl(240, 95%, 60%) !important;
       }
     }
   
