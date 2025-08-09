@@ -1,8 +1,11 @@
 // src/assets/sass/layout/_grid.scss
 
 /* Grid Layout */
-@mixin grid-layout($columns: 1fr, $gap: 20px) {
+@mixin grid-layout(
+  $columns: repeat(auto-fit, minmax(380px, 1fr)),
+  $gap: 20px
+) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  grid-gap: $gap;
+  grid-template-columns: $columns;
+  gap: $gap;
 }

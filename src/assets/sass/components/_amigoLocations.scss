@@ -1,4 +1,4 @@
-@import '../layout/grid';
+@use '../layout/grid' as default-grid;
 
 .amigo-location-item {
   border: 1px solid #ccc;
@@ -18,5 +18,5 @@
 }
 
 .amigo-location-list {
-  @include grid-layout(auto 1fr, 10px);
+  @include default-grid.grid-layout();
 }

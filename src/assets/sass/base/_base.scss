@@ -1,4 +1,6 @@
 // src/assets/sass/base/_base.scss
+@use '../abstracts' as tokens;
+
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;

@@ -5,7 +5,8 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   align-content: center;
-  background-color: #1a1a1a;
+  background-color: hsl(240, 80%, 45%);
+  color: hsl(240, 35%, 80%);
   cursor: pointer;
   display: flex;
   font-family: inherit;
@@ -20,9 +21,9 @@ button {
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: hsl(240, 100%, 45%);
   color: #fff;
-  background-color: #2f2f2f;
+  background-color: hsl(240, 100%, 55%);
 }
 
 button:focus,

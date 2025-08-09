@@ -1,9 +1,8 @@
-@import '../layout/grid';
-@import '../base/common';
-@import 'buttons';
+@use '../layout/grid' as default-grid;
+@use '../abstracts' as tokens;
 
 .amigo-detail-item {
-  @extend .border-box;
+  @include tokens.border-box;
 
   &__header {
     font-size: 1.5rem;
@@ -29,5 +28,5 @@
 }
 
 .amigo-detail-list {
-  @include grid-layout(auto 1fr, 10px);
+  @include default-grid.grid-layout(); // → uses default columns and gap
 }

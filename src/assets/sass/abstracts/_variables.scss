@@ -1,0 +1,108 @@
+// Typography
+$font-family-sans: 'Inter', system-ui, sans-serif !default;
+$font-family-serif: Georgia, serif !default;
+
+$font-size-xs: 0.75rem !default;    // 12px
+$font-size-sm: 0.875rem !default;   // 14px
+$font-size-base: 1rem !default;     // 16px
+$font-size-lg: 1.125rem !default;   // 18px
+$font-size-xl: 1.25rem !default;    // 20px
+
+// Font Weights
+$font-weight-light: 300 !default;
+$font-weight-regular: 400 !default;
+$font-weight-medium: 500 !default;
+$font-weight-semibold: 600 !default;
+$font-weight-bold: 700 !default;
+$font-weight-black: 900 !default;
+
+// line and letter spacing
+$line-height-base: 1.5 !default;
+$line-height-heading: 1.2 !default;
+$letter-spacing-base: 0.02em !default;
+
+//Color Palette
+$color-background: hsl(0, 0%, 100%) !default;        // White
+$color-foreground: hsl(240, 10%, 10%) !default;      // Near-black text
+$color-surface: hsl(0, 0%, 98%) !default;            // Very light gray
+$color-muted: hsl(240, 15%, 70%) !default;           // Muted gray
+
+$color-primary: hsl(240, 100%, 56%) !default;        // Blue
+$color-primary-hover: hsl(240, 100%, 46%) !default;
+$color-secondary: hsl(30, 80%, 60%) !default;       // Pinkish-red
+$color-secondary-hover: hsl(30, 80%, 50%) !default;
+
+$color-success: hsl(150, 60%, 40%) !default;
+$color-warning: hsl(30, 100%, 50%) !default;
+$color-error: hsl(0, 80%, 60%) !default;
+$color-error: hsl(0, 100%, 50%) !default;
+$color-alert: hsl(0, 80%, 60%);
+$color-alert-hover: hsl(0, 100%, 50%);
+
+$color-border: hsl(240, 25%, 80%) !default;
+$color-divider: hsl(240, 25%, 90%) !default;
+
+// Links
+$link-color: hsl(240, 100%, 60%) !default;
+$link-color-hover: hsl(240, 100%, 50%) !default;
+$link-color-hover-light: hsl(240, 80%, 40%) !default;
+
+// Spacing Scale
+$spacing-xxs: 0.25rem !default;
+$spacing-xs: 0.5rem !default;
+$spacing-sm: 0.75rem !default;
+$spacing-md: 1rem !default;
+$spacing-lg: 1.5rem !default;
+$spacing-xl: 2rem !default;
+$spacing-xxl: 3rem !default;
+
+$spacing-unit: 1rem !default; // base unit
+
+// Border & Radius
+$radius-sm: 2px !default;
+$radius-md: 4px !default;
+$radius-lg: 8px !default;
+$radius-base: 6px !default;
+$radius-full-circle: 50% !default;
+$border-width: 1px !default;
+
+// Elevation (Shadows)
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05) !default;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1) !default;
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1) !default;
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1) !default;
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15) !default;
+
+// Z-Index Tokens
+$z-header: 100 !default;
+$z-modal: 1000 !default;
+$z-tooltip: 1100 !default;
+$z-overlay: 1200 !default;
+
+// Motion
+$transition-duration-fast: 150ms !default;
+$transition-duration: 300ms !default;
+$transition-ease: ease-in-out !default;
+$transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1) !default;
+
+// Grid & Layout
+$container-max-width: 1200px !default;
+$grid-gap: 1rem !default;
+$grid-columns: 12 !default;
+
+// Scrollbars
+$scrollbar-track: hsl(240, 25%, 95%) !default;
+$scrollbar-thumb: hsl(240, 25%, 70%) !default;
+
+// Focus & Accessibility
+$focus-ring-color: hsl(220, 100%, 70%) !default;
+$focus-ring-width: 2px !default;
+
+// Misc
+$backdrop-blur: blur(8px) !default;
+$overlay-bg: rgba(0, 0, 0, 0.4) !default;
+
+// ——— Feature toggles (compile-time conditionals) ———
+$include-scrollbar: true !default;     // emit custom scrollbar CSS
+$enable-legacy-grid: false !default;   // example: emit older grid fallback
+$emit-debug-outlines: false !default;  // example: dev-only outlines

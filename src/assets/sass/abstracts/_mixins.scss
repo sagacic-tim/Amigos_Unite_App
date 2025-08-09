@@ -6,4 +6,16 @@
   gap: $gap;
 }
 
+@mixin border-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+@mixin link-reset {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
 /* Add other mixins here */

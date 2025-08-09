@@ -1,48 +1,111 @@
-/* Reset styles to ensure consistency across browsers */
+// ----------------------------------------------------------------------------
+// Reset (Dart Sass 3.0–compliant, no @import)
+// - Exposes !default variables for easy theming
+// - Emits CSS once by default via @include at the bottom
+// - If you want to control when it runs, delete the last line and
+//   call:  @use './reset' as reset; @include reset.reset();
+// ----------------------------------------------------------------------------
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+
+// Pull tokens from abstracts
+@use '../abstracts' as tokens;
+
+// Expose a mixin so you can auto-emit or control inclusion from the caller
+@mixin reset() {
+  :root {
+    --font-family-sans: #{tokens.$font-family-sans};
+    --font-size-base: #{tokens.$font-size-base};
+    --line-height-base: #{tokens.$line-height-base};
+
+    --color-foreground: #{tokens.$color-foreground};
+    --color-background: #{tokens.$color-background};
+    --color-alert: #{tokens.$color-alert};
+    --color-alert-hover: #{tokens.$color-alert-hover};
+
+    --border-radius: #{tokens.$radius-base};
+    --scrollbar-thumb: #{tokens.$scrollbar-thumb};
+    --scrollbar-track: #{tokens.$scrollbar-track};
+  }
+
+  html {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+
+    font-kerning: normal;
+    font-size-adjust: none;
+    letter-spacing: 0.02em;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+
+    @media (prefers-reduced-motion: no-preference) {
+      interpolate-size: allow-keywords;
+    }
+  }
+
+  body {
     margin: 0;
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+
+  * { margin: 0; }
+
+  body, h1, h2, h3, h4, p,
+  figure, blockquote, dl, dd { margin-block-end: 0; }
+
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+
+  h1, h2, h3, h4, button, input, label { line-height: 1.1; }
+
+  p { text-wrap: pretty; }
+  h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
+
+  ul[role='list'], ol[role='list'] {
+    list-style: none;
     padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
+  }
+
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  input, button, textarea, select { font: inherit; }
+
+  textarea:not([rows]) { min-height: 10em; }
+
+  a:not([class]) {
+    text-decoration-skip-ink: auto;
+    color: currentColor;
+  }
+
+  :target { scroll-margin-block: 5ex; }
+
+  #root, #__next { isolation: isolate; }
+
+  @if tokens.$include-scrollbar {
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--scrollbar-track);
+    }
+  }
 }
 
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-    display: block;
-}
-body {
-    line-height: 1;
-    padding: 0 !important;
-    margin:0 !important;
-}
-ol, ul {
-    list-style: none;
-}
-blockquote, q {
-    quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-    content: '';
-    content: none;
-}
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
+// Emit once by default (optional). Remove this line if you want caller control.
+@include reset();
+

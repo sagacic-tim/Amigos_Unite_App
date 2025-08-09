@@ -1,14 +1,13 @@
 // vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import fs from 'fs';
-import os from 'os';
+import { defineConfig } from 'vite'
+import react        from '@vitejs/plugin-react'
+import path         from 'path'
+import fs           from 'fs'
+import os           from 'os'
 
-const home = os.homedir(); // '/Users/drruby'
-const keyPath  = path.join(home, 'ruby_projects', 'localhost+2-key.pem');
-const certPath = path.join(home, 'ruby_projects', 'localhost+2.pem');
-console.log({ keyPath, certPath });
+const home     = os.homedir()
+const keyPath  = path.join(home, 'ruby_projects', 'localhost+2-key.pem')
+const certPath = path.join(home, 'ruby_projects', 'localhost+2.pem')
 
 export default defineConfig({
   plugins: [react()],
@@ -18,11 +17,10 @@ export default defineConfig({
     },
   },
   css: {
+    devSourcemap: true,
     preprocessorOptions: {
-      scss: {
-        additionalData: `@import "@/assets/sass/abstracts/variables";`,
-      },
-    },
+      scss: {}
+    }
   },
   server: {
     host: 'localhost',
@@ -33,13 +31,13 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target:      'https://localhost:3001',
+        target:       'https://localhost:3001',
         changeOrigin: true,
-        secure:      false,  // allow self‑signed
+        secure:       false, // allow self-signed
       },
     },
   },
   build: {
-    sourcemap: true,
-  },
-});
+    sourcemap: true,       // CSS/JS sourcemaps in prod
+  }
+})

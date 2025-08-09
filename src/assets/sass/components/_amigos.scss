@@ -1,11 +1,9 @@
 // src/assets/sass/components/_amigos.scss
-@import '../layout/grid';
-@import '../base/common';
-@import '../components/buttons';
-@import '../components/modal';
+@use '../layout/grid' as default-grid;
+@use '../abstracts' as tokens;
 
 .amigo-item {
-  @extend .border-box;
+  @include tokens.border-box;
   position: relative;
   padding: 1rem;
   border: 1px solid #ddd;
@@ -55,5 +53,5 @@
 }
 
 .amigo-list {
-  @include grid-layout(auto 1fr, 10px); 
+  @include default-grid.grid-layout(); 
 }

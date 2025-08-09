@@ -1,0 +1,112 @@
+// Purpose: Defines runtime CSS custom properties for the entire app.
+// These are applied globally and can be consumed anywhere in the app’s styles.
+
+@use '../abstracts' as tokens;
+
+:root {
+  /* ————— Typography ————— */
+  --font-family-sans: #{tokens.$font-family-sans};
+  --font-family-serif: #{tokens.$font-family-serif};
+  --font-size-xs: #{tokens.$font-size-xs};
+  --font-size-sm: #{tokens.$font-size-sm};
+  --font-size-base: #{tokens.$font-size-base};
+  --font-size-lg: #{tokens.$font-size-lg};
+  --font-size-xl: #{tokens.$font-size-xl};
+
+  --font-weight-light: #{tokens.$font-weight-light};     // 300 → Quote blocks, secondary text in cards
+  --font-weight-regular: #{tokens.$font-weight-regular}; // 400 → Body copy, paragraph text
+  --font-weight-medium: #{tokens.$font-weight-medium};   // 500 → Menu items, form labels
+  --font-weight-semibold: #{tokens.$font-weight-semibold}; // 600 → Sidebar headings, button text
+  --font-weight-bold: #{tokens.$font-weight-bold};       // 700 → Blog post titles, page headings
+  --font-weight-black: #{tokens.$font-weight-black};     // 900 → Splash hero headings, key landing
+  
+  --line-height-base: #{tokens.$line-height-base};
+  --line-height-heading: #{tokens.$line-height-heading};
+  --letter-spacing-base: #{tokens.$letter-spacing-base};
+
+  /* ————— Color Palette ————— */
+  --color-background: #{tokens.$color-background};
+  --color-foreground: #{tokens.$color-foreground};
+  --color-surface: #{tokens.$color-surface};
+  --color-muted: #{tokens.$color-muted};
+
+  --color-primary: #{tokens.$color-primary};
+  --color-primary-hover: #{tokens.$color-primary-hover};
+  --color-secondary: #{tokens.$color-secondary};
+  --color-secondary-hover: #{tokens.$color-secondary-hover};
+
+  --color-success: #{tokens.$color-success};
+  --color-warning: #{tokens.$color-warning};
+  --color-error: #{tokens.$color-error};
+
+  /* ————— Links ————— */
+  --link-color: #{tokens.$link-color};
+  --link-color-hover: #{tokens.$link-color-hover};
+  --link-color-hover-light: #(tokens.$link-color-hover-light);
+
+  --color-border: #{tokens.$color-border};
+  --color-divider: #{tokens.$color-divider};
+
+  /* ————— Spacing Scale ————— */
+  --spacing-xxs: #{tokens.$spacing-xxs};
+  --spacing-xs: #{tokens.$spacing-xs};
+  --spacing-sm: #{tokens.$spacing-sm};
+  --spacing-md: #{tokens.$spacing-md};
+  --spacing-lg: #{tokens.$spacing-lg};
+  --spacing-xl: #{tokens.$spacing-xl};
+  --spacing-xxl: #{tokens.$spacing-xxl};
+
+  --spacing-unit: #{tokens.$spacing-unit};
+
+  /* ————— Border & Radius ————— */
+  --border-radius-sm: #{tokens.$radius-sm};
+  --border-radius-md: #{tokens.$radius-md};
+  --border-radius-lg: #{tokens.$radius-lg};
+  --border-radius-base: #{tokens.$radius-base};
+  --radius-full-circle: #{tokens.$radius-full-circle};
+  --border-width: #{tokens.$border-width};
+
+  /* ————— Elevation (Shadows) ————— */
+  --shadow-xs: #{tokens.$shadow-xs};
+  --shadow-sm: #{tokens.$shadow-sm};
+  --shadow-md: #{tokens.$shadow-md};
+  --shadow-lg: #{tokens.$shadow-lg};
+  --shadow-xl: #{tokens.$shadow-xl};
+
+  /* ————— Z-Index Tokens ————— */
+  --z-header: #{tokens.$z-header};
+  --z-modal: #{tokens.$z-modal};
+  --z-tooltip: #{tokens.$z-tooltip};
+  --z-overlay: #{tokens.$z-overlay};
+
+  /* ————— Motion ————— */
+  --transition-duration-fast: #{tokens.$transition-duration-fast};
+  --transition-duration: #{tokens.$transition-duration};
+  --transition-ease: #{tokens.$transition-ease};
+  --transition-bounce: #{tokens.$transition-bounce};
+
+  /* ————— Grid & Layout ————— */
+  --container-max-width: #{tokens.$container-max-width};
+  --grid-gap: #{tokens.$grid-gap};
+  --grid-columns: #{tokens.$grid-columns};
+
+  /* ————— Scrollbars ————— */
+  --scrollbar-track: #{tokens.$scrollbar-track};
+  --scrollbar-thumb: #{tokens.$scrollbar-thumb};
+
+  /* ————— Focus & Accessibility ————— */
+  --focus-ring-color: #{tokens.$focus-ring-color};
+  --focus-ring-width: #{tokens.$focus-ring-width};
+
+  /* ————— Misc ————— */
+  --backdrop-blur: #{tokens.$backdrop-blur};
+  --overlay-bg: #{tokens.$overlay-bg};
+}
+
+/* ————— Light Theme Override ————— */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-foreground: hsl(240, 35%, 10%);
+    --color-background: #ffffff;
+  }
+}

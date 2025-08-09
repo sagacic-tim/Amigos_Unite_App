@@ -1,22 +1,22 @@
 // src/App.scss
 
 // Abstract files
-@import "./assets/sass/abstracts/all";
+@use './assets/sass/abstracts' as *;
 
 // Base files
-@import "./assets/sass/base/all";
+@use './assets/sass/base' as base-styles;
 
 // Components
-@import "./assets/sass/components/all";
+@use './assets/sass/components' as comps;
 
 // Layout
-@import "./assets/sass/layout/all";
+@use './assets/sass/layout' as layout;
 
 // Pages
-@import "./assets/sass/pages/all";
+@use './assets/sass/pages' as pages;
 
 // Theme
-// @import "./assets/sass/theme/all";
+@use './assets/sass/theme' as theme;
 
-// Vendor Files
-// @import "./assets/sass/vendor/all";
+// Vendor
+@use './assets/sass/vendors' as vendors;

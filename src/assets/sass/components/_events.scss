@@ -1,5 +1,5 @@
 // src/assets/sass/components/_events.scss
-@import '../layout/grid';
+@use '../layout/grid' as default-grid;
 
 .event-item {
   border: 1px solid #ccc;
@@ -16,5 +16,5 @@
 }
 
 .event-list {
-  @include grid-layout(auto 1fr, 10px); // Using the grid layout mixin
+  @include default-grid.grid-layout(); // Using the grid layout mixin
 }
