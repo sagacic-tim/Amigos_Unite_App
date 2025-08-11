@@ -1,0 +1,9 @@
+@use '../abstracts' as tokens;
+
+.radius-sm  { border-radius: #{tokens.$radius-sm}; }
+.radius-md  { border-radius: #{tokens.$radius-md}; }
+.radius-lg  { border-radius: #{tokens.$radius-lg}; }
+.radius     { border-radius: #{tokens.$radius-base}; }
+.rounded    { border-radius: 9999px; }
+.border     { border: #{tokens.$border-width} solid var(--color-border, #{tokens.$color-border}); }
+

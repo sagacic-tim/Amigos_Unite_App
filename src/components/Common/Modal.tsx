@@ -1,6 +1,6 @@
 // src/components/Common/Modal.tsx
 import React from 'react';
-import '../../assets/sass/components/_modal.scss'; // Add styles for your modal
+import '../../assets/sass/components/_modals.scss'; // Add styles for your modal
 
 interface ModalProps {
   isOpen: boolean;

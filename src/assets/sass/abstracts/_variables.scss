@@ -16,29 +16,40 @@ $font-weight-semibold: 600 !default;
 $font-weight-bold: 700 !default;
 $font-weight-black: 900 !default;
 
-// line and letter spacing
+// Line & Letter Spacing
 $line-height-base: 1.5 !default;
 $line-height-heading: 1.2 !default;
 $letter-spacing-base: 0.02em !default;
 
-//Color Palette
-$color-background: hsl(0, 0%, 100%) !default;        // White
-$color-foreground: hsl(240, 10%, 10%) !default;      // Near-black text
-$color-surface: hsl(0, 0%, 98%) !default;            // Very light gray
-$color-muted: hsl(240, 15%, 70%) !default;           // Muted gray
+/* ————— Color Palette ————— */
+// Backgrounds / Surfaces
+$color-background-primary: hsl(240, 15%, 98%) !default;     // base page bg (light)
+$color-background-secondary: hsl(240, 25%, 90%) !default;   // subtle section bg
+$color-background-primary-hover: hsl(240, 0%, 100%) !default;
+$color-background-secondary-hover: hsl(240, 15%, 97%) !default;
+$color-background-disabled: hsl(240, 20%, 80%) !default;
 
-$color-primary: hsl(240, 100%, 56%) !default;        // Blue
-$color-primary-hover: hsl(240, 100%, 46%) !default;
-$color-secondary: hsl(30, 80%, 60%) !default;       // Pinkish-red
+$color-surface: hsl(0, 0%, 98%) !default;                   // cards/panels
+$color-foreground: hsl(240, 10%, 10%) !default;             // main text
+$color-muted: hsl(240, 15%, 70%) !default;                  // muted text
+
+// Brand / Accents
+$color-primary: hsl(240, 100%, 55%) !default;
+$color-primary-hover: hsl(240, 100%, 45%) !default;
+$color-secondary: hsl(30, 80%, 60%) !default;
 $color-secondary-hover: hsl(30, 80%, 50%) !default;
 
+// Status
+$color-disabled: hsl(295, 15%, 50%) !default;               // consider neutral gray if desired
 $color-success: hsl(150, 60%, 40%) !default;
-$color-warning: hsl(30, 100%, 50%) !default;
-$color-error: hsl(0, 80%, 60%) !default;
+$color-success-hover: hsl(150, 70%, 50%) !default;
+$color-warning: hsl(30, 80%, 60%) !default;
+$color-warning-hover: hsl(30, 100%, 50%) !default;
 $color-error: hsl(0, 100%, 50%) !default;
-$color-alert: hsl(0, 80%, 60%);
-$color-alert-hover: hsl(0, 100%, 50%);
+$color-alert: hsl(30, 80%, 60%) !default;
+$color-alert-hover: hsl(30, 100%, 50%) !default;
 
+// Structure
 $color-border: hsl(240, 25%, 80%) !default;
 $color-divider: hsl(240, 25%, 90%) !default;
 

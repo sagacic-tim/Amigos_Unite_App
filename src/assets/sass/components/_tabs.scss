@@ -1,0 +1,31 @@
+@use '../abstracts' as tokens;
+
+.tabs {
+  display: grid;
+  gap: var(--spacing-sm, #{tokens.$spacing-sm});
+}
+
+.tabs__list {
+  display: flex;
+  gap: .5rem;
+  border-bottom: 1px solid var(--color-divider, #{tokens.$color-divider});
+}
+
+.tabs__trigger {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: .5rem .75rem;
+  cursor: pointer;
+  color: var(--color-foreground, #{tokens.$color-foreground});
+  border-bottom: 2px solid transparent;
+  font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
+
+  &.is-active {
+    color: var(--color-primary, #{tokens.$color-primary});
+    border-color: var(--color-primary, #{tokens.$color-primary});
+  }
+}
+
+.tabs__panel { display: none; }
+.tabs__panel.is-active { display: block; }

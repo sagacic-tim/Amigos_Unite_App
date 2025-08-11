@@ -1,0 +1,37 @@
+
+@use '../abstracts' as tokens;
+
+.avatar {
+  --_size: 40px;
+
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+  border: 1px solid var(--color-divider, #{tokens.$color-divider});
+  box-shadow: var(--shadow-xs, #{tokens.$shadow-xs});
+  background: var(--color-surface, #{tokens.$color-surface});
+
+  &--sm { --_size: 28px; }
+  &--lg { --_size: 64px; }
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.avatar-stack {
+  display: inline-flex;
+  align-items: center;
+
+  .avatar {
+    margin-inline-start: -8px;
+
+    &:first-child { margin-inline-start: 0; }
+    box-shadow: 0 0 0 2px var(--color-background-primary, #{tokens.$color-background-primary});
+  }
+}

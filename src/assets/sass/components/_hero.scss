@@ -1,1 +1,27 @@
-/* Empty */
+
+@use '../abstracts' as tokens;
+
+.hero {
+  padding-block: clamp(3rem, 5vw, 6rem);
+  background: var(--color-surface, #{tokens.$color-surface});
+  color: var(--color-foreground, #{tokens.$color-foreground});
+
+  .hero__inner {
+    max-width: var(--container-max-width, #{tokens.$container-max-width});
+    margin-inline: auto;
+    padding-inline: var(--spacing-md, #{tokens.$spacing-md});
+    display: grid;
+    gap: var(--spacing-lg, #{tokens.$spacing-lg});
+    align-items: center;
+  }
+
+  .hero__title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: var(--line-height-heading, #{tokens.$line-height-heading});
+    margin: 0;
+  }
+
+  .hero__subtitle { margin: 0; color: var(--color-muted, #{tokens.$color-muted}); }
+  .hero__actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+}
+

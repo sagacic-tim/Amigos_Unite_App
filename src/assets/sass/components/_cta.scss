@@ -1,1 +1,20 @@
-/* Empty */
+@use '../abstracts' as tokens;
+
+.cta {
+  padding: var(--spacing-xl, #{tokens.$spacing-xl}) var(--spacing-lg, #{tokens.$spacing-lg});
+  border-radius: var(--border-radius-lg, #{tokens.$radius-lg});
+  background: color-mix(in oklab, #{tokens.$color-primary}, white 85%);
+  color: var(--color-foreground, #{tokens.$color-foreground});
+  text-align: center;
+  box-shadow: var(--shadow-sm, #{tokens.$shadow-sm});
+
+  .cta__title {
+    font-size: var(--font-size-xl, #{tokens.$font-size-xl});
+    line-height: var(--line-height-heading, #{tokens.$line-height-heading});
+    margin: 0 0 .5rem 0;
+  }
+
+  .cta__body { margin: 0 0 1rem 0; }
+
+  .cta__actions { display: inline-flex; gap: .75rem; }
+}

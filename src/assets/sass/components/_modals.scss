@@ -1,0 +1,112 @@
+// Components: Modals (Amigos Unite)
+// Aligns with tokens and runtime CSS variables
+// HTML hook: .modal (overlay), .modal__dialog, .modal__header/body/footer, .modal__close
+
+@use '../abstracts' as tokens;
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;                          // default hidden
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md, #{tokens.$spacing-md});
+  z-index: var(--z-modal, #{tokens.$z-modal});
+
+  // overlay color (use tokens; can be overridden in :root)
+  background: var(--overlay-bg, #{tokens.$overlay-bg});
+
+  &.is-open { display: flex; }
+}
+
+.modal__dialog {
+  inline-size: min(90vw, 640px);          // width tokenized below if you wish
+  max-block-size: 90vh;
+  background: var(--color-background, #{tokens.$color-background-primary});
+  color: var(--color-foreground, #{tokens.$color-foreground});
+  border-radius: var(--border-radius, #{tokens.$radius-base});
+  border: 1px solid var(--color-divider, #{tokens.$color-divider});
+  box-shadow: var(--shadow-lg, #{tokens.$shadow-lg});
+  overflow: hidden;                        // clip header/footer borders when sticky, etc.
+
+  // scrollable body area (optional pattern)
+  &--scrollable {
+    overflow: auto;
+
+    // Optional: gated custom scrollbars
+    @if tokens.$include-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb, #{tokens.$scrollbar-thumb})
+                       var(--scrollbar-track, #{tokens.$scrollbar-track});
+
+      &::-webkit-scrollbar { width: 8px; height: 8px; }
+      &::-webkit-scrollbar-track { background: var(--scrollbar-track, #{tokens.$scrollbar-track}); }
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb, #{tokens.$scrollbar-thumb});
+        border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
+        border: 1px solid var(--scrollbar-track, #{tokens.$scrollbar-track});
+      }
+    }
+  }
+}
+
+.modal__header,
+.modal__footer {
+  padding: var(--spacing-sm, #{tokens.$spacing-sm}) var(--spacing-md, #{tokens.$spacing-md});
+  background: var(--color-surface, #{tokens.$color-surface});
+  border-bottom: 1px solid var(--color-divider, #{tokens.$color-divider});
+}
+
+.modal__footer {
+  border-top: 1px solid var(--color-divider, #{tokens.$color-divider});
+  border-bottom: 0;
+}
+
+.modal__title {
+  margin: 0;
+  font-weight: var(--font-weight-semibold, #{tokens.$font-weight-semibold});
+}
+
+.modal__body {
+  padding: var(--spacing-md, #{tokens.$spacing-md});
+  color: var(--color-foreground, #{tokens.$color-foreground});
+  line-height: var(--line-height-base, #{tokens.$line-height-base});
+
+  // If body scrolls independently
+  &--scroll {
+    max-block-size: 560px;
+    overflow: auto;
+
+    @if tokens.$include-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb, #{tokens.$scrollbar-thumb})
+                       var(--scrollbar-track, #{tokens.$scrollbar-track});
+
+      &::-webkit-scrollbar { width: 8px; height: 8px; }
+      &::-webkit-scrollbar-track { background: var(--scrollbar-track, #{tokens.$scrollbar-track}); }
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb, #{tokens.$scrollbar-thumb});
+        border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
+        border: 1px solid var(--scrollbar-track, #{tokens.$scrollbar-track});
+      }
+    }
+  }
+}
+
+.modal__close {
+  position: absolute;
+  top: var(--spacing-sm, #{tokens.$spacing-sm});
+  right: var(--spacing-sm, #{tokens.$spacing-sm});
+  background: transparent;
+  border: 0;
+  padding: var(--spacing-xs, #{tokens.$spacing-xs});
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-foreground, #{tokens.$color-foreground});
+  border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
+
+  &:hover {
+    background: var(--colorbackground-primary-hover, #{tokens.$color-background-primary-hover});
+    color: var(--color-background, #{tokens.$color-primary-hover});
+  }
+}

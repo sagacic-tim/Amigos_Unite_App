@@ -1,0 +1,23 @@
+@use '../abstracts' as tokens;
+
+.container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--spacing-md, #{tokens.$spacing-md});
+  max-width: var(--container-max-width, #{tokens.$container-max-width});
+}
+
+.content-section {
+  padding-block: var(--spacing-xl, #{tokens.$spacing-xl});
+}
+
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--grid-gap, #{tokens.$grid-gap});
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+

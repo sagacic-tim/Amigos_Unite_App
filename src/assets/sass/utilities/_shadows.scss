@@ -1,0 +1,8 @@
+@use '../abstracts' as tokens;
+
+.shadow-xs { box-shadow: #{tokens.$shadow-xs}; }
+.shadow-sm { box-shadow: #{tokens.$shadow-sm}; }
+.shadow-md { box-shadow: #{tokens.$shadow-md}; }
+.shadow-lg { box-shadow: #{tokens.$shadow-lg}; }
+.shadow-xl { box-shadow: #{tokens.$shadow-xl}; }
+

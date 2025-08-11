@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Amigo } from '../../types/AmigoTypes';
 import Modal from '../Common/Modal';
 import AmigoDetailItem from '../AmigoDetails/AmigoDetailItem';
-import '../../assets/sass/components/_amigos.scss';
+import '../../assets/sass/pages/_amigos.scss';
 import { AmigoDetail } from '../../types/AmigoDetailTypes';
 import { AmigoLocation } from '../../types/AmigoLocationTypes';
 import { fetchAmigoDetails, fetchAmigoLocations } from '../../services/AmigoService';

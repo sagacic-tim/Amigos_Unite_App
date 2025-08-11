@@ -1,0 +1,22 @@
+
+// Navigation: Sub Navigation (Secondary/Section Nav)
+@use '../abstracts' as tokens;
+
+.sub-nav {
+  display: flex;
+  gap: var(--spacing-sm, #{tokens.$spacing-sm});
+  border-bottom: 1px solid var(--color-divider, #{tokens.$color-divider});
+  padding: var(--spacing-xs, #{tokens.$spacing-xs}) 0;
+
+  a {
+    text-decoration: none;
+    color: var(--color-link, #{tokens.$link-color});
+    font-size: var(--font-size-sm, #{tokens.$font-size-sm});
+
+    &:hover,
+    &.is-active {
+      color: var(--color-link-hover, #{tokens.$link-color-hover});
+      border-bottom: 2px solid var(--color-primary, #{tokens.$color-primary});
+    }
+  }
+}

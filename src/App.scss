@@ -1,22 +1,26 @@
 // src/App.scss
 
-// Abstract files
-@use './assets/sass/abstracts' as *;
 
-// Base files
-@use './assets/sass/base' as base-styles;
+// 1) tokens (optional override via `with (...)`)
+@use './assets/sass/abstracts' as tokens;
 
-// Components
+// 2) base (root → reset → typography → base)
+@use './assets/sass/base' as base;
+
+// 3) layout + navigation + media
+@use './assets/sass/layout' as layout;
+@use './assets/sass/navigation' as nav;
+@use './assets/sass/media' as media;
+
+// 4) components
 @use './assets/sass/components' as comps;
 
-// Layout
-@use './assets/sass/layout' as layout;
+// 5) utilities (last so they can override small things safely)
+@use './assets/sass/utilities' as util;
 
-// Pages
+// 6) pages (only what you need compiled)
 @use './assets/sass/pages' as pages;
 
-// Theme
+// 7) theme (optional, overrides variables in :root)
 @use './assets/sass/theme' as theme;
 
-// Vendor
-@use './assets/sass/vendors' as vendors;

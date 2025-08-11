@@ -1,0 +1,31 @@
+
+@use '../abstracts' as tokens;
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-background, #{tokens.$color-background-primary});
+  border: 1px solid var(--color-divider, #{tokens.$color-divider});
+  border-radius: var(--border-radius, #{tokens.$radius-base});
+  overflow: hidden;
+
+  thead th {
+    text-align: left;
+    background: var(--color-surface, #{tokens.$color-surface});
+    color: var(--color-foreground, #{tokens.$color-foreground});
+    font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
+  }
+
+  th, td {
+    padding: .6rem .8rem;
+    border-bottom: 1px solid var(--color-divider, #{tokens.$color-divider});
+  }
+
+  tbody tr:hover {
+    background: color-mix(in oklab, #{tokens.$color-surface}, white 10%);
+  }
+
+  &.-zebra tbody tr:nth-child(even) {
+    background: color-mix(in oklab, #{tokens.$color-surface}, white 6%);
+  }
+}

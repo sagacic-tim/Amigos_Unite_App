@@ -4,7 +4,7 @@ import AmigoItem from './AmigoItem';
 import { Amigo } from '../../types/AmigoTypes';
 import { fetchAmigos } from '../../services/AmigoService';
 import useAuth from '../../hooks/useAuth'; // Import the useAuth hook
-import '../../assets/sass/components/_amigos.scss';
+import '../../assets/sass/pages/_amigos.scss';
 
 const AmigoList: React.FC = () => {
   const { isLoggedIn } = useAuth(); // Use the useAuth hook to get auth status

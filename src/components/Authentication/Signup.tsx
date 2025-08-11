@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { publicPost } from '../../services/apiHelper';
 import Modal from '../Common/Modal';
-import '../../assets/sass/components/_authentication.scss';
+import '../../assets/sass/pages/_authentication.scss';
 
 interface SignupProps {
   isOpen: boolean;

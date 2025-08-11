@@ -13,41 +13,54 @@
   --font-size-lg: #{tokens.$font-size-lg};
   --font-size-xl: #{tokens.$font-size-xl};
 
-  --font-weight-light: #{tokens.$font-weight-light};     // 300 → Quote blocks, secondary text in cards
-  --font-weight-regular: #{tokens.$font-weight-regular}; // 400 → Body copy, paragraph text
-  --font-weight-medium: #{tokens.$font-weight-medium};   // 500 → Menu items, form labels
-  --font-weight-semibold: #{tokens.$font-weight-semibold}; // 600 → Sidebar headings, button text
-  --font-weight-bold: #{tokens.$font-weight-bold};       // 700 → Blog post titles, page headings
-  --font-weight-black: #{tokens.$font-weight-black};     // 900 → Splash hero headings, key landing
-  
+  --font-weight-light: #{tokens.$font-weight-light};
+  --font-weight-regular: #{tokens.$font-weight-regular};
+  --font-weight-medium: #{tokens.$font-weight-medium};
+  --font-weight-semibold: #{tokens.$font-weight-semibold};
+  --font-weight-bold: #{tokens.$font-weight-bold};
+  --font-weight-black: #{tokens.$font-weight-black};
+
   --line-height-base: #{tokens.$line-height-base};
   --line-height-heading: #{tokens.$line-height-heading};
   --letter-spacing-base: #{tokens.$letter-spacing-base};
 
-  /* ————— Color Palette ————— */
-  --color-background: #{tokens.$color-background};
-  --color-foreground: #{tokens.$color-foreground};
+  /* ————— Backgrounds / Surfaces ————— */
+  --color-background-primary: #{tokens.$color-background-primary};
+  --color-background-secondary: #{tokens.$color-background-secondary};
+  --color-background-primary-hover: #{tokens.$color-background-primary-hover};
+  --color-background-secondary-hover: #{tokens.$color-background-secondary-hover};
+  --color-background-disabled: #{tokens.$color-background-disabled};
+
   --color-surface: #{tokens.$color-surface};
+  --color-foreground: #{tokens.$color-foreground};
   --color-muted: #{tokens.$color-muted};
 
+  /* ————— Brand / Accents ————— */
   --color-primary: #{tokens.$color-primary};
   --color-primary-hover: #{tokens.$color-primary-hover};
   --color-secondary: #{tokens.$color-secondary};
   --color-secondary-hover: #{tokens.$color-secondary-hover};
 
+  /* ————— Status ————— */
+  --color-disabled: #{tokens.$color-disabled};
   --color-success: #{tokens.$color-success};
+  --color-success-hover: #{tokens.$color-success-hover};
   --color-warning: #{tokens.$color-warning};
+  --color-warning-hover: #{tokens.$color-warning-hover};
   --color-error: #{tokens.$color-error};
+  --color-alert: #{tokens.$color-alert};
+  --color-alert-hover: #{tokens.$color-alert-hover};
+
+  /* ————— Structure ————— */
+  --color-border: #{tokens.$color-border};
+  --color-divider: #{tokens.$color-divider};
 
   /* ————— Links ————— */
   --link-color: #{tokens.$link-color};
   --link-color-hover: #{tokens.$link-color-hover};
-  --link-color-hover-light: #(tokens.$link-color-hover-light);
+  --link-color-hover-light: #{tokens.$link-color-hover-light};
 
-  --color-border: #{tokens.$color-border};
-  --color-divider: #{tokens.$color-divider};
-
-  /* ————— Spacing Scale ————— */
+  /* ————— Spacing ————— */
   --spacing-xxs: #{tokens.$spacing-xxs};
   --spacing-xs: #{tokens.$spacing-xs};
   --spacing-sm: #{tokens.$spacing-sm};
@@ -55,7 +68,6 @@
   --spacing-lg: #{tokens.$spacing-lg};
   --spacing-xl: #{tokens.$spacing-xl};
   --spacing-xxl: #{tokens.$spacing-xxl};
-
   --spacing-unit: #{tokens.$spacing-unit};
 
   /* ————— Border & Radius ————— */
@@ -66,14 +78,14 @@
   --radius-full-circle: #{tokens.$radius-full-circle};
   --border-width: #{tokens.$border-width};
 
-  /* ————— Elevation (Shadows) ————— */
+  /* ————— Elevation ————— */
   --shadow-xs: #{tokens.$shadow-xs};
   --shadow-sm: #{tokens.$shadow-sm};
   --shadow-md: #{tokens.$shadow-md};
   --shadow-lg: #{tokens.$shadow-lg};
   --shadow-xl: #{tokens.$shadow-xl};
 
-  /* ————— Z-Index Tokens ————— */
+  /* ————— Z-Index ————— */
   --z-header: #{tokens.$z-header};
   --z-modal: #{tokens.$z-modal};
   --z-tooltip: #{tokens.$z-tooltip};
@@ -94,7 +106,7 @@
   --scrollbar-track: #{tokens.$scrollbar-track};
   --scrollbar-thumb: #{tokens.$scrollbar-thumb};
 
-  /* ————— Focus & Accessibility ————— */
+  /* ————— Focus & A11y ————— */
   --focus-ring-color: #{tokens.$focus-ring-color};
   --focus-ring-width: #{tokens.$focus-ring-width};
 
@@ -107,6 +119,6 @@
 @media (prefers-color-scheme: light) {
   :root {
     --color-foreground: hsl(240, 35%, 10%);
-    --color-background: #ffffff;
+    --color-background-primary: #ffffff;
   }
 }

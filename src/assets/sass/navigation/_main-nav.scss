@@ -1,0 +1,22 @@
+
+// Navigation: Main Nav (Primary Site Navigation)
+@use '../abstracts' as tokens;
+
+.main-nav {
+  display: flex;
+  gap: var(--spacing-md, #{tokens.$spacing-md});
+
+  a {
+    text-decoration: none;
+    padding: var(--spacing-xs, #{tokens.$spacing-xs}) var(--spacing-sm, #{tokens.$spacing-sm});
+    color: var(--color-link, #{tokens.$link-color});
+    font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
+    border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
+
+    &:hover,
+    &.is-active {
+      background: var(--color-primary, #{tokens.$color-primary});
+      color: var(--color-background-primnary, #{tokens.$color-background-primary});
+    }
+  }
+}

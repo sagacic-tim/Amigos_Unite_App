@@ -1,0 +1,35 @@
+
+// Navigation: Breadcrumbs
+@use '../abstracts' as tokens;
+
+.breadcrumbs {
+  font-size: var(--font-size-sm, #{tokens.$font-size-sm});
+  color: var(--color-muted, #{tokens.$color-muted});
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs, #{tokens.$spacing-xs});
+}
+
+.breadcrumbs__item {
+  display: flex;
+  align-items: center;
+
+  &::after {
+    content: '/';
+    margin-inline: var(--spacing-xs, #{tokens.$spacing-xs});
+    color: var(--color-divider, #{tokens.$color-divider});
+  }
+
+  &:last-child::after {
+    content: '';
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--link-color, #{tokens.$link-color});
+
+    &:hover {
+      color: var(--link-color-hover, #{tokens.$link-color-hover});
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AmigoDetail } from '../../types/AmigoDetailTypes';
 import { Amigo } from '../../types/AmigoTypes';
-import '../../assets/sass/components/_amigoDetails.scss';
+import '../../assets/sass/pages/_amigoDetails.scss';
 
 interface AmigoDetailItemProps {
   amigoDetail: AmigoDetail | null; // Allow amigoDetail to be null

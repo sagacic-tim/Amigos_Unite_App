@@ -1,7 +1,7 @@
 import React from 'react';
 import { AmigoLocation } from '../../types/AmigoLocationTypes';
 import { Amigo } from '../../types/AmigoTypes';
-import '../../assets/sass/components/_amigoLocations.scss';
+import '../../assets/sass/pages/_amigoLocations.scss';
 
 interface AmigoLocationItemProps {
   location: AmigoLocation | null; // Allow location to be null

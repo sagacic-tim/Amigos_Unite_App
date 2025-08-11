@@ -1,38 +1,73 @@
 // src/assets/sass/components/_buttons.scss
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  align-content: center;
-  background-color: hsl(240, 80%, 45%);
-  color: hsl(240, 35%, 80%);
-  cursor: pointer;
-  display: flex;
-  font-family: inherit;
-  font-weight: 500;
-  height: 2.50rem;
+@use '../abstracts' as tokens;
+
+.button {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  justify-self: center;
-  line-height: 1.25rem;
-  padding: 0.5rem;
-  transition: border-color 0.35s, color 0.55s, background-color 0.45s;
-  width: 200px;
-}
+  font-family: inherit;
+  font-size: var(--font-size-sm, #{tokens.$font-size-sm});
+  font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
+  line-height: 1.25;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, #{tokens.$radius-sm});
+  padding: var(--spacing-xs, #{tokens.$spacing-xs}) var(--spacing-md, #{tokens.$spacing-md});
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
-button:hover {
-  border-color: hsl(240, 100%, 45%);
-  color: #fff;
-  background-color: hsl(240, 100%, 55%);
-}
+  &--primary {
+    background-color: var(--color-background-primary, #{tokens.$color-background-primary});
+    color: var(--color-primary, #{tokens.$color-primary});
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+    &:hover {
+      background-color: var(--color-background-primary-hover, #{tokens.$color-background-primary-hover});
+    }
+    &:disabled {
+      background-color: var(--color-background-disabled, #{tokens.$color-background-disabled});
+      color: var(--color-disabled, #{tokens.$color-disabled});
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
 
-@media (prefers-color-scheme: light) {
-  button {
-    background-color: #d9d9d9;
+  &--secondary {
+    background-color: var(--color-secondary, #{tokens.$color-background-secondary});
+    color: var(--color-on-secondary, #{tokens.$color-secondary});
+
+    &:hover {
+      background-color: var(--color-secondary-hover, #{tokens.$color-secondary-hover});
+    }
+  }
+
+  &--outline {
+    background: transparent;
+    border-color: currentColor;
+    color: var(--color-primary, #{tokens.$color-primary});
+
+    &:hover {
+      background-color: var(--color-background-primary-hover, #{tokens.$color-background-primary-hover});
+    }
+  }
+
+  &--link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-link, #{tokens.$link-color});
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--color-link-hover, #{tokens.$link-color-hover});
+    }
+  }
+
+  &--sm {
+    font-size: var(--font-size-xs, #{tokens.$font-size-xs});
+    padding: var(--spacing-xxs, #{tokens.$spacing-xxs}) var(--spacing-sm, #{tokens.$spacing-sm});
+  }
+
+  &--lg {
+    font-size: var(--font-size-md, #{tokens.$font-size-lg});
+    padding: var(--spacing-sm, #{tokens.$spacing-sm}) var(--spacing-lg, #{tokens.$spacing-lg});
   }
 }

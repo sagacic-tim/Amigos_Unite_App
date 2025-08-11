@@ -1,7 +1,7 @@
 import React from 'react';
 import AmigoList from '../components/Amigos/AmigoList';
 import useAuth from '../hooks/useAuth'; // Import useAuth hook
-import '../assets/sass/layout/_form.scss';
+import '../assets/sass/layout/_forms.scss';
 
 const AmigosPage: React.FC = () => {
   const { isLoggedIn } = useAuth(); // Check auth status directly
