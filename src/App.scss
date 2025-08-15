@@ -1,26 +1,24 @@
-// src/App.scss
-
-
-// 1) tokens (optional override via `with (...)`)
+// 1) abstracts: gives Sass tokens/mixins to downstream @use
 @use './assets/sass/abstracts' as tokens;
 
-// 2) base (root → reset → typography → base)
+// 2) reset: include once, before base/theme
+@use './assets/sass/base/reset.emit';
+
+// 3) base: :root, base, typography
 @use './assets/sass/base' as base;
 
-// 3) layout + navigation + media
+// 4) layout primitives
 @use './assets/sass/layout' as layout;
+
+// 5) navigation primitives
 @use './assets/sass/navigation' as nav;
-@use './assets/sass/media' as media;
 
-// 4) components
+// 6) components & utilities
 @use './assets/sass/components' as comps;
-
-// 5) utilities (last so they can override small things safely)
 @use './assets/sass/utilities' as util;
 
-// 6) pages (only what you need compiled)
+// 7) pages (optional, or load page bundles on demand)
 @use './assets/sass/pages' as pages;
 
-// 7) theme (optional, overrides variables in :root)
+// 8) theme last (optionally override CSS variables defined in :root)
 @use './assets/sass/theme' as theme;
-

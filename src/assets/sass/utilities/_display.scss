@@ -1,6 +1,72 @@
-.block { display: block; }
-.inline { display: inline; }
-.inline-block { display: inline-block; }
-.flex { display: flex; }
-.grid { display: grid; }
-.hidden { display: none !important; }
+/* src/assets/sass/utilities/_display.scss */
+@use 'sass:map';
+@use '../abstracts' as tokens;
+
+/* -----------------------------------------
+   Core display utilities (namespaced)
+   ----------------------------------------- */
+/* Keep utilities intentionally strong so they can override components when used */
+$displays: (
+  block,
+  inline,
+  inline-block,
+  flex,
+  inline-flex,
+  grid,
+  inline-grid,
+  contents,
+  flow-root,
+  none
+);
+
+@each $d in $displays {
+  .d-#{$d} { display: #{$d} !important; }
+}
+
+/* Visibility (separate from display: none) */
+.v-visible   { visibility: visible !important; }
+.v-invisible { visibility: hidden !important; }
+
+/* Semantic hidden utility (avoid clashing with the [hidden] attribute) */
+.u-hidden { display: none !important; }
+
+/* -----------------------------------------
+   Responsive variants (sm/md/lg/xl/xxl)
+   ----------------------------------------- */
+@each $bp, $width in tokens.$breakpoints {
+  @media (min-width: #{$width}) {
+    @each $d in $displays {
+      .#{$bp}\:d-#{$d} { display: #{$d} !important; }
+    }
+    .#{$bp}\:v-invisible { visibility: hidden !important; }
+    .#{$bp}\:u-hidden    { display: none !important; }
+  }
+}
+
+/* -----------------------------------------
+   Print variants
+   ----------------------------------------- */
+@media print {
+  .print\:d-none { display: none !important; }
+  .print\:d-block { display: block !important; }
+}
+
+/* -----------------------------------------
+   Screen-reader only (a11y)
+   ----------------------------------------- */
+.u-sr-only {
+  position: absolute !important;
+  width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.u-not-sr-only {
+  position: static !important;
+  width: auto !important; height: auto !important;
+  margin: 0 !important; overflow: visible !important;
+  clip: auto !important; white-space: normal !important;
+  border: 0 !important;
+}

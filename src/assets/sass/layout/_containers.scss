@@ -1,23 +1,137 @@
-@use '../abstracts' as tokens;
+/* src/assets/sass/layout/_containers.scss */
 
+/* =========================================
+   Container
+   ========================================= */
 .container {
+  /* Component "knobs" mapped from global tokens */
+  --container-inline-padding: var(--spacing-md);
+  /* Use the global token directly (or alias to a different name if you prefer) */
+  /* --container-max: var(--container-max-width); */
+
   width: 100%;
   margin-inline: auto;
-  padding-inline: var(--spacing-md, #{tokens.$spacing-md});
-  max-width: var(--container-max-width, #{tokens.$container-max-width});
+  padding-inline: var(--container-inline-padding);
+  max-inline-size: var(--container-max-width); /* reads global token */
 }
 
+/* Size modifiers — change the knob, not the property */
+.container--sm  { --container-max-width: 640px; }
+.container--md  { --container-max-width: 768px; }
+.container--lg  { --container-max-width: 1024px; }
+.container--xl  { --container-max-width: 1200px; }
+.container--xxl { --container-max-width: 1440px; }
+
+/* =========================================
+   Sections
+   ========================================= */
 .content-section {
-  padding-block: var(--spacing-xl, #{tokens.$spacing-xl});
+  padding-block: var(--spacing-xl);
 }
 
+/* =========================================
+   Page grid wrapper
+   ========================================= */
+.page-container {
+  display: grid;
+  align-content: start;
+  gap: var(--spacing-sm);
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  justify-content: start;
+}
+
+/* =========================================
+   Stack
+   ========================================= */
+.stack {
+  --stack-gap: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap);
+}
+.stack--sm { --stack-gap: var(--spacing-sm); }
+.stack--lg { --stack-gap: var(--spacing-lg); }
+
+/* =========================================
+   Cluster
+   ========================================= */
+.cluster {
+  --cluster-gap: var(--spacing-sm);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster-gap);
+}
+.cluster--center  { justify-content: center; }
+.cluster--between { justify-content: space-between; }
+
+/* =========================================
+   Grid
+   ========================================= */
+.grid {
+  --grid-gap: var(--spacing-md);
+  display: grid;
+  gap: var(--grid-gap);
+}
+
+.grid--cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid--cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid--cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Responsive helpers (CSS variables can’t be used as MQ thresholds) */
+@media (min-width: 768px) {  /* md */
+  .md\\:grid--cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .md\\:grid--cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .md\\:grid--cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) { /* lg */
+  .lg\\:grid--cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lg\\:grid--cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lg\\:grid--cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Autofit */
+.grid--autofit {
+  --min-col-size: 280px;
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-col-size), 1fr));
+}
+
+/* =========================================
+   Sidebar
+   ========================================= */
+.sidebar {
+  --sidebar-size: 320px;
+  --sidebar-gap: var(--spacing-md);
+  display: grid;
+  gap: var(--sidebar-gap);
+  grid-template-columns: 1fr;
+}
+.sidebar__main  { order: 1; }
+.sidebar__aside { order: 2; }
+
+@media (min-width: 1024px) {
+  .sidebar {
+    grid-template-columns: minmax(0, 1fr) var(--sidebar-size);
+    align-items: start;
+  }
+}
+
+/* =========================================
+   Two-column helper
+   ========================================= */
 .two-column-layout {
+  --col-gap: var(--grid-gap);
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: var(--grid-gap, #{tokens.$grid-gap});
+  gap: var(--col-gap);
 
-  @media (max-width: 900px) {
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
 }
 
+/* Root container (if still needed) */
+.root-container {
+  margin: var(--spacing-md);
+}

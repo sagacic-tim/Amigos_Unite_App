@@ -8,13 +8,13 @@
 .slider__track {
   position: relative; inline-size: 100%; block-size: 4px;
   border-radius: 2px;
-  background: var(--color-divider, #{tokens.$color-divider});
+  background: var(--color-divider);
 }
 
 .slider__thumb {
   position: absolute; top: 50%; transform: translate(-50%, -50%);
   inline-size: 16px; block-size: 16px; border-radius: 50%;
-  background: var(--color-primary, #{tokens.$color-primary});
-  box-shadow: var(--shadow-sm, #{tokens.$shadow-sm});
+  background: var(--color-primary);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
 }

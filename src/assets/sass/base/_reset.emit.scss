@@ -1,0 +1,3 @@
+// src/assets/sass/base/_reset.emit.scss
+@use './reset' as reset;
+@include reset.reset();

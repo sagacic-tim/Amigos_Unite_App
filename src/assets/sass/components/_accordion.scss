@@ -2,25 +2,25 @@
 @use '../abstracts' as tokens;
 
 .accordion {
-  border: 1px solid var(--color-divider, #{tokens.$color-divider});
-  border-radius: var(--border-radius, #{tokens.$radius-base});
-  background: var(--color-background, #{tokens.$color-background-primary});
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius);
+  background: var(--color-background-primary);
   overflow: hidden;
 }
 
 .accordion__item + .accordion__item {
-  border-top: 1px solid var(--color-divider, #{tokens.$color-divider});
+  border-top: 1px solid var(--color-divider);
 }
 
 .accordion__header {
   display: flex; justify-content: space-between; align-items: center;
   padding: .75rem 1rem;
-  background: var(--color-surface, #{tokens.$color-surface});
+  background: var(--color-surface);
   cursor: pointer;
-  font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
+  font-weight: var(--font-weight-medium);
 }
 
-.accordion__icon { transition: transform var(--transition-duration, #{tokens.$transition-duration}) var(--transition-ease, #{tokens.$transition-ease}); }
+.accordion__icon { transition: transform var(--transition-duration) var(--transition-ease); }
 .accordion__item.is-open .accordion__icon { transform: rotate(90deg); }
 
 .accordion__panel {

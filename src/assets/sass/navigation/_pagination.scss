@@ -1,13 +1,12 @@
+/* src/assets/sass/navigation/_pagination.scss */
 
-// Navigation: Pagination Controls
-@use '../abstracts' as tokens;
-
+/* Navigation: Pagination Controls */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-xs, #{tokens.$spacing-xs});
-  margin-block: var(--spacing-lg, #{tokens.$spacing-lg});
+  gap: var(--spacing-xs);
+  margin-block: var(--spacing-lg);
 }
 
 .pagination__link {
@@ -16,20 +15,20 @@
   align-items: center;
   min-inline-size: 2rem;
   min-block-size: 2rem;
-  padding: var(--spacing-xs, #{tokens.$spacing-xs});
-  border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
   text-decoration: none;
-  color: var(--color-link, #{tokens.$link-color});
-  border: 1px solid var(--color-divider, #{tokens.$color-divider});
+  color: var(--link-color);
+  border: 1px solid var(--color-divider);
 
   &:hover {
-    background: var(--color-primary, #{tokens.$color-primary});
-    color: var(--color-background-primary, #{tokens.$color-background-primary});
+    background: var(--color-background-primary-hover);
+    color: var(--color-primary-hover);
   }
 
   &.is-active {
-    background: var(--color-background-primary, #{tokens.$color-background-primary});
-    color: var(--color-background, #{tokens.$color-primary});
-    font-weight: var(--font-weight-bold, #{tokens.$font-weight-bold});
+    background: var(--color-background-primary-active);
+    color: var(--color-primary-active);
+    font-weight: var(--font-weight-bold);
   }
 }

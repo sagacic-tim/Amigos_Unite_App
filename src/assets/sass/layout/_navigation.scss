@@ -1,20 +1,19 @@
+/* src/assets/sass/layout/_navigation.scss */
+
 .nav-layout {
   display: grid;
-  grid-gap: 0.75rem;
-  grid-area: 1/1/span 1/span 5;
-  grid-template-columns: repeat(2, auto 1fr);
+  gap: var(--grid-gap);
+  /* Place within parent via grid-area only if this element sits in a parent grid */
+  /* grid-area: 1 / 1 / span 1 / span 5;  // keep only if required by parent layout */
+
+  /* Two columns: breadcrumbs (auto) and nav (1fr) */
+  grid-template-columns: auto 1fr;
   grid-template-rows: 1fr;
-  justify-items: self-end;
-  margin: 1.0rem;
+  grid-template-areas: "crumbs nav";
+  align-items: center;
+  margin: var(--spacing-md);
 }
 
-.bread-crumbs {
-  display: flex;
-  grid-gap: 0.75rem;
-  font-size: 1.15rem;
-  grid-area: 1 / 1 / span 1 / span 1;
-}
-
-.bread-crumbs a {
-  font-weight: 600;
-}
+/* Map children into the grid areas (no visual styling here) */
+.breadcrumbs { grid-area: crumbs; }
+.main-nav    { grid-area: nav; justify-self: end; }

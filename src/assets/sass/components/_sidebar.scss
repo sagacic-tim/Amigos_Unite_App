@@ -1,0 +1,136 @@
+/* src/assets/sass/components/_sidebar.scss */
+
+/* Base component knobs (override per instance if needed) */
+.sidebar {
+  --sidebar-width: 320px;
+  --sidebar-bg: var(--color-surface);
+  --sidebar-fg: var(--color-foreground);
+  --sidebar-border-color: var(--color-divider);
+  --sidebar-padding: var(--spacing-md);
+  --sidebar-gap: var(--spacing-sm);
+
+  color: var(--sidebar-fg);
+  background: var(--sidebar-bg);
+  inline-size: var(--sidebar-width);
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border-inline-end: 1px solid var(--sidebar-border-color);
+  overflow: hidden; /* clip rounded corners if you add them */
+}
+
+/* Sections */
+.sidebar__header,
+.sidebar__footer { padding: var(--sidebar-padding); }
+
+.sidebar__body {
+  padding: var(--sidebar-padding);
+  overflow: auto;
+  display: grid;
+  gap: var(--sidebar-gap);
+}
+
+/* Optional: sticky variant (pairs with your --header-offset from layout) */
+.sidebar--sticky {
+  position: sticky;
+  inset-block-start: var(--header-offset, 0);
+  align-self: start;
+  block-size: calc(100dvh - var(--header-offset, 0));
+}
+
+/* Optional: compact “rail” variant (icon rail) */
+.sidebar--rail {
+  --sidebar-width: 72px;
+  --sidebar-padding: var(--spacing-sm);
+}
+
+/* Elevation (when floating over content) */
+.sidebar--elevated { box-shadow: var(--shadow-sm); }
+
+/* -----------------------------------------
+   Sidebar nav (scoped to the component)
+   ----------------------------------------- */
+
+.sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--spacing-xxs);
+}
+
+.sidebar-nav__item { /* hook for per-item states if needed */ }
+
+.sidebar-nav__link {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min-content 1fr;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: .5rem .75rem;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-foreground);
+  text-decoration: none;
+}
+
+.sidebar-nav__link:hover {
+  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 8%);
+}
+
+.sidebar-nav__link.is-active {
+  color: var(--color-primary);
+  background: color-mix(in oklab, var(--color-background-primary), var(--color-primary) 12%);
+}
+
+/* Optional: icon slot sizing */
+.sidebar-nav__icon {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+
+/* -----------------------------------------
+   Off-canvas behavior (mobile)
+   ----------------------------------------- */
+
+/* Hidden off-screen by default, slides in when .is-open is present. */
+.sidebar--offcanvas {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  transform: translateX(-100%);
+  transition: transform var(--transition-duration) var(--transition-ease);
+  z-index: var(--z-overlay);
+  block-size: 100dvh;
+}
+
+/* Open state (toggled by a button with aria-controls) */
+.sidebar--offcanvas.is-open { transform: translateX(0); }
+
+/* Backdrop pairs with off-canvas; place adjacent to sidebar in DOM */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  backdrop-filter: var(--backdrop-blur);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-duration) var(--transition-ease);
+  z-index: calc(var(--z-overlay) - 1);
+}
+
+/* Show backdrop when the sidebar is open */
+.sidebar--offcanvas.is-open + .sidebar-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Desktop: keep sidebar visible and sticky; hide the backdrop */
+@media (min-width: 1024px) {
+  .sidebar--offcanvas {
+    position: sticky;
+    inset-block-start: var(--header-offset, 0);
+    transform: none;
+    block-size: calc(100dvh - var(--header-offset, 0));
+  }
+  .sidebar-backdrop { display: none; }
+}

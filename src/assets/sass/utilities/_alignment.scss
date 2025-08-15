@@ -1,0 +1,106 @@
+
+/* src/assets/sass/utilities/_alignment.scss */
+
+/* ---------------------------------------
+   Text alignment (logical, RTL-friendly)
+   --------------------------------------- */
+.text-start   { text-align: start; }
+.text-center  { text-align: center; }
+.text-end     { text-align: end; }
+.text-justify { text-align: justify; }
+
+/* Responsive text alignment */
+@media (min-width: 768px)  { /* md */
+  .md\:text-start  { text-align: start; }
+  .md\:text-center { text-align: center; }
+  .md\:text-end    { text-align: end; }
+}
+@media (min-width: 1024px) { /* lg */
+  .lg\:text-start  { text-align: start; }
+  .lg\:text-center { text-align: center; }
+  .lg\:text-end    { text-align: end; }
+}
+
+/* ---------------------------------------
+   Inline-level vertical alignment
+   (applies to inline/inline-block/table-cell)
+   --------------------------------------- */
+.align-baseline    { vertical-align: baseline; }
+.align-middle      { vertical-align: middle; }
+.align-top         { vertical-align: top; }
+.align-bottom      { vertical-align: bottom; }
+.align-text-top    { vertical-align: text-top; }
+.align-text-bottom { vertical-align: text-bottom; }
+
+/* ---------------------------------------
+   Flex/Grid container alignment
+   (use on elements that are already display:flex|grid)
+   --------------------------------------- */
+
+/* Cross-axis alignment of items (align-items) */
+.items-start   { align-items: start; }
+.items-center  { align-items: center; }
+.items-end     { align-items: end; }
+.items-stretch { align-items: stretch; }
+
+/* Main-axis distribution (justify-content) */
+.justify-start   { justify-content: start; }
+.justify-center  { justify-content: center; }
+.justify-end     { justify-content: end; }
+.justify-between { justify-content: space-between; }
+.justify-around  { justify-content: space-around; }
+.justify-evenly  { justify-content: space-evenly; }
+
+/* Multi-line alignment (align-content) — flex-wrap or grid with multiple rows */
+.content-start   { align-content: start; }
+.content-center  { align-content: center; }
+.content-end     { align-content: end; }
+.content-between { align-content: space-between; }
+.content-around  { align-content: space-around; }
+.content-evenly  { align-content: space-evenly; }
+.content-stretch { align-content: stretch; }
+
+/* ---------------------------------------
+   Item-level self-alignment
+   (use on flex/grid children)
+   --------------------------------------- */
+.self-auto    { align-self: auto; }
+.self-start   { align-self: start; }
+.self-center  { align-self: center; }
+.self-end     { align-self: end; }
+.self-stretch { align-self: stretch; }
+
+/* Grid-only self-alignment on the inline axis (justify-self) */
+.justify-self-auto    { justify-self: auto; }
+.justify-self-start   { justify-self: start; }
+.justify-self-center  { justify-self: center; }
+.justify-self-end     { justify-self: end; }
+.justify-self-stretch { justify-self: stretch; }
+
+/* Shorthands for grid (both axes) */
+.place-items-start   { place-items: start; }
+.place-items-center  { place-items: center; }
+.place-items-end     { place-items: end; }
+.place-items-stretch { place-items: stretch; }
+
+.place-content-start   { place-content: start; }
+.place-content-center  { place-content: center; }
+.place-content-end     { place-content: end; }
+.place-content-between { place-content: space-between; }
+.place-content-around  { place-content: space-around; }
+.place-content-evenly  { place-content: space-evenly; }
+.place-content-stretch { place-content: stretch; }
+
+.place-self-auto    { place-self: auto; }
+.place-self-start   { place-self: start; }
+.place-self-center  { place-self: center; }
+.place-self-end     { place-self: end; }
+.place-self-stretch { place-self: stretch; }
+
+/* ---------------------------------------
+   Notes:
+   - These utilities do not set display; combine with .flex/.grid, etc.
+   - Use text-* for inline content; items-justify-* on containers;
+     self-justify-self-* on individual items (children).
+   - Prefer logical values (start/end) for RTL compatibility.
+   --------------------------------------- */

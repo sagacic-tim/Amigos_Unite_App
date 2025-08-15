@@ -1,0 +1,113 @@
+
+/* src/assets/sass/components/_lists.scss */
+
+/* Reusable List component:
+   Works with <ul class="list">, <ol class="list">, or <div class="list">.
+   Component-scoped knobs map to global tokens but remain overrideable per instance. */
+
+.list {
+  /* Component knobs (semantic) */
+  --list-gap: var(--spacing-sm);
+  --list-radius: var(--border-radius-base);
+  --list-divider-color: var(--color-divider);
+  --list-item-padding-block: var(--spacing-sm);
+  --list-item-padding-inline: 0;
+  --list-bg: transparent;
+
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Nesting-friendly reset */
+.list ul,
+.list ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base row */
+.list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--list-gap);
+  padding-block: var(--list-item-padding-block);
+  padding-inline: var(--list-item-padding-inline);
+  border-radius: var(--list-radius);
+  background: var(--list-bg);
+  min-inline-size: 0; /* better truncation behavior */
+}
+
+/* Typical content slots */
+.list__thumb   { flex: 0 0 auto; inline-size: var(--thumb-size, 3rem); block-size: var(--thumb-size, 3rem); border-radius: var(--border-radius-md); overflow: hidden; }
+.list__content { min-inline-size: 0; }
+.list__title   { margin: 0; font-weight: var(--font-weight-semibold); }
+.list__meta    { margin: 0; font-size: var(--font-size-sm); color: var(--color-muted); }
+
+/* ——— Variants (component-level) ——— */
+
+/* Dividers between items */
+.list--divided .list__item + .list__item {
+  border-top: 1px solid var(--list-divider-color);
+  border-radius: 0;
+}
+
+/* Zebra striping (subtle) */
+.list--zebra .list__item:nth-child(even) {
+  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 4%);
+}
+
+/* Interactive rows (for clickable items) */
+.list--interactive .list__item {
+  cursor: pointer;
+  transition:
+    background var(--transition-duration) var(--transition-ease),
+    box-shadow var(--transition-duration) var(--transition-ease);
+}
+.list--interactive .list__item:hover {
+  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 8%);
+}
+.list--interactive .list__item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* Density controls */
+.list--dense   { --list-item-padding-block: var(--spacing-xs); --list-gap: var(--spacing-xs); }
+.list--relaxed { --list-item-padding-block: var(--spacing-md); --list-gap: var(--spacing-md); }
+
+/* Media layout (thumb + content alignment) */
+.list--media .list__item { align-items: center; }
+.list--media .list__thumb { border-radius: var(--border-radius-md); }
+
+/* Selectable rows (checkbox/radio) */
+.list--selectable .list__item { align-items: center; gap: var(--spacing-sm); }
+.list--selectable input[type="checkbox"],
+.list--selectable input[type="radio"] { margin: 0; }
+
+/* Tile/grid variant (card-like items within the same component) */
+.list--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--tile-min, 260px), 1fr));
+  gap: var(--grid-gap);
+}
+.list--grid .list__item {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+}
+.list--grid .list__item:hover { box-shadow: var(--shadow-sm); }
+
+/* Empty state block */
+.list__empty {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-muted);
+  border: 1px dashed var(--color-divider);
+  border-radius: var(--border-radius-base);
+  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 6%);
+}

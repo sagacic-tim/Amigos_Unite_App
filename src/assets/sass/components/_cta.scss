@@ -1,16 +1,16 @@
 @use '../abstracts' as tokens;
 
 .cta {
-  padding: var(--spacing-xl, #{tokens.$spacing-xl}) var(--spacing-lg, #{tokens.$spacing-lg});
-  border-radius: var(--border-radius-lg, #{tokens.$radius-lg});
-  background: color-mix(in oklab, #{tokens.$color-primary}, white 85%);
-  color: var(--color-foreground, #{tokens.$color-foreground});
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+  background: color-mix(in oklab, #{var(--base-color), var(--neutral-neutral-light-gray) 95%});
+  color: var(--color-foreground);
   text-align: center;
-  box-shadow: var(--shadow-sm, #{tokens.$shadow-sm});
+  box-shadow: var(--shadow-sm);
 
   .cta__title {
-    font-size: var(--font-size-xl, #{tokens.$font-size-xl});
-    line-height: var(--line-height-heading, #{tokens.$line-height-heading});
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-heading);
     margin: 0 0 .5rem 0;
   }
 

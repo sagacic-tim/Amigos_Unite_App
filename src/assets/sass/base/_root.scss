@@ -1,6 +1,7 @@
 // Purpose: Defines runtime CSS custom properties for the entire app.
 // These are applied globally and can be consumed anywhere in the app’s styles.
 
+@use 'sass:map';
 @use '../abstracts' as tokens;
 
 :root {
@@ -13,6 +14,19 @@
   --font-size-lg: #{tokens.$font-size-lg};
   --font-size-xl: #{tokens.$font-size-xl};
 
+  // Emit heading variabless from the nested Sass map
+  @each $tag, $conf in tokens.$heading-scale {
+    $size: map.get($conf, size);
+    $weight: map.get($conf, weight);
+    $tracking: if(map.has-key($conf, tracking), map.get($conf, tracking), tokens.$letter-spacing-base);
+    $lh: if(map.has-key($conf, lh), map.get($conf, lh), tokens.$line-height-heading);
+
+    --font-size-#{$tag}: #{$size};
+    --font-weight-#{$tag}: #{$weight};
+    --letter-spacing-#{$tag}: #{$tracking};
+    --line-height-#{$tag}: #{$lh}; // unitless → proportional to font-size
+  }
+
   --font-weight-light: #{tokens.$font-weight-light};
   --font-weight-regular: #{tokens.$font-weight-regular};
   --font-weight-medium: #{tokens.$font-weight-medium};
@@ -24,42 +38,111 @@
   --line-height-heading: #{tokens.$line-height-heading};
   --letter-spacing-base: #{tokens.$letter-spacing-base};
 
-  /* ————— Backgrounds / Surfaces ————— */
-  --color-background-primary: #{tokens.$color-background-primary};
-  --color-background-secondary: #{tokens.$color-background-secondary};
-  --color-background-primary-hover: #{tokens.$color-background-primary-hover};
-  --color-background-secondary-hover: #{tokens.$color-background-secondary-hover};
-  --color-background-disabled: #{tokens.$color-background-disabled};
+}
 
-  --color-surface: #{tokens.$color-surface};
-  --color-foreground: #{tokens.$color-foreground};
-  --color-muted: #{tokens.$color-muted};
+:root {
 
-  /* ————— Brand / Accents ————— */
-  --color-primary: #{tokens.$color-primary};
-  --color-primary-hover: #{tokens.$color-primary-hover};
-  --color-secondary: #{tokens.$color-secondary};
-  --color-secondary-hover: #{tokens.$color-secondary-hover};
+  // SASS generated complimentary colors plus triad and tetrad harmnonies
 
-  /* ————— Status ————— */
-  --color-disabled: #{tokens.$color-disabled};
-  --color-success: #{tokens.$color-success};
-  --color-success-hover: #{tokens.$color-success-hover};
-  --color-warning: #{tokens.$color-warning};
-  --color-warning-hover: #{tokens.$color-warning-hover};
-  --color-error: #{tokens.$color-error};
-  --color-alert: #{tokens.$color-alert};
-  --color-alert-hover: #{tokens.$color-alert-hover};
+  --base-color: #{tokens.$base-color};
 
-  /* ————— Structure ————— */
-  --color-border: #{tokens.$color-border};
-  --color-divider: #{tokens.$color-divider};
+  // Emit rotated variants as CSS variables
+  @each $name, $value in tokens.$base-color-variants {
+    --base-color-#{$name}: #{$value};
+  }
 
-  /* ————— Links ————— */
-  --link-color: #{tokens.$link-color};
-  --link-color-hover: #{tokens.$link-color-hover};
-  --link-color-hover-light: #{tokens.$link-color-hover-light};
+}
 
+:root {
+
+  /* neutrals */
+  @each $name, $val in tokens.$hsla-neutrals {
+    --#{$name}: #{$val};
+  }
+
+  /* background/surfaces */
+  @each $name, $val in tokens.$hsla-background-surfaces {
+    --#{$name}: #{$val};
+  }
+
+  /* brand/accents */
+  @each $name, $val in tokens.$hsla-brand-accents {
+    --#{$name}: #{$val};
+  }
+
+  /* status */
+  @each $name, $val in tokens.$hsla-status {
+    --#{$name}: #{$val};
+  }
+
+  /* structure */
+  @each $name, $val in tokens.$hsla-structure {
+    --#{$name}: #{$val};
+  }
+
+  /* links */
+  @each $name, $val in tokens.$hsla-links {
+    --#{$name}: #{$val};
+  }
+
+  /* scrollbars */
+  @each $name, $val in tokens.$hsla-scrollbars {
+    --#{$name}: #{$val};
+  }
+
+  /* focus & a11y */
+  @each $name, $val in tokens.$hsla-focus-accessibility {
+    --#{$name}: #{$val};
+  }
+}
+
+/* 2) Modern overrides: OKLCH (and oklch-in-gradients) */
+@supports (color: oklch(50% 0 0)) {
+  :root {
+    /* neutrals */
+    @each $name, $val in tokens.$oklch-neutrals {
+      --#{$name}: #{$val};
+    }
+
+    /* background/surfaces */
+    @each $name, $val in tokens.$oklch-background-surfaces {
+      --#{$name}: #{$val};
+    }
+
+    /* brand/accents */
+    @each $name, $val in tokens.$oklch-brand-accents {
+      --#{$name}: #{$val};
+    }
+
+    /* status */
+    @each $name, $val in tokens.$oklch-status {
+      --#{$name}: #{$val};
+    }
+
+    /* structure */
+    @each $name, $val in tokens.$oklch-structure {
+      --#{$name}: #{$val};
+    }
+
+    /* links */
+    @each $name, $val in tokens.$oklch-links {
+      --#{$name}: #{$val};
+    }
+
+    /* scrollbars */
+    @each $name, $val in tokens.$oklch-scrollbars {
+      --#{$name}: #{$val};
+    }
+
+    /* focus & a11y */
+    @each $name, $val in tokens.$oklch-focus-accessibility {
+      --#{$name}: #{$val};
+    }
+  }
+}
+
+
+:root {
   /* ————— Spacing ————— */
   --spacing-xxs: #{tokens.$spacing-xxs};
   --spacing-xs: #{tokens.$spacing-xs};
@@ -102,12 +185,7 @@
   --grid-gap: #{tokens.$grid-gap};
   --grid-columns: #{tokens.$grid-columns};
 
-  /* ————— Scrollbars ————— */
-  --scrollbar-track: #{tokens.$scrollbar-track};
-  --scrollbar-thumb: #{tokens.$scrollbar-thumb};
-
   /* ————— Focus & A11y ————— */
-  --focus-ring-color: #{tokens.$focus-ring-color};
   --focus-ring-width: #{tokens.$focus-ring-width};
 
   /* ————— Misc ————— */

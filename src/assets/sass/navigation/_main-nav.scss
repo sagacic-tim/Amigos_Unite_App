@@ -1,22 +1,21 @@
+/* src/assets/sass/navigation/_main-nav.scss */
 
-// Navigation: Main Nav (Primary Site Navigation)
-@use '../abstracts' as tokens;
-
+/* Navigation: Main Nav (Primary Site Navigation) */
 .main-nav {
   display: flex;
-  gap: var(--spacing-md, #{tokens.$spacing-md});
+  gap: var(--spacing-md);
 
   a {
     text-decoration: none;
-    padding: var(--spacing-xs, #{tokens.$spacing-xs}) var(--spacing-sm, #{tokens.$spacing-sm});
-    color: var(--color-link, #{tokens.$link-color});
-    font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
-    border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
+    padding: var(--spacing-xs) var(--spacing-sm);
+    color: var(--link-color);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--border-radius-sm);
 
     &:hover,
     &.is-active {
-      background: var(--color-primary, #{tokens.$color-primary});
-      color: var(--color-background-primnary, #{tokens.$color-background-primary});
+      background: var(--color-background-primary-hover);
+      color: var(--color-primary-hover);
     }
   }
 }

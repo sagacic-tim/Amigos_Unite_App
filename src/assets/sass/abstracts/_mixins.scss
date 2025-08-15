@@ -12,10 +12,35 @@
   margin: 10px 0;
 }
 
-@mixin link-reset {
+/* Resets link defaults safely */
+@mixin link-reset() {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
 
-/* Add other mixins here */
+/* Applies your link color system via CSS variables */
+@mixin link-colors() {
+  color: var(--link-color);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+
+  &:hover {
+    color: var(--link-color-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: 2px;
+    text-decoration: none;
+  }
+}
+
+/* Optional: tweak hover color for light scheme */
+@mixin link-light-hover() {
+  @media (prefers-color-scheme: light) {
+    &:hover {
+      color: var(--link-color-hover-light);
+    }
+  }
+}

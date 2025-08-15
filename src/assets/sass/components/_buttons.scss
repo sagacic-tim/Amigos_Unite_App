@@ -6,46 +6,46 @@
   align-items: center;
   justify-content: center;
   font-family: inherit;
-  font-size: var(--font-size-sm, #{tokens.$font-size-sm});
-  font-weight: var(--font-weight-medium, #{tokens.$font-weight-medium});
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   line-height: 1.25;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm, #{tokens.$radius-sm});
-  padding: var(--spacing-xs, #{tokens.$spacing-xs}) var(--spacing-md, #{tokens.$spacing-md});
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-md);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
   &--primary {
-    background-color: var(--color-background-primary, #{tokens.$color-background-primary});
-    color: var(--color-primary, #{tokens.$color-primary});
+    background-color: var(--color-background-primary);
+    color: var(--color-primary);
 
     &:hover {
-      background-color: var(--color-background-primary-hover, #{tokens.$color-background-primary-hover});
+      background-color: var(--color-background-primary-hover);
     }
     &:disabled {
-      background-color: var(--color-background-disabled, #{tokens.$color-background-disabled});
-      color: var(--color-disabled, #{tokens.$color-disabled});
+      background-color: var(--color-background-disabled);
+      color: var(--color-disabled,);
       cursor: not-allowed;
       opacity: 0.6;
     }
   }
 
   &--secondary {
-    background-color: var(--color-secondary, #{tokens.$color-background-secondary});
-    color: var(--color-on-secondary, #{tokens.$color-secondary});
+    background-color: var(--color-background-secondary);
+    color: var(--color-secondary);
 
     &:hover {
-      background-color: var(--color-secondary-hover, #{tokens.$color-secondary-hover});
+      background-color: var(--color-secondary-hover);
     }
   }
 
   &--outline {
     background: transparent;
     border-color: currentColor;
-    color: var(--color-primary, #{tokens.$color-primary});
+    color: var(--color-primary);
 
     &:hover {
-      background-color: var(--color-background-primary-hover, #{tokens.$color-background-primary-hover});
+      background-color: var(--color-background-primary-hover);
     }
   }
 
@@ -53,21 +53,21 @@
     background: none;
     border: none;
     padding: 0;
-    color: var(--color-link, #{tokens.$link-color});
+    color: var(--link-color);
     text-decoration: underline;
 
     &:hover {
-      color: var(--color-link-hover, #{tokens.$link-color-hover});
+      color: var(--link-color-hover);
     }
   }
 
   &--sm {
-    font-size: var(--font-size-xs, #{tokens.$font-size-xs});
-    padding: var(--spacing-xxs, #{tokens.$spacing-xxs}) var(--spacing-sm, #{tokens.$spacing-sm});
+    font-size: var(--font-size-xs,);
+    padding: var(--spacing-xxs,) var(--spacing-sm);
   }
 
   &--lg {
-    font-size: var(--font-size-md, #{tokens.$font-size-lg});
-    padding: var(--spacing-sm, #{tokens.$spacing-sm}) var(--spacing-lg, #{tokens.$spacing-lg});
+    font-size: var(--font-size-md);
+    padding: var(--spacing-sm) var(--spacing-lg);
   }
 }

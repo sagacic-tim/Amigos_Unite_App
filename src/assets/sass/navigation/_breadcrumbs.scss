@@ -1,13 +1,11 @@
-
-// Navigation: Breadcrumbs
-@use '../abstracts' as tokens;
+/* src/assets/sass/navigation/_breadcrumbs.scss */
 
 .breadcrumbs {
-  font-size: var(--font-size-sm, #{tokens.$font-size-sm});
-  color: var(--color-muted, #{tokens.$color-muted});
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs, #{tokens.$spacing-xs});
+  gap: var(--spacing-xs);
 }
 
 .breadcrumbs__item {
@@ -16,8 +14,8 @@
 
   &::after {
     content: '/';
-    margin-inline: var(--spacing-xs, #{tokens.$spacing-xs});
-    color: var(--color-divider, #{tokens.$color-divider});
+    margin-inline: var(--spacing-xs);
+    color: var(--color-divider);
   }
 
   &:last-child::after {
@@ -26,10 +24,10 @@
 
   a {
     text-decoration: none;
-    color: var(--link-color, #{tokens.$link-color});
+    color: var(--link-color);
 
     &:hover {
-      color: var(--link-color-hover, #{tokens.$link-color-hover});
+      color: var(--link-color-hover);
     }
   }
 }

@@ -3,15 +3,16 @@
 .badge {
   display: inline-block;
   padding: 0.25em 0.5em;
-  border-radius: var(--border-radius-sm, #{tokens.$radius-sm});
-  font-size: var(--font-size-sm, #{tokens.$font-size-sm});
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
   line-height: 1;
-  border: 1px solid var(--color-divider, #{tokens.$color-divider});
-  color: var(--color-foreground, #{tokens.$color-foreground});
-  background: var(--color-surface, #{tokens.$color-surface});
+  border: 1px solid var(--color-divider);
+  color: var(--color-foreground);
+  background: var(--color-surface);
 }
 
-.badge.-success { border-color: var(--color-success, #{tokens.$color-success}); }
-.badge.-warning { border-color: var(--color-warning, #{tokens.$color-warning}); }
-.badge.-error   { border-color: var(--color-error, #{tokens.$color-error}); }
-.badge.-info    { border-color: var(--color-primary, #{tokens.$color-primary}); }
+.badge.-success { border-color: var(--color-success); }
+.badge.-warning { border-color: var(--color-warning); }
+.badge.-error   { border-color: var(--color-error); }
+.badge.-info    { border-color: var(--color-primary); }
+.badge.-alert    { border-color: var(--color-alert); }

@@ -5,15 +5,15 @@
   @include tokens.border-box;
 
   &__header {
-    font-size: 1.5rem;
+    font-size: var('--font-size-base:');
     margin-bottom: 1rem;
-    color: #333;
+    color: var('color-header');
   }
 
   &__field {
     margin-bottom: 0.5rem;
     font-size: 1rem;
-    color: #555;
+    color: var('color-primary');
   }
 
   &__locations {
@@ -22,7 +22,7 @@
     &-header {
       font-size: 1.25rem;
       margin-bottom: 0.75rem;
-      color: #333;
+      color: 'color-header';
     }
   }
 }

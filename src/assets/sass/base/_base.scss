@@ -1,36 +1,26 @@
 // src/assets/sass/base/_base.scss
-@use '../abstracts' as tokens;
+// Purpose: Apply project tokens to the now-normalized DOM.
 
-:root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
-}
-
-.root-container {
-  margin: 1rem;
+html {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
 }
 
 body {
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-foreground);
+  background-color: var(--color-background-primary);
   min-height: 100vh;
   min-width: 320px;
-  padding: 1.0rem !important;
-  place-items: center;
+  margin: 0;
+  padding: var(--spacing-md);
 }
 
-.page-container {
-  align-content: space-around;
-  display: grid;
-  grid-gap: 0.75rem;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  justify-content: start;
-}
-
+/* Theme-aware adjustments */
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+  body {
+    color: var(--color-foreground);
+    background-color: var(--color-background-primary);
   }
 }
-  

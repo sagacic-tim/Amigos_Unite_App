@@ -4,15 +4,15 @@
 .carousel {
   position: relative;
   overflow: hidden;
-  border-radius: var(--border-radius, #{tokens.$radius-base});
-  box-shadow: var(--shadow-md, #{tokens.$shadow-md});
-  background: var(--color-surface, #{tokens.$color-surface});
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface);
 
   &__track {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 100%;
-    transition: transform var(--transition-duration, #{tokens.$transition-duration}) var(--transition-ease, #{tokens.$transition-ease});
+    transition: transform var(--transition-duration) var(--transition-ease);
     will-change: transform;
   }
 
@@ -24,11 +24,11 @@
     .carousel__btn {
       pointer-events: all;
       position: absolute; top: 50%; transform: translateY(-50%);
-      background: color-mix(in oklab, #{tokens.$color-background-primary}, rgba(0,0,0,.2));
-      border: 1px solid var(--color-divider, #{tokens.$color-divider});
-      border-radius: var(--border-radius, #{tokens.$radius-base});
+      background: var(--color-background-lightbox);
+      border: 1px solid var(--color-divider);
+      border-radius: var(--border-radius-base);
       padding: .4rem .6rem;
-      box-shadow: var(--shadow-sm, #{tokens.$shadow-sm});
+      box-shadow: var(--shadow-sm);
       cursor: pointer;
     }
     .is-prev { left: .5rem; }
@@ -41,9 +41,9 @@
 
     button {
       inline-size: .5rem; block-size: .5rem; border-radius: 50%;
-      border: 1px solid var(--color-divider, #{tokens.$color-divider});
-      background: var(--color-surface, #{tokens.$color-surface});
-      &.is-active { background: var(--color-primary, #{tokens.$color-primary}); }
+      border: 1px solid var(--color-divider);
+      background-image: var(--color-button-gradient-background);
+      &.is-active { background-image: var(--color-button-gradient-background-active); }
     }
   }
 }

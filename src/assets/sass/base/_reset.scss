@@ -1,42 +1,23 @@
 // ----------------------------------------------------------------------------
-// Reset (Dart Sass 3.0–compliant, no @import)
-// - Exposes !default variables for easy theming
-// - Emits CSS once by default via @include at the bottom
-// - If you want to control when it runs, delete the last line and
-//   call:  @use './reset' as reset; @include reset.reset();
+// Reset (Dart Sass 3.x compliant, no @import)
+// - Pure normalization: no project colors/fonts applied here
+// - Uses CSS variables only when needed (e.g., optional scrollbar)
+// - Emit via mixin so caller controls inclusion order
 // ----------------------------------------------------------------------------
 
-
-// Pull tokens from abstracts
 @use '../abstracts' as tokens;
 
-// Expose a mixin so you can auto-emit or control inclusion from the caller
 @mixin reset() {
-  :root {
-    --font-family-sans: #{tokens.$font-family-sans};
-    --font-size-base: #{tokens.$font-size-base};
-    --line-height-base: #{tokens.$line-height-base};
+  /* 1) Box sizing & margin reset */
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; }
 
-    --color-foreground: #{tokens.$color-foreground};
-    --color-background: #{tokens.$color-background-primary};
-    --color-alert: #{tokens.$color-alert};
-    --color-alert-hover: #{tokens.$color-alert-hover};
-
-    --border-radius: #{tokens.$radius-base};
-    --scrollbar-thumb: #{tokens.$scrollbar-thumb};
-    --scrollbar-track: #{tokens.$scrollbar-track};
-  }
-
+  /* 2) HTML defaults (agent normalization only) */
   html {
-    font-family: var(--font-family-sans);
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-base);
-    color: var(--color-foreground);
-    background-color: var(--color-background);
-
+    /* Do not set brand fonts/colors here */
     font-kerning: normal;
     font-size-adjust: none;
-    letter-spacing: 0.02em;
+    letter-spacing: 0; /* leave neutral in reset */
     overflow-wrap: break-word;
     word-break: break-word;
 
@@ -49,63 +30,55 @@
     }
   }
 
+  /* 3) Body baseline (agent normalization only) */
   body {
     margin: 0;
     min-height: 100vh;
-    line-height: 1.5;
+    line-height: 1.5; /* neutral, not your design token */
     -webkit-font-smoothing: antialiased;
   }
 
-  *,
-  *::before,
-  *::after { box-sizing: border-box; }
-
-  * { margin: 0; }
-
-  body, h1, h2, h3, h4, p,
-  figure, blockquote, dl, dd { margin-block-end: 0; }
-
+  /* 4) Common element rescues */
+  body, h1, h2, h3, h4, p, figure, blockquote, dl, dd { margin-block-end: 0; }
   p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
-
   h1, h2, h3, h4, button, input, label { line-height: 1.1; }
 
-  p { text-wrap: pretty; }
-  h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
+  /* Lists */
+  ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
 
-  ul[role='list'], ol[role='list'] {
-    list-style: none;
-    padding: 0;
-  }
-
+  /* Media */
   img, picture, video, canvas, svg {
     display: block;
     max-width: 100%;
+    height: auto;
   }
 
-  input, button, textarea, select { font: inherit; }
-
+  /* Forms */
+  input, button, textarea, select { font: inherit; color: inherit; }
   textarea:not([rows]) { min-height: 10em; }
 
+  /* Links without class */
   a:not([class]) {
     text-decoration-skip-ink: auto;
     color: currentColor;
   }
 
+  /* Anchored scroll margin */
   :target { scroll-margin-block: 5ex; }
 
+  /* Root stacking isolation (SPA frameworks) */
   #root, #__next { isolation: isolate; }
 
+  /* 5) Optional: custom scrollbars (uses CSS vars, not Sass tokens) */
   @if tokens.$include-scrollbar {
     ::-webkit-scrollbar { width: 10px; height: 10px; }
     ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
     ::-webkit-scrollbar-thumb {
       background-color: var(--scrollbar-thumb);
-      border-radius: var(--border-radius);
+      border-radius: var(--border-radius, 4px);
       border: 1px solid var(--scrollbar-track);
     }
+    /* Firefox */
+    * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
   }
 }
-
-// Emit once by default (optional). Remove this line if you want caller control.
-@include reset();
-

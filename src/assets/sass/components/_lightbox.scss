@@ -2,21 +2,21 @@
 @use '../abstracts' as tokens;
 
 .lightbox {
-  position: fixed; inset: 0; z-index: var(--z-overlay, #{tokens.$z-overlay});
-  background: color-mix(in oklab, black, transparent 60%);
+  position: fixed; inset: 0; z-index: var(--z-overlay);
+  background: var(--color-background-lightbox);
   display: none;
   align-items: center; justify-content: center;
-  padding: var(--spacing-md, #{tokens.$spacing-md});
+  padding: var(--spacing-md);
 
   &.is-open { display: flex; }
 
   &__content {
     max-inline-size: min(90vw, 1000px);
     max-block-size: 90vh;
-    background: var(--color-background, #{tokens.$color-background-primary});
-    border-radius: var(--border-radius, #{tokens.$radius-base});
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: var(--shadow-lg, #{tokens.$shadow-lg});
+    box-shadow: var(--shadow-lg);
   }
 
   &__close {
