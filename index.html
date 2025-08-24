@@ -5,6 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Amigos Unite</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+
+    <!-- Default (first visit, JS decides quickly; noscript fallback below) -->
+  <link id="theme-loader" rel="stylesheet" href="/themes/public/loaders/blue-light.loader.css">
+
+  <!-- Early inline loader to avoid flash and keep as last stylesheet -->
+
+
+<script>
+(function () {
+  function ensureLink() {
+    var el = document.getElementById('theme-loader');
+    if (!el) {
+      el = document.createElement('link');
+      el.id = 'theme-loader';
+      el.rel = 'stylesheet';
+      document.head.appendChild(el);
+    }
+    return el;
+  }
+  function supportsOKLCH() {
+    return typeof CSS !== 'undefined'
+      && CSS.supports
+      && CSS.supports('color', 'oklch(50% 0.2 264)');
+  }
+  function computeHref() {
+    var area = location.pathname.startsWith('/admin') ? 'admin' : 'public';
+    var raw = localStorage.getItem('theme:' + area);
+    var stored = raw ? JSON.parse(raw) : null;
+    var prefersDark = matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+    var mode    = (stored && stored.mode)    || (prefersDark ? 'dark' : 'light');
+    var palette = area === 'public' ? ((stored && stored.palette) || 'blue') : 'admin';
+    var prefix  = supportsOKLCH() ? 'oklch' : 'hsla';
+
+    if (area === 'admin') {
+      // adjust this pattern if your admin filenames differ
+      return '/themes/admin/css-palettes/' + prefix + '-admin-palette-' + mode + '.css';
+    }
+    return '/themes/public/css-palettes/' + prefix + '-' + palette + '-palette-' + mode + '.css';
+  }
+  function ensureLast(link) {
+    if (document.head.lastElementChild !== link) document.head.appendChild(link);
+  }
+  try {
+    var link = ensureLink();
+    var href = computeHref();
+    if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+
+    // keep as last stylesheet so it wins the cascade
+    ensureLast(link);
+    document.addEventListener('DOMContentLoaded', function () { ensureLast(link); });
+    window.addEventListener('load', function () { ensureLast(link); });
+  } catch (e) {}
+})();
+</script>
+
+  <noscript>
+    <!-- No JS: OKLCH/HSL is chosen inside the loader -->
+    <link rel="stylesheet" href="/themes/public/loaders/blue-light.loader.css">
+  </noscript>
+
 </head>
 <body>
   <div id="root"></div>

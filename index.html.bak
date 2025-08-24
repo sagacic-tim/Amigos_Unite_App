@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amigos Unite</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+
+    <!-- Default (first visit, JS decides quickly; noscript fallback below) -->
+  <link id="theme-loader" rel="stylesheet" href="/themes/public/loaders/blue-light.loader.css">
+  <noscript>
+    <!-- No JS: OKLCH/HSL is chosen inside the loader -->
+    <link rel="stylesheet" href="/themes/public/loaders/blue-light.loader.css">
+  </noscript>
+
+  <script>
+  (function () {
+    // --- helpers ---
+    function readCookie(name) {
+      const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g,'\\$1') + '=([^;]*)'));
+      return m ? decodeURIComponent(m[1]) : null;
+    }
+    function computeLoaderPath(area, palette, mode) {
+      if (area === 'admin') {
+        // Admin has only light/dark loaders that choose OKLCH/HSL internally
+        return `/themes/admin/loaders/${mode === 'dark' ? 'dark' : 'light'}-theme.loader.css`;
+      } else {
+        // Public has per-palette loaders
+        // e.g. /themes/public/loaders/earth-tones-dark.loader.css
+        return `/themes/public/loaders/${palette}-${mode}.loader.css`;
+      }
+    }
+    function swapLoader(href) {
+      const oldLink = document.getElementById('theme-loader');
+      if (oldLink && oldLink.href.endsWith(href)) return; // already correct
+
+      const link = document.createElement('link');
+      link.id = 'theme-loader';
+      link.rel = 'stylesheet';
+      link.href = href;
+
+      // Hot-swap without flash: insert new, wait loaded, then remove old
+      link.onload = () => { if (oldLink && oldLink !== link) oldLink.remove(); };
+      document.head.insertBefore(link, oldLink || document.head.firstChild);
+      if (!oldLink) return;
+    }
+
+    // --- state from cookie or defaults ---
+    // cookie format: ui:theme=AREA:PALETTE:MODE
+    const raw = readCookie('ui:theme') || '';
+    const parts = raw.split(':');
+    const area   = parts[0] || 'public';
+    const palette= parts[1] || 'blue';   // for public
+    const mode   = parts[2] || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    const href = computeLoaderPath(area, palette, mode);
+    swapLoader(href);
+
+    // Optional: expose on window for later changes without reloading
+    window.__setTheme = function setTheme(next) {
+      const nextArea    = next.area    || area;
+      const nextPalette = next.palette || palette;
+      const nextMode    = next.mode    || mode;
+      const nextHref    = computeLoaderPath(nextArea, nextPalette, nextMode);
+
+      // Persist one year; secure/lax cookie
+      document.cookie = `ui:theme=${encodeURIComponent(`${nextArea}:${nextPalette}:${nextMode}`)}; Max-Age=31536000; Path=/; SameSite=Lax${location.protocol==='https:'?'; Secure':''}`;
+      swapLoader(nextHref);
+    };
+  })();
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx" defer></script>
+</body>
+</html>

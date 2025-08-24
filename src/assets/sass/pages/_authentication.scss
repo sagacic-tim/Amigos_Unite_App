@@ -17,26 +17,34 @@
     }
   
     &__button {
-      background-color: hsl(240, 75%, 45%) !important;
+      background: var(--primary-button-background);
       border-radius: 4px;
       border: none;
-      color: #fff;
+      color: var(--primary-button-text);
       cursor: pointer;
       margin: 0;
       padding: 10px;
+      transition: all 0.5s;
       width: 150px;
   
       &:disabled {
-        background-color: #ccc;
+        background-color: var(--priary-button-background-disabled);
+        color: var(--primary-button-text-disabled);
         cursor: not-allowed;
       }
       &:hover {
-        background-color: hsl(240, 95%, 60%) !important;
+        background: var(--primary-button-background-hover);
+        color: var(--primary-button-text-hover);
       }
+      &:active {
+      background: var(--primary-button-background-active);
+      color: var(--rimary-button-text-active);
+      }
+
     }
   
     &__error-message {
-      color: red;
+      color: var(--color-alert);
       margin-top: 1rem;
     }
   }

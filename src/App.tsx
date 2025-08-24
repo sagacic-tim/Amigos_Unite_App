@@ -7,6 +7,7 @@ import Signup from './components/Authentication/Signup';
 import HomePage from './pages/HomePage';
 import AmigosPage from './pages/AmigosPage';
 import './App.scss';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -24,16 +25,22 @@ const App: React.FC = () => {
   const handleSignupSuccess = () => setSignupModalOpen(false);
 
   const location = useLocation();
+  const inAdmin = location.pathname.startsWith('/admin');
 
   return (
     <>
       {/* Header + primary nav */}
-      <header className="header" id="top">
-        <div className="header__inner">
-          <h2><Link className="header__logo" to="/" aria-label="Amigos Unite – Home">
-            Amigos Unite
-          </Link></h2>
+      <header className="site-header site-header--sticky" id="top">
+        <div className="site-header__inner">
+          {/* 1) Logo */}
+          <Link className="site-header__logo" to="/" aria-label="Amigos Unite – Home">
+            <img className="site-header__logo-img" src="src/assets/images/home_page/amigos-unite-logo-128.png" />
+          </Link>
 
+          {/* 2) Site Title */}
+          <div className="site-title">Amigos Unite</div>
+
+          {/* 3) Primary Nav */}
           <nav className="main-nav" aria-label="Main">
             <NavLink to="/" end className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
               Home
@@ -41,9 +48,15 @@ const App: React.FC = () => {
             <NavLink to="/amigos" className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
               Amigos
             </NavLink>
+            {/* add more links as needed */}
           </nav>
 
-          {/* Auth actions (use your button system if present) */}
+          {/* 4) Theme switcher (no reload; persists via cookie/localStorage) */}
+          <div className="theme-tools">
+            <ThemeSwitcher area={inAdmin ? 'admin' : 'public'} />
+          </div>
+
+          {/* 5) Auth actions */}
           <div className="cluster">
             <button className="auth-form__button" onClick={() => setLoginModalOpen(true)}>Login</button>
             <button className="auth-form__button" onClick={() => setSignupModalOpen(true)}>Signup</button>
@@ -51,8 +64,8 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main id="main-content">
-        {/* Optional breadcrumbs (static demo; you can replace with a small helper) */}
+      <main id="main-content" className="site-main">
+        {/* Breadcrumbs */}
         <nav className="container content-section" aria-label="Breadcrumbs">
           <ol className="breadcrumbs">
             <li className="breadcrumbs__item"><Link to="/">Home</Link></li>
@@ -62,7 +75,7 @@ const App: React.FC = () => {
           </ol>
         </nav>
 
-        {/* Page content container */}
+        {/* Page content */}
         <div className="container content-section">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -125,7 +138,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Toast stack (optional; ready for use) */}
+      {/* Toast stack (optional) */}
       <div className="toast-container toast-container--top-right" role="region" aria-label="Notifications" />
     </>
   );

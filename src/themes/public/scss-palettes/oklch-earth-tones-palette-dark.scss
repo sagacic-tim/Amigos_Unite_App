@@ -1,0 +1,99 @@
+
+/* src/themes/public/scss-palettes/oklch-earth-tones-palette-dark.scss
+   - Public DARK palette (OKLCH)
+   - Earth/beige scheme with dark backgrounds + light warm text
+*/
+@use 'abstracts' as tokens; /* adjust path if needed */
+
+:root {
+  /* Base hues + neutrals (OKLCH) */
+  @each $k, $v in tokens.$oklch-site-palette { --#{$k}: #{$v}; }
+  @each $k, $v in tokens.$oklch-neutrals     { --#{$k}: #{$v}; }
+
+  /* Local helpers (tune these to shift the whole palette) */
+  --_earth-hue:    color-mix(in oklch, var(--base-orange) 60%, var(--base-red-orange) 40%);   /* warm brown core */
+  --_earth-accent: color-mix(in oklch, var(--base-yellow-orange) 45%, var(--base-orange) 55%); /* amber accent */
+  --_ink-light:    color-mix(in oklch, var(--neutral-white) 92%, var(--_earth-hue) 8%);        /* light warm text */
+
+  /* ───────────── Backgrounds / Surfaces (dark, warm) ───────────── */
+  /* Aim ~12–18% “lightness” equivalent with slight brown cast */
+  --color-background-primary:     color-mix(in oklch, var(--neutral-black) 88%, var(--_earth-hue) 12%);
+  --color-background-secondary:   color-mix(in oklch, var(--neutral-black) 82%, var(--_earth-hue) 18%);
+
+  --color-background-primary-hover:    color-mix(in oklch, var(--neutral-black) 84%, var(--_earth-hue) 16%);
+  --color-background-secondary-hover:  color-mix(in oklch, var(--neutral-black) 78%, var(--_earth-hue) 22%);
+  --color-background-primary-active:   color-mix(in oklch, var(--neutral-black) 90%, var(--_earth-hue) 10%);
+  --color-background-secondary-active: color-mix(in oklch, var(--neutral-black) 86%, var(--_earth-hue) 14%);
+
+  --color-background-disabled: color-mix(in oklch, var(--neutral-dark-gray) 90%, var(--_earth-hue) 10%);
+  --color-background-lightbox: color-mix(in oklch, var(--neutral-black) 88%, var(--_earth-hue) 12%);
+  --overlay-opacity: 0.75;
+
+  /* Surfaces & text */
+  --color-surface:    color-mix(in oklch, var(--neutral-black) 84%, var(--_earth-hue) 16%); /* cards/panels */
+  --color-foreground: var(--_ink-light);                                                    /* main text */
+  --color-muted:      color-mix(in oklch, var(--neutral-med-dark-gray) 80%, var(--_earth-hue) 20%);
+
+  /* ───────────── Buttons (Primary) ───────────── */
+  --primary-button-background:          color-mix(in oklch, var(--_earth-hue) 70%, var(--neutral-black) 30%);
+  --primary-button-background-hover:    color-mix(in oklch, var(--_earth-hue) 78%, var(--neutral-black) 22%);
+  --primary-button-background-active:   color-mix(in oklch, var(--_earth-hue) 62%, var(--neutral-black) 38%);
+  --primary-button-background-disabled: color-mix(in oklch, var(--neutral-dark-gray) 75%, var(--_earth-hue) 25%);
+
+  /* Button text */
+  --primary-button-text:            color-mix(in oklch, var(--neutral-white) 96%, var(--_earth-hue) 4%);
+  --primary-button-text-hover:      var(--neutral-white);
+  --primary-button-text-active:     color-mix(in oklch, var(--neutral-white) 92%, var(--_earth-hue) 8%);
+  --primary-button-text-disabled:   color-mix(in oklch, var(--neutral-med-light-gray) 92%, var(--_earth-hue) 8%);
+
+  /* ───────────── Buttons (Secondary) ───────────── */
+  /* Subtle pill on dark bg */
+  --secondary-button-background:          color-mix(in oklch, var(--_earth-hue) 15%, var(--neutral-dark-gray) 85%);
+  --secondary-button-background-hover:    color-mix(in oklch, var(--_earth-hue) 22%, var(--neutral-dark-gray) 78%);
+  --secondary-button-background-active:   color-mix(in oklch, var(--_earth-hue) 12%, var(--neutral-black) 88%);
+  --secondary-button-background-disabled: color-mix(in oklch, var(--_earth-hue) 6%,  var(--neutral-dark-gray) 94%);
+
+  --secondary-button-text:          color-mix(in oklch, var(--neutral-white) 90%, var(--_earth-hue) 10%);
+  --secondary-button-text-hover:    var(--neutral-white);
+  --secondary-button-text-active:   color-mix(in oklch, var(--neutral-white) 88%, var(--_earth-hue) 12%);
+  --secondary-button-text-disabled: color-mix(in oklch, var(--neutral-med-light-gray) 92%, var(--_earth-hue) 8%);
+
+  /* ───────────── Brand / Accents (earthy) ───────────── */
+  --color-primary:        color-mix(in oklch, var(--_earth-hue) 88%, black 12%); /* headlines, key icons */
+  --color-primary-hover:  color-mix(in oklch, var(--_earth-hue) 95%, black 5%);
+  --color-primary-active: color-mix(in oklch, var(--_earth-hue) 80%, black 20%);
+
+  --color-secondary:        color-mix(in oklch, var(--_earth-accent) 75%, white 25%);
+  --color-secondary-hover:  color-mix(in oklch, var(--_earth-accent) 85%, white 15%);
+  --color-secondary-active: color-mix(in oklch, var(--_earth-accent) 65%, white 35%);
+
+  --color-header:        var(--color-primary);
+  --color-header-hover:  var(--color-primary-hover);
+  --color-header-active: var(--color-primary-active);
+
+  /* ───────────── Status ───────────── */
+  --color-disabled:       color-mix(in oklch, var(--neutral-dark-gray) 70%, var(--_earth-hue) 30%);
+  --color-success:        color-mix(in oklch, var(--base-malachite-green) 80%, black 20%);
+  --color-success-hover:  color-mix(in oklch, var(--base-malachite-green) 90%, black 10%);
+  --color-warning:        color-mix(in oklch, var(--base-orange) 85%, black 15%);
+  --color-warning-hover:  color-mix(in oklch, var(--base-yellow-orange) 90%, black 10%);
+  --color-error:          color-mix(in oklch, var(--base-red) 90%, black 10%);
+  --color-alert:          color-mix(in oklch, var(--base-red-orange) 75%, white 25%);
+  --color-alert-hover:    color-mix(in oklch, var(--base-orange) 85%, white 15%);
+
+  /* ───────────── Structure ───────────── */
+  --color-border:   color-mix(in oklch, var(--neutral-dark-gray) 70%, var(--_earth-hue) 30%);
+  --color-divider:  color-mix(in oklch, var(--neutral-dark-gray) 60%, var(--_earth-hue) 40%);
+
+  /* ───────────── Links (warm on dark) ───────────── */
+  --link-color:             color-mix(in oklch, var(--_earth-accent) 75%, white 25%);
+  --link-color-hover:       color-mix(in oklch, var(--_earth-accent) 90%, white 10%);
+  --link-color-hover-light: color-mix(in oklch, var(--_earth-accent) 60%, white 40%);
+
+  /* ───────────── Scrollbars ───────────── */
+  --scrollbar-track: color-mix(in oklch, var(--neutral-black) 92%, var(--_earth-hue) 8%);
+  --scrollbar-thumb: color-mix(in oklch, var(--neutral-dark-gray) 65%, var(--_earth-hue) 35%);
+
+  /* ───────────── Focus & A11y ───────────── */
+  --focus-ring-color: color-mix(in oklch, var(--_earth-accent) 75%, white 25%);
+}

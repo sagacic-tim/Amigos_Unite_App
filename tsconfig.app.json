@@ -3,8 +3,8 @@
   "compilerOptions": {
     "composite": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
-    // "types": ["vite/client"] // inherited
+    "experimentalDecorators": true,
+    "sourceMap": true
   },
   "include": ["src"]
 }

@@ -1,52 +1,32 @@
+// src/assets/sass/components/_modals.scss
 // Components: Modals (Amigos Unite)
-// Aligns with tokens and runtime CSS variables
-// HTML hook: .modal (overlay), .modal__dialog, .modal__header/body/footer, .modal__close
-
-@use '../abstracts' as tokens;
 
 .modal {
   position: fixed;
   inset: 0;
-  display: none;                          // default hidden
+  display: none; /* hidden by default; shown via .is-open */
   align-items: center;
   justify-content: center;
   padding: var(--spacing-md);
   z-index: var(--z-modal);
-
-  // overlay color (use tokens; can be overridden in :root)
   background: var(--overlay-bg);
 
   &.is-open { display: flex; }
 }
 
 .modal__dialog {
-  inline-size: min(90vw, 640px);          // width tokenized below if you wish
+  inline-size: min(90vw, 640px);
   max-block-size: 90vh;
   background: var(--color-background-primary);
   color: var(--color-foreground);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-divider,);
+  border-radius: var(--border-radius-base); /* was --border-radius (nonexistent) */
+  border: 1px solid var(--color-divider);   /* removed stray comma */
   box-shadow: var(--shadow-lg);
-  overflow: hidden;                        // clip header/footer borders when sticky, etc.
+  overflow: hidden;
 
-  // scrollable body area (optional pattern)
   &--scrollable {
     overflow: auto;
-
-    // Optional: gated custom scrollbars
-    @if tokens.$include-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: var(--scrollbar-thumb)
-                       var(--scrollbar-track);
-
-      &::-webkit-scrollbar { width: 8px; height: 8px; }
-      &::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-      &::-webkit-scrollbar-thumb {
-        background-color: var(--scrollbar-thumb);
-        border-radius: var(--border-radius-sm);
-        border: 1px solid var(--scrollbar-track);
-      }
-    }
+    /* optional custom scrollbar rules if desired */
   }
 }
 
@@ -71,26 +51,6 @@
   padding: var(--spacing-md);
   color: var(--color-foreground);
   line-height: var(--line-height-base);
-
-  // If body scrolls independently
-  &--scroll {
-    max-block-size: 560px;
-    overflow: auto;
-
-    @if tokens.$include-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: var(--scrollbar-thumb)
-                       var(--scrollbar-track);
-
-      &::-webkit-scrollbar { width: 8px; height: 8px; }
-      &::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-      &::-webkit-scrollbar-thumb {
-        background-color: var(--scrollbar-thumb);
-        border-radius: var(--border-radius-sm);
-        border: 1px solid var(--scrollbar-track);
-      }
-    }
-  }
 }
 
 .modal__close {
@@ -106,7 +66,7 @@
   border-radius: var(--border-radius-sm);
 
   &:hover {
-    background: var(--colorbackground-primary-hover);
-    color: var(--color-background-primary);
+    background: var(--color-background-primary-hover); /* fixed var name */
+    color: var(--color-primary);
   }
 }

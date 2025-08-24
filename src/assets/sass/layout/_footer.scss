@@ -95,7 +95,7 @@
 
 /* Bottom bar: legal/meta row */
 .site-footer__bottom {
-  margin-top: var(--spacing-lg);
+  margin: var(--spacing-lg) var(--spacing-md) 0;
   padding-top: var(--spacing-sm);
   border-top: 1px solid var(--footer-border-color);
 

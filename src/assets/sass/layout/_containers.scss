@@ -5,14 +5,13 @@
    ========================================= */
 .container {
   /* Component "knobs" mapped from global tokens */
-  --container-inline-padding: var(--spacing-md);
+  --container-inline-padding: 0;
   /* Use the global token directly (or alias to a different name if you prefer) */
   /* --container-max: var(--container-max-width); */
 
   width: 100%;
-  margin-inline: auto;
-  padding-inline: var(--container-inline-padding);
-  max-inline-size: var(--container-max-width); /* reads global token */
+  margin-inline: 0;
+  padding-inline: 0;
 }
 
 /* Size modifiers — change the knob, not the property */
@@ -26,7 +25,8 @@
    Sections
    ========================================= */
 .content-section {
-  padding-block: var(--spacing-xl);
+  margin: 0 auto;
+  padding-block: 0;
 }
 
 /* =========================================
@@ -39,6 +39,14 @@
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: auto;
   justify-content: start;
+}
+
+.site-main {
+  padding: var(--spacing-md) 0;
+}
+
+.section-content {
+  margin: 0 2rem;
 }
 
 /* =========================================

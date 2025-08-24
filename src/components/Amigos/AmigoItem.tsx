@@ -102,8 +102,8 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
             );
           })}
         </ul>
-        <button onClick={handleOpenDetailModal}>View Details</button>
-        <button onClick={handleOpenLocationModal}>View Address(es)</button>
+        <button className="button--secondary" onClick={handleOpenDetailModal}>View Details</button>
+        <button className="button--secondary" onClick={handleOpenLocationModal}>View Address(es)</button>
       </div>
 
       <Modal isOpen={isDetailModalOpen} onClose={handleCloseModal}>

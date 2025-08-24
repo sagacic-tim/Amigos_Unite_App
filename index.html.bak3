@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amigos Unite</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+
+    <!-- Default (first visit, JS decides quickly; noscript fallback below) -->
+  <link id="theme-loader" rel="stylesheet" href="/themes/public/loaders/blue-light.loader.css">
+
+
+  <!-- Early inline loader to avoid flash (localStorage-based) -->
+
+  <!-- Early inline loader to avoid flash and keep as last stylesheet -->
+  <script>
+  (function () {
+    function ensureLink() {
+      var el = document.getElementById('theme-loader');
+      if (!el) {
+        el = document.createElement('link');
+        el.id = 'theme-loader';
+        el.rel = 'stylesheet';
+        document.head.appendChild(el);
+      }
+      return el;
+    }
+    function computeHref() {
+      var area = location.pathname.startsWith('/admin') ? 'admin' : 'public';
+      var raw = localStorage.getItem('theme:' + area);
+      var stored = raw ? JSON.parse(raw) : null;
+      var prefersDark = matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      var mode = (stored && stored.mode) || (prefersDark ? 'dark' : 'light');
+      var palette = area === 'public' ? ((stored && stored.palette) || 'blue') : 'admin';
+      return area === 'admin'
+        ? '/themes/admin/loaders/' + (mode === 'dark' ? 'dark' : 'light') + '-theme.loader.css'
+        : '/themes/public/loaders/' + palette + '-' + mode + '.loader.css';
+    }
+    function ensureLast(link) {
+      // If any other CSS gets injected later (Vite), move loader to end so it wins
+      if (document.head.lastElementChild !== link) {
+        document.head.appendChild(link); // re-append moves it to the end
+      }
+    }
+
+    try {
+      var link = ensureLink();
+      var href = computeHref();
+      if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+
+      // data-* hooks (optional)
+      var area = href.indexOf('/themes/admin/') === 0 ? 'admin' : 'public';
+      var mode = /-(dark|light)\.loader\.css$/.exec(href)?.[1] || 'light';
+      var palette = area === 'public' ? href.split('/loaders/')[1].split('-')[0] : 'admin';
+      var root = document.documentElement;
+      root.setAttribute('data-theme-area', area);
+      root.setAttribute('data-theme-mode', mode);
+      if (area === 'public') root.setAttribute('data-theme-palette', palette);
+      else root.removeAttribute('data-theme-palette');
+
+      // Make sure loader ends up LAST (wins cascade) after Vite injects CSS
+      ensureLast(link);
+      document.addEventListener('DOMContentLoaded', function () {
+        ensureLast(link);
+        setTimeout(function () { ensureLast(link); }, 0);
+      });
+      window.addEventListener('load', function () { ensureLast(link); });
+    } catch (e) {}
+  })();
+  </script>
+
+  <noscript>
+    <!-- No JS: OKLCH/HSL is chosen inside the loader -->
+    <link rel="stylesheet" href="/themes/public/loaders/blue-light.loader.css">
+  </noscript>
+
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx" defer></script>
+</body>
+</html>

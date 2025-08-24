@@ -12,9 +12,9 @@ body {
   color: var(--color-foreground);
   background-color: var(--color-background-primary);
   min-height: 100vh;
-  min-width: 320px;
+  min-width: 480px;
   margin: 0;
-  padding: var(--spacing-md);
+  padding: 0;
 }
 
 /* Theme-aware adjustments */

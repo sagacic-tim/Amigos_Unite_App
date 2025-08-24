@@ -12,7 +12,7 @@
   --shell-gap: var(--spacing-md);
 
   /* Page gutter; base/_base.scss already sets body padding, this augments for safe areas */
-  --page-gutter-inline: var(--spacing-md);
+  --page-gutter-inline: 0;
 }
 
 /* ---------------------------------------

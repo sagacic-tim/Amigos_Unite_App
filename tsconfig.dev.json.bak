@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/dev/tsconfig.tsbuildinfo",
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

@@ -1,6 +1,7 @@
 // src/assets/sass/abstracts/_variables.scss
 @use 'sass:color';
 @use 'sass:map';
+@use 'sass:list';
 
 // Typography
 $font-family-sans: 'Inter', system-ui, sans-serif !default;
@@ -65,210 +66,72 @@ $line-height-base: 1.5 !default;
 $line-height-heading: 1.2 !default;
 $letter-spacing-base: 0.02em !default;
 
-// Generate a hue-rotation set from a single base color.
+// Manually set a hue-rotation set from 30 and 45 degree rotations.
 
-// Keep this for compile-time hue rotation:
-$base-color: hsl(240, 100%, 50%) !default;
+$oklch-site-palette: (
+  base-red:                 oklch(0.628 0.258 29),
+  base-red-orange:          oklch(0.656 0.233 35),
+  base-orange:              oklch(0.732 0.186 53),
+  base-yellow-orange:       oklch(0.84 0.172 84),
+  base-yellow:              oklch(0.968 0.211 110),
+  base-chartreuse:          oklch(0.891 0.264 136),
+  base-shamrock-green:      oklch(0.866 0.295 142),
+  base-neon-green:          oklch(0.868 0.278 144),
+  base-malachite-green:     oklch(0.875 0.234 151),
+  base-turquoise-blue:      oklch(0.905 0.155 195),
+  base-sapphire-blue:       oklch(0.615 0.211 256),
+  base-cobalt-blue:         oklch(0.501 0.28 264),
+  base-blue:                oklch(0.452 0.313 264),
+  base-true-purple:         oklch(0.53 0.293 294),
+  base-magenta:             oklch(0.702 0.322 328),
+  base-fuchsia:             oklch(0.668 0.286 344),
+  base-ruby:                oklch(0.645 0.26 2)
+) !default;
 
-// Add this for runtime use and mixing:
-$base-color-oklch: oklch(45.20% 0.3132 264.1) !default;
+$hsla-site-palette: (
+  base-red:                 hsl(0, 100%, 50%),
+  base-red-orange:          hsl(15, 100%, 50%),
+  base-orange:              hsl(30, 100%, 50%),
+  base-yellow-orange:       hsl(45, 100%, 50%),
+  base-yellow:              hsl(60, 100%, 50%),
+  base-chartreuse:          hsl(90, 100%, 50%),
+  base-shamrock-green:      hsl(120, 100%, 50%),
+  base-neon-green:          hsl(135, 100%, 50%),
+  base-malachite-green:     hsl(150, 100%, 50%),
+  base-turquoise-blue:      hsl(180, 100%, 50%),
+  base-sapphire-blue:       hsl(210, 100%, 50%),
+  base-cobalt-blue:         hsl(225, 100%, 50%),
+  base-blue:                hsl(240, 100%, 50%),
+  base-true-purple:         hsl(270, 100%, 50%),
+  base-magenta:             hsl(300, 100%, 50%),
+  base-fuchsia:             hsl(315, 100%, 50%),
+  base-ruby:                hsl(330, 100%, 50%)
 
-
-$base-color-angles: (30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 315, 330) !default;
-
-// Map of name → color, e.g., ("plus-120deg": <color>)
-$base-color-variants: () !default;
-@each $deg in $base-color-angles {
-  $rotated: color.adjust($base-color, $hue: $deg);
-  $base-color-variants: map.merge(
-    $base-color-variants,
-    ("plus-#{$deg}deg": $rotated)
-  );
-}
+) !default;
 
 /* Neutral colors for shading elements */
 
+// Absolute neutrals (OKLCH) — achromatic, no hue bias
 $oklch-neutrals: (
-  neutral-white:          oklch(100.00% 0.0000 89.9),
-  neutral-light-gray:     oklch(97.72% 0.0000 89.9),
-  neutral-med-light-gray: oklch(84.52% 0.0000 89.9),
-  neutral-gray:           oklch(59.82% 0.0000 89.9),
-  neutral-med-dark-gray:  oklch(41.84% 0.0000 89.9),
-  neutral-dark-gray:      oklch(26.97% 0.0000 89.9),
-  neutral-black:          oklch(0.00%  0.0000 0.0)
+  neutral-white:          oklch(100%   0 none),
+  neutral-light-gray:     oklch(97.6%  0 none),
+  neutral-med-light-gray: oklch(76.7%  0 none),
+  neutral-gray:           oklch(60%    0 none),
+  neutral-med-dark-gray:  oklch(42%    0 none),
+  neutral-dark-gray:      oklch(26.9%  0 none),
+  neutral-black:          oklch(0%     0 none)
 ) !default;
 
+// Absolute neutrals (HSL) — saturation 0% makes hue irrelevant
 $hsla-neutrals: (
-  neutral-white:          hsl(240, 0%, 100%),
-  neutral-light-gray:     hsl(240, 0%, 97%),
-  neutral-med-light-gray: hsl(240, 0%, 70%),
-  neutral-gray:           hsl(240, 0%, 50%),
-  neutral-med-dark-gray:  hsl(240, 0%, 30%),
-  neutral-dark-gray:      hsl(240, 0%, 15%),
-  neutral-black:          hsl(240, 0%, 0%)
+  neutral-white:          hsl(0, 0%, 100%),
+  neutral-light-gray:     hsl(0, 0%, 97%),
+  neutral-med-light-gray: hsl(0, 0%, 70%),
+  neutral-gray:           hsl(0, 0%, 50%),
+  neutral-med-dark-gray:  hsl(0, 0%, 30%),
+  neutral-dark-gray:      hsl(0, 0%, 15%),
+  neutral-black:          hsl(0, 0%, 0%)
 ) !default;
-
-/* ————— Color Palette ————— */
-
-// Backgrounds / Surfaces
-$oklch-background-surfaces: (
-  color-background-primary:           oklch(98.29% 0.0020 286.4),
-  color-background-secondary:         oklch(90.78% 0.0172 286.1),
-  color-background-primary-hover:     oklch(100.00% 0.0000 89.9),
-  color-background-secondary-hover:   oklch(97.44% 0.0030 286.3),
-  color-background-primary-active:    oklch(100.00% 0.0000 89.9),
-  color-background-secondary-active:  oklch(100.00% 0.0000 89.9),
-  color-background-disabled:          oklch(81.98% 0.0284 285.8),
-  color-background-lightbox:          oklch(18.91% 0.1310 264.1 / 0.75),
-
-  color-button-gradient-background: linear-gradient(to bottom, oklch(41.74% 0.2892 264.1), oklch(34.59% 0.2397 264.1)),
-  color-button-gradient-background-hover: linear-gradient(to bottom, oklch(46.68% 0.3029 266.2), oklch(41.74% 0.2892 264.1)),
-  color-button-gradient-background-active: linear-gradient(to bottom, oklch(46.68% 0.3029 266.2), oklch(41.74% 0.2892 264.1)),
-
-  color-surface:      oklch(98.61% 0.0000 0.0),
-  color-foreground:   oklch(24.13% 0.0216 287.8),
-  color-muted:        oklch(71.43% 0.0466 286.0)
-) !default;
-
-$hsla-background-surfaces: (
-  color-background-primary:           hsl(240, 15%, 98%),
-  color-background-secondary:         hsl(240, 25%, 90%),
-  color-background-primary-hover:     hsl(240, 0%, 100%),
-  color-background-secondary-hover:   hsl(240, 15%, 97%),
-  color-background-primary-active:    hsl(240, 0%, 100%),
-  color-background-secondary-active:  hsl(240, 0%, 100%),
-  color-background-disabled:          hsl(240, 20%, 80%),
-  color-background-lightbox:          hsla(240, 100%, 15%, 75%),
-
-  color-button-gradient-background: linear-gradient(to bottom, hsl(240, 100%, 45%), hsl(240, 100%, 35%)),
-  color-button-gradient-background-hover: linear-gradient(to bottom, hsl(240, 100%, 55%), hsl(240, 100%, 45%)),
-  color-button-gradient-background-active: linear-gradient(to bottom, hsl(240, 100%, 55%), hsl(240, 100%, 45%)),
-
-  color-surface:   hsl(0, 0%, 98%),       // cards/panels
-  color-foreground:hsl(240, 10%, 10%), // main text
-  color-muted:     hsl(240, 15%, 70%),      // muted text
-
-) !default;
-
-
-// Brand / Accents
-
-$oklch-brand-accents: (
-
-  color-primary:            oklch(17.55% 0.0512 279.7),
-  color-primary-hover:      oklch(37.84% 0.1595 274.7),
-  color-primary-active:     oklch(39.30% 0.2394 268.1),
-
-  color-secondary:          oklch(75.06% 0.1370 62.8),
-  color-secondary-hover:    oklch(68.71% 0.1215 59.8),
-  color-secondary-active:   oklch(73.11% 0.1861 52.8),
-
-  color-header:             oklch(52.05% 0.1024 280.0),
-  color-header-hover:       oklch(45.99% 0.1881 272.2),
-  color-header-active:      oklch(41.74% 0.2892 264.1)
-
-) !default;
-
-$hsla-brand-accents: (
-
-  color-primary:           hsl(240, 50%, 10%),
-  color-primary-hover:     hsl(240, 75%, 30%),
-  color-primary-active:    hsl(240, 100%, 40%),
-
-  color-secondary:         hsl(30, 80%, 60%),
-  color-secondary-hover:   hsl(30, 80%, 50%),
-  color-secondary-active:  hsl(30, 100%, 50%),
-
-  color-header:            hsl(240, 50%, 30%),
-  color-header-hover:      hsl(240, 75%, 45%),
-  color-header-active:     hsl(240, 100%, 45%)
-
-) !default;
-
-// Status colors
-$oklch-status: (
-
-  color-disabled:         oklch(63.61% 0.0337 333.6),
-  color-success:          oklch(63.56% 0.1398 156.1),
-  color-success-hover:    oklch(78.01% 0.1859 154.6),
-  color-warning:          oklch(75.06% 0.1370 62.8),
-  color-warning-hover:    oklch(73.11% 0.1861 52.8),
-  color-error:            oklch(62.80% 0.2577 29.2),
-  color-alert:            oklch(75.06% 0.1370 62.8),
-  color-alert-hover:      oklch(73.11% 0.1861 52.8)
-
-) !default;
-
-$hsla-status: (
-
-  color-disabled:        hsl(295, 15%, 50%),
-  color-success:         hsl(150, 60%, 40%),
-  color-success-hover:   hsl(150, 70%, 50%),
-  color-warning:         hsl(30, 80%, 60%),
-  color-warning-hover:   hsl(30, 100%, 50%),
-  color-error:           hsl(0, 100%, 50%),
-  color-alert:           hsl(30, 80%, 60%),
-  color-alert-hover:     hsl(30, 100%, 50%)
-
-) !default;
-
-// Structure
-$oklch-structure: (
-
-  color-border:   oklch(81.35% 0.0356 285.6),
-  color-divider:  oklch(90.78% 0.0172 286.1)
-
-) !default;
-
-$hsla-structure: (
-
-  color-border:  hsl(240, 25%, 80%),
-  color-divider: hsl(240, 25%, 90%)
-
-) !default;
-
-// Links
-$oklch-links: (
-
-  link-color:               oklch(49.73% 0.2829 269.8),
-  link-color-hover:         oklch(45.20% 0.3132 264.1),
-  link-color-hover-light:   oklch(55.02% 0.2330 267.1)
-
-) !default;
-
-$hsla-links: (
-
-  link-color:              hsl(240, 100%, 60%),
-  link-color-hover:        hsl(240, 100%, 50%),
-  link-color-hover-light:  hsl(240, 100%, 70%)
-
-) !default;
-
-// Scrollbars
-$oklch-scrollbars: (
-
-  scrollbar-track:          oklch(95.41% 0.0085 286.2),
-  scrollbar-thumb:          oklch(71.69% 0.0553 284.9)
-
-) !default;
-
-$hsla-scrollbars: (
-
-  scrollbar-track:          hsl(240 20% 65%),
-  scrollbar-thumb:          hsl(285 25% 95%)
-) !default;
-
-// Focus & Accessibility
-$oklch-focus-accessibility: (
-
-  focus-ring-color:          oklch(0.598 0.221 277)
-) !default;
-
-$hsla-focus-accessibility: (
-
-  focus-ring-color:          hsl(240 100% 70%)
-) !default;
-
 
 // Spacing Scale
 $spacing-xxs: 0.25rem !default;
@@ -290,11 +153,11 @@ $radius-full-circle: 50% !default;
 $border-width: 1px !default;
 
 // Elevation (Shadows)
-$shadow-xs: 0 1px 2px   hsla(0, 0, 0, 0.05) !default;
-$shadow-sm: 0 1px 3px   rgba(0, 0, 0, 0.1) !default;
-$shadow-md: 0 4px 6px   rgba(0, 0, 0, 0.1) !default;
-$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1) !default;
-$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15) !default;
+$shadow-xs: 0 1px 2px   hsla(0, 0%, 0%, 0.05) !default;
+$shadow-sm: 0 1px 3px   rgba(0, 0%, 0%, 0.1) !default;
+$shadow-md: 0 4px 6px   rgba(0, 0%, 0%, 0.1) !default;
+$shadow-lg: 0 10px 15px rgba(0, 0%, 0%, 0.1) !default;
+$shadow-xl: 0 20px 25px rgba(0, 0%, 0%, 0.15) !default;
 
 // Z-Index Tokens
 $z-header: 100 !default;

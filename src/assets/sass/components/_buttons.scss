@@ -31,11 +31,16 @@
   }
 
   &--secondary {
-    background-color: var(--color-background-secondary);
-    color: var(--color-secondary);
+    background-color: var(--secondary-button-background);
+    color: var(--secondary-button-text);
+    border-width: 1px;
+    border-radius: 4px;
+    margin-right: 3px;
+    transition: background-color 0.5s, color 0.5s;
 
     &:hover {
-      background-color: var(--color-secondary-hover);
+      background-color: var(--secondry-button-background-hover);
+      color: var(--secondary-button-text-hover);
     }
   }
 
