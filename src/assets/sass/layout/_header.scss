@@ -34,12 +34,13 @@
 /* Inner content wrapper constrained to your container width
    Layout: Logo | Title | (flexible) Nav | Auth */
 .site-header__inner {
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
   align-items: center;
+  display: grid;
   gap: var(--spacing-md);
-  max-inline-size: var(--container-max-width);
+  grid-template-columns: auto auto auto 1fr 1fr;
+  justify-items: self-end;
   margin-inline: var(--spacing-md);
+  max-inline-size: var(--container-max-width);
   padding-inline: 0;
 }
 
