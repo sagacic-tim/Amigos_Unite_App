@@ -114,22 +114,28 @@ $hsla-site-palette: (
 // Absolute neutrals (OKLCH) — achromatic, no hue bias
 $oklch-neutrals: (
   neutral-white:          oklch(100%   0 none),
-  neutral-light-gray:     oklch(97.6%  0 none),
+  neutral-off-white:      oklch(97.6%  0 none),
+  neutral-light-gray:     oklch(92.5%  0 none),
   neutral-med-light-gray: oklch(76.7%  0 none),
   neutral-gray:           oklch(60%    0 none),
   neutral-med-dark-gray:  oklch(42%    0 none),
   neutral-dark-gray:      oklch(26.9%  0 none),
+  neutral-gray-black:     oklch(0.226  0 none),
+  neutral-off-black:      oklch(18.2%  0 none),
   neutral-black:          oklch(0%     0 none)
 ) !default;
 
 // Absolute neutrals (HSL) — saturation 0% makes hue irrelevant
 $hsla-neutrals: (
   neutral-white:          hsl(0, 0%, 100%),
-  neutral-light-gray:     hsl(0, 0%, 97%),
+  neutral-off-white:      hsl(0, 0%, 97%),
+  neutral-light-gray:     hsl(0, 0%, 90%),
   neutral-med-light-gray: hsl(0, 0%, 70%),
   neutral-gray:           hsl(0, 0%, 50%),
   neutral-med-dark-gray:  hsl(0, 0%, 30%),
   neutral-dark-gray:      hsl(0, 0%, 15%),
+  neutral-gray-black:     hsl(0, 0%, 11%),
+  neutral-off-black:      hsl(0, 0%, 7%),
   neutral-black:          hsl(0, 0%, 0%)
 ) !default;
 

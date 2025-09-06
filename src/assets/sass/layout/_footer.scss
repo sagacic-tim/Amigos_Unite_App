@@ -6,9 +6,9 @@
    --------------------------------------- */
 .site-footer {
   /* Footer-scoped knobs (default to your design tokens) */
-  --footer-bg: var(--color-surface);
-  --footer-fg: var(--color-foreground);
-  --footer-border-color: var(--color-divider);
+  --footer-bg: var(--secondary-surface-bg-color-1);
+  --footer-fg: var(--secondary-text-color);
+  --footer-border-color: var(--secondary-border-color);
   --footer-link: var(--link-color);
   --footer-link-hover: var(--link-color-hover);
 

@@ -6,7 +6,7 @@
   overflow: hidden;
   border-radius: var(--border-radius-base);
   box-shadow: var(--shadow-md);
-  background: var(--color-surface);
+  background: var(--primary-surface-bg-color-1);
 
   &__track {
     display: grid;
@@ -24,7 +24,7 @@
     .carousel__btn {
       pointer-events: all;
       position: absolute; top: 50%; transform: translateY(-50%);
-      background: var(--color-background-lightbox);
+      background: var(--lightbox-bg-color);
       border: 1px solid var(--color-divider);
       border-radius: var(--border-radius-base);
       padding: .4rem .6rem;

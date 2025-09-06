@@ -1,10 +1,10 @@
 
 /* blue-light.loader.css */
-@import url("/themes/public/css-palettes/oklch-earth-tones-palette-dark.css")
+@import url("/themes/public/css-palettes/oklch-earth-tones-dark.css")
   supports(color: oklch(50% 0.2 264));
 
 /* Fallback for browsers without OKLCH support */
-@import url("/themes/public/css-palettes/hsla-earth-tones-palette-dark.css")
+@import url("/themes/public/css-palettes/hsla-earth-tones-dark.css")
   supports (not (color: oklch(50% 0.2 264)));
 
 

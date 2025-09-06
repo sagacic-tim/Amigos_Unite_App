@@ -6,16 +6,20 @@
   gap: var(--spacing-md);
 
   a {
+    background-color: var(--nav-item-bg-color);
     text-decoration: none;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    color: var(--link-color);
+    padding: var(--spacing-xxs) var(--spacing-xs);
+    color: var(--nav-item-text-color);
     font-weight: var(--font-weight-medium);
     border-radius: var(--border-radius-sm);
 
-    &:hover,
+    &:hover {
+      background: var(--nav-item-hover-bg-color);
+      color: var(--nav-item-hover-text-color);
+    }
     &.is-active {
-      background: var(--color-background-primary-hover);
-      color: var(--color-primary-hover);
+      background: var(--nav-item-active-bg-color);
+      color: var(--nav-item-active-text-color);
     }
   }
 }

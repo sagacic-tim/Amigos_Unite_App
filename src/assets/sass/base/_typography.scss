@@ -54,8 +54,6 @@ h6 {
 a[href] {
   @include mixins.link-reset();
   @include mixins.link-colors();
-  @include mixins.link-light-hover(); /* Lighter hover color for light scheme if you want a distinct shade */
-
 }
 
 /* Lists */

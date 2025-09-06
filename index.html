@@ -37,7 +37,7 @@
     var stored = raw ? JSON.parse(raw) : null;
     var prefersDark = matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
     var mode    = (stored && stored.mode)    || (prefersDark ? 'dark' : 'light');
-    var palette = area === 'public' ? ((stored && stored.palette) || 'blue') : 'admin';
+    var palette = area === 'public' ? ((stored && stored.palette) || 'blue-tones') : 'admin';
     var prefix  = supportsOKLCH() ? 'oklch' : 'hsla';
 
     if (area === 'admin') {

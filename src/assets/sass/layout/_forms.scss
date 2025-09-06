@@ -29,23 +29,23 @@
     margin: var(--spacing-xxs) 0 0;
     padding: var(--spacing-sm); 
     width: 100%;
-    color: var(--color-foreground);
-    background: var(--color-surface);
+    color: var(--secondary-text-color);
+    background: var(--secondary-surface-bg-color-1);
   }
 
   button {
     width: 150px; 
     padding: var(--spacing-sm);
-    background-color: var(--primary-button-background);
-    color: var(--primary-button-text);
+    background-color: var(--primary-button-bg-color);
+    color: var(--primary-button-label-color);
     border: none;
     border-radius: var(--border-radius-md);
     cursor: pointer;
     font-weight: var(--font-weight-medium);
 
     &:hover {
-      color: var(--primary-button-text);
-      background-color: var(--primary-button-background-hover);
+      color: var(--primary-button-hover-label-color);
+      background-color: var(--primary-button-hover-bg-color);
     }
   }
 

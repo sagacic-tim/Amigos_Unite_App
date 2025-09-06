@@ -9,7 +9,7 @@
   /* Component knobs (semantic) */
   --list-gap: var(--spacing-sm);
   --list-radius: var(--border-radius-base);
-  --list-divider-color: var(--color-divider);
+  --list-divider-color: var(--secondary-border-color);
   --list-item-padding-block: var(--spacing-sm);
   --list-item-padding-inline: 0;
   --list-bg: transparent;
@@ -50,13 +50,13 @@
 
 /* Dividers between items */
 .list--divided .list__item + .list__item {
-  border-top: 1px solid var(--list-divider-color);
+  border-top: 1px solid var(--secondary-border-color);
   border-radius: 0;
 }
 
 /* Zebra striping (subtle) */
 .list--zebra .list__item:nth-child(even) {
-  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 4%);
+  background: var(--secondary-surface-bg-color-2);
 }
 
 /* Interactive rows (for clickable items) */
@@ -67,7 +67,7 @@
     box-shadow var(--transition-duration) var(--transition-ease);
 }
 .list--interactive .list__item:hover {
-  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 8%);
+  background: var(--secondary-surface-bg-color-1);
 }
 .list--interactive .list__item:focus-visible {
   outline: none;
@@ -95,9 +95,9 @@
 }
 .list--grid .list__item {
   padding: var(--spacing-md);
-  border: 1px solid var(--color-divider);
+  border: 1px solid var(--primary-border-color);
   border-radius: var(--border-radius-base);
-  background: var(--color-surface);
+  background: var(--secondary-surface-bg-color-2);
   box-shadow: var(--shadow-xs);
 }
 .list--grid .list__item:hover { box-shadow: var(--shadow-sm); }
@@ -106,8 +106,8 @@
 .list__empty {
   padding: var(--spacing-lg);
   text-align: center;
-  color: var(--color-muted);
-  border: 1px dashed var(--color-divider);
+  color: var(--muted-text-color);
+  border: 1px dashed var(--secondary-border-color);
   border-radius: var(--border-radius-base);
-  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 6%);
+  background: var(--empty-surface-bg-color);
 }

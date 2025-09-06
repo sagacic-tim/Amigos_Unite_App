@@ -20,6 +20,3 @@
 
 // 7) pages (optional, or load page bundles on demand)
 @use './assets/sass/pages' as pages;
-
-// 8) theme last (optionally override CSS variables defined in :root)
-@use './assets/sass/theme' as theme;

@@ -1,9 +1,9 @@
 
 /* blue-light.loader.css */
-@import url("/themes/public/css-palettes/oklch-blue-palette-dark.css")
+@import url("/themes/public/css-palettes/oklch-blue-tones-dark.css")
   supports(color: oklch(50% 0.2 264));
 
 /* Fallback for browsers without OKLCH support */
-@import url("/themes/public/css-palettes/hsla-blue-palette-dark.css")
+@import url("/themes/public/css-palettes/hsla-blue-tones-dark.css")
   supports (not (color: oklch(50% 0.2 264)));
 

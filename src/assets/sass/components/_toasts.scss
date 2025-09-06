@@ -35,10 +35,10 @@
   --toast-padding: var(--spacing-sm);
   --toast-radius: var(--border-radius-base);
   --toast-shadow: var(--shadow-sm);
-  --toast-bg: var(--color-surface);
-  --toast-fg: var(--color-foreground);
-  --toast-border: var(--color-divider);
-  --toast-accent: var(--color-primary);
+  --toast-bg: var(--secondary-surface-bg-color-1);
+  --toast-fg: var(--primary-text-color);
+  --toast-border: var(--primary-border-color);
+  --toast-accent: var(--accent-color);
   --toast-duration: 4.5s;   /* used for progress bar/auto-dismiss animation */
 
   inline-size: var(--toast-width);
@@ -71,7 +71,7 @@
 .toast__icon   { align-self: start; inline-size: 1.25rem; block-size: 1.25rem; margin-inline: var(--spacing-xs); }
 .toast__body   { min-inline-size: 0; display: grid; gap: var(--spacing-xxs); }
 .toast__title  { margin: 0; font-weight: var(--font-weight-semibold); }
-.toast__text   { margin: 0; color: var(--color-muted); }
+.toast__text   { margin: 0; color: var(--secondary-text-color); }
 .toast__close  {
   appearance: none;
   border: 0;
@@ -106,26 +106,26 @@
 .toast--info {
   --toast-accent: var(--link-color);
   /* slightly tinted bg for emphasis */
-  --toast-bg: color-mix(in oklab, var(--color-background-primary), var(--link-color) 6%);
+  --toast-bg: var(--primary-surface-bg-color-1);
 }
 .toast--success {
-  --toast-accent: var(--color-success);
-  --toast-bg: color-mix(in oklab, var(--color-background-primary), var(--color-success) 6%);
+  --toast-accent: var(--success-color);
+  --toast-bg: var(--secondary-surface-color-1);
 }
 .toast--warning {
   --toast-accent: var(--color-warning);
-  --toast-bg: color-mix(in oklab, var(--color-background-primary), var(--color-warning) 10%);
+  --toast-bg: var(--secondary-surface-bg-color-1);
 }
 .toast--error {
   --toast-accent: var(--color-error);
-  --toast-bg: color-mix(in oklab, var(--color-background-primary), var(--color-error) 8%);
+  --toast-bg: var(--primary-surface-bg-color-1)
 }
 
 /* Inverse/dark accent (optional) */
 .toast--inverse {
   --toast-bg: var(--color-header);
   --toast-fg: var(--neutral-white);
-  --toast-border: color-mix(in oklab, var(--color-header), black 20%);
+  --toast-border: var(--primary-border-color) 
 }
 
 /* Compact density */

@@ -3,7 +3,7 @@
 .hero {
   padding-block: clamp(3rem, 5vw, 6rem);
   background: var(--color-surface);
-  color: var(--color-foreground);
+  color: var(--primary-text-color);
 
   .hero__inner {
     max-width: var(--container-max-width);
@@ -22,7 +22,7 @@
 
   .hero__subtitle {
     margin: 0;
-    color: var(--color-muted);
+    color: var(--muted-text-color);
   }
 
   .hero__actions {

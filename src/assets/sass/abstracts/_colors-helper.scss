@@ -1,0 +1,18 @@
+/* src/assets/sass/abstracts/_colors-helper.scss */
+
+@use "sass:string";
+@use 'sass:map';
+@use 'sass:meta';
+
+/* Build a color-mix() that the BROWSER computes */
+@function mix-str($space, $a, $aPct, $b, $bPct) {
+  @return string.unquote("color-mix(in #{$space}, #{$a} #{$aPct}%, #{$b} #{$bPct}%)");
+}
+
+/* Accept either a palette key OR a raw color */
+@function from-palette($palette, $key-or-color) {
+  @if meta.type-of($key-or-color) == 'string' and map.has-key($palette, $key-or-color) {
+    @return map.get($palette, $key-or-color);
+  }
+  @return $key-or-color; // already a color token/value
+}

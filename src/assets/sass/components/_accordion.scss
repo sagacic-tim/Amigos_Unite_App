@@ -2,20 +2,20 @@
 @use '../abstracts' as tokens;
 
 .accordion {
-  border: 1px solid var(--color-divider);
+  border: 1px solid var(--primary-border-color);
   border-radius: var(--border-radius);
-  background: var(--color-background-primary);
+  background: var(--primary-surface-bg-color);
   overflow: hidden;
 }
 
 .accordion__item + .accordion__item {
-  border-top: 1px solid var(--color-divider);
+  border-top: 1px solid var(--secondary-border-color);
 }
 
 .accordion__header {
   display: flex; justify-content: space-between; align-items: center;
   padding: .75rem 1rem;
-  background: var(--color-surface);
+  background: var(--secondary-surface-color);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
 }

@@ -1,5 +1,5 @@
 // src/components/ThemeSwitcher.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getTheme, setTheme } from '../publicApi';
 
 type Props = { area?: 'public' | 'admin' };
@@ -18,6 +18,7 @@ export function ThemeSwitcher({ area }: Props) {
     <div className="theme-switcher" style={{ display: 'inline-flex', gap: 8 }}>
       {!area && (
         <select
+          className="user-menu__select"
           aria-label="Area"
           value={currentArea}
           onChange={(e) => setCurrentArea(e.target.value as 'public' | 'admin')}
@@ -38,10 +39,10 @@ export function ThemeSwitcher({ area }: Props) {
         </select>
       )}
 
-      <button type="button" aria-pressed={mode === 'light'} onClick={() => setMode('light')}>
+      <button className="button--secondary" type="button" aria-pressed={mode === 'light'} onClick={() => setMode('light')}>
         Light
       </button>
-      <button type="button" aria-pressed={mode === 'dark'} onClick={() => setMode('dark')}>
+      <button className="button--secondary" type="button" aria-pressed={mode === 'dark'} onClick={() => setMode('dark')}>
         Dark
       </button>
     </div>

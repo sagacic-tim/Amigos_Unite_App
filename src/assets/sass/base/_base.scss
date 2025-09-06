@@ -9,18 +9,10 @@ html {
 body {
   font-family: var(--font-family-sans);
   font-weight: var(--font-weight-regular);
-  color: var(--color-foreground);
-  background-color: var(--color-background-primary);
+  color: var(--primary-text-color);
+  background-color: var(--primary-container-bg-color-1);
   min-height: 100vh;
   min-width: 480px;
   margin: 0;
   padding: 0;
-}
-
-/* Theme-aware adjustments */
-@media (prefers-color-scheme: light) {
-  body {
-    color: var(--color-foreground);
-    background-color: var(--color-background-primary);
-  }
 }

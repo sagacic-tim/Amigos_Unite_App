@@ -3,31 +3,31 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--color-background-primary);
-  border: 1px solid var(--color-divider);
-  border-radius: var(--border-radius-base);
+  background: var(--primary-surface-bg-color);
+  border: 1px solid var(--primary-border-color);
+  border-radius: var(--border-radius-md);
   overflow: hidden;
 
   thead th {
     text-align: left;
-    background: var(--color-surface);
-    color: var(--color-foreground);
+    background: var(--secondary-surface-bg-color-1);
+    color: var(--primary-text-color);
     font-weight: var(--font-weight-medium);
   }
 
   th,
   td {
     padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid var(--color-divider);
+    border-bottom: 1px solid var(--primary-border-color);
   }
 
   tbody tr:hover {
     /* 10% neutral-white over the current surface, mixed perceptually */
-    background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 10%);
+    background: var(--primary-surface-hover-bg-color-1);
   }
 
   &.-zebra tbody tr:nth-child(even) {
     /* Slightly lighter stripe: 6% neutral-white over surface */
-    background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 6%);
+    background: var(--secondary-surface-bg-color-1);
   }
 }

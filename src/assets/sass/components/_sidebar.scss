@@ -3,9 +3,10 @@
 /* Base component knobs (override per instance if needed) */
 .sidebar {
   --sidebar-width: 320px;
-  --sidebar-bg: var(--color-surface);
-  --sidebar-fg: var(--color-foreground);
-  --sidebar-border-color: var(--color-divider);
+  --sidebar-bg: var(--primary-surface-bg-color-1);
+  --sidebar-hover-bg: var(--primary-surface-hover-bg-color-1)
+  --sidebar-fg: var(--primary-text-color);
+  --sidebar-border-color: var(--primary-border-color);
   --sidebar-padding: var(--spacing-md);
   --sidebar-gap: var(--spacing-sm);
 
@@ -69,17 +70,17 @@
   gap: var(--spacing-xs);
   padding: .5rem .75rem;
   border-radius: var(--border-radius-sm);
-  color: var(--color-foreground);
+  color: var(--sidebar-fg);
   text-decoration: none;
 }
 
 .sidebar-nav__link:hover {
-  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 8%);
+  background: var(--sidebar-hover-bg);
 }
 
 .sidebar-nav__link.is-active {
-  color: var(--color-primary);
-  background: color-mix(in oklab, var(--color-background-primary), var(--color-primary) 12%);
+  color: var(--sidebar-fg);
+  background: var(--sidebar-hover-bg);
 }
 
 /* Optional: icon slot sizing */
@@ -110,7 +111,7 @@
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  background: var(--overlay-bg);
+  background: var(--lightbox-bg-color);
   backdrop-filter: var(--backdrop-blur);
   opacity: 0;
   pointer-events: none;

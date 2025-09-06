@@ -2,9 +2,9 @@
 
 /* Page shell for the site header (no nav-item styling here) */
 .site-header {
-  background: var(--color-surface);
-  color: var(--color-foreground);
-  border-bottom: 1px solid var(--color-divider);
+  background: var(--secondary-container-bg-color-1);
+  color: var(--primary-heading-color);
+  border-bottom: 2px solid var(--primary-border-color);
   margin: 0;
   padding: 0 0 var(--spacing-sm) 0;
   position: relative;
@@ -14,7 +14,7 @@
   @supports (backdrop-filter: blur(0)) {
     &.site-header--translucent {
       backdrop-filter: var(--backdrop-blur);
-      background: color-mix(in oklab, var(--color-surface), transparent 20%);
+      background: color-mix(in oklab, var(--lightbox-bg-color), transparent 20%);
     }
   }
 
@@ -37,7 +37,7 @@
   align-items: center;
   display: grid;
   gap: var(--spacing-md);
-  grid-template-columns: auto auto auto 1fr 1fr;
+  grid-template-columns: auto auto auto 1fr;
   justify-items: self-end;
   margin-inline: var(--spacing-md);
   max-inline-size: var(--container-max-width);
@@ -65,9 +65,10 @@
 /* Site title */
 .site-title {
   grid-area: 1 / 2 / 2 / 3;
+  color: var(--color-header);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-heading);
-  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  font-size: clamp(1.5rem, 2.5vw, 1.75rem);
 }
 
 /* Keep nav compact and anchored to start of its grid cell */

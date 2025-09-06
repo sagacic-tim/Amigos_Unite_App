@@ -1,9 +1,9 @@
 // vite.config.ts
 import { defineConfig } from 'vite'
-import react        from '@vitejs/plugin-react'
-import path         from 'path'
-import fs           from 'fs'
-import os           from 'os'
+import react            from '@vitejs/plugin-react'
+import path             from 'node:path';
+import fs               from 'node:fs';
+import os               from 'node:os';
 
 const home     = os.homedir()
 const keyPath  = path.join(home, 'ruby_projects', 'localhost+2-key.pem')

@@ -3,8 +3,8 @@
 .cta {
   padding: var(--spacing-xl) var(--spacing-lg);
   border-radius: var(--border-radius-lg);
-  background: color-mix(in oklab, #{var(--base-color), var(--neutral-neutral-light-gray) 95%});
-  color: var(--color-foreground);
+  background: var(--primary-surface-bg-color);
+  color: var(--primary-text-color);
   text-align: center;
   box-shadow: var(--shadow-sm);
 
