@@ -1,5 +1,6 @@
 
 @use 'sass:map';
+@use '../assets/sass/abstracts/variables' as tokens;
 @use '../assets/sass/abstracts/colors-helper' as ch;
 
 /* ───── DARK  THEME ───── */
@@ -42,12 +43,12 @@
 
     /* ───────── Navigation Items ───────── */
     --nav-item-bg-color:         #{ch.mix-str($space, map.get($neutrals, neutral-gray-black), 90, $brand-color, 10)};
-    --nav-item-hover-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-off-black),  85, $brand-color, 15)};
-    --nav-item-active-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-off-black),  70, $brand-color, 30)};
+    --nav-item-hover-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-black),  95, $brand-color, 5)};
+    --nav-item-active-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-black),  90, $brand-color, 10)};
 
-    --nav-item-text-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 90, $brand-color, 10)};
-    --nav-item-hover-text-color:  #{ch.mix-str($space, map.get($neutrals, neutral-white),     95, $brand-color,  5)};
-    --nav-item-active-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-white),     85, $brand-color, 15)};
+    --nav-item-text-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 80, $brand-color, 20)};
+    --nav-item-hover-text-color:  #{ch.mix-str($space, map.get($neutrals, neutral-white),     99, $brand-color,  1)};
+    --nav-item-active-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-white),     97, $brand-color, 3)};
 
     /* ───────── Text ───────── */
     --primary-text-color:   #{ch.mix-str($space, map.get($neutrals, neutral-white),        97, $brand-color, 3)};
@@ -72,8 +73,8 @@
     --secondary-border-color: #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 86, $brand-color,  14)};
 
     /* ───────── Primary Buttons ───────── */
-    --primary-button-bg-color:            #{$brand-color};
-    --primary-button-hover-bg-color:      #{ch.mix-str($space, $brand-color, 92, map.get($neutrals, neutral-white), 8)};
+    --primary-button-bg-color:          #{ch.mix-str($space, map.get($neutrals, neutral-gray), 50, $brand-color, 50)};
+    --primary-button-hover-bg-color:      #{ch.mix-str($space, map.get($neutrals, neutral-gray), 30, $brand-color, 70)};
     --primary-button-disabled-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 85, $brand-color, 15)};
 
     --primary-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};
@@ -95,26 +96,27 @@
     --link-active-color: #{ch.mix-str($space, map.get($neutrals, neutral-white), 90, $accent-color, 0)};
 
     /* ───────── Input Fields ───────── */
-    --input-bg-color:             var(--primary-surface-bg-color-1);
-    --input-label-color:          var(--secondary-text-color);
+    --input-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 95, $brand-color, 5)};
+    --input-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 70, $brand-color, 30)};
+    --input-entry-color:          #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 80, $brand-color, 20)};
     --input-placeholder-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 80, $brand-color, 20)};
     --input-border-color:         #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 78, $brand-color, 22)};
     --input-focus-border-color:   #{ch.mix-str($space, $brand-color, 75, map.get($neutrals, neutral-white), 25)};
     --input-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 90, $brand-color, 10)};
     --input-disabled-text-color:  #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 88, $brand-color, 12)};
 
-    /* ───────── Scrollbars ───────── */
+/* ───────── Scrollbars ───────── */
     --scrollbar-bg-color:           var(--primary-surface-bg-color-1);
     --scrollbar-thumb-color:        #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 70, $brand-color, 30)};
     --scrollbar-thumb-hover-color:  #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 60, $brand-color, 40)};
     --scrollbar-track-color:        #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 92, $brand-color, 8)};
 
     /* ───────── Modals ───────── */
-    --lightbox-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 80, $brand-color, 30)};
+--lightbox-bg-color: #{ch.overlay-str($space, map.get($neutrals, neutral-black), 85, $brand-color, 15, tokens.$alpha-75)};
 
     /* ───────── Decorations ───────── */
-    --text-shadow-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25)};
-    --box-shadow-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25)};
+    --text-shadow-color: #{ch.overlay-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25, tokens.$alpha-50)};
+    --box-shadow-color: #{ch.overlay-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25, tokens.$alpha-50)};
     --focus-ring-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 50, $brand-color, 50)};
 
     /* ───────── Status / semantic colors ───────── */
@@ -174,21 +176,21 @@
 
 
     /* ───────── Navigation Items ───────── */
-    --nav-item-bg-color:         #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 96, $brand-color, 4)};
-    --nav-item-hover-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 92, $brand-color, 8)};
-    --nav-item-active-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 85, $brand-color, 15)};
+    --nav-item-bg-color:         #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 90, $brand-color, 10)};
+    --nav-item-hover-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $brand-color, 5)};
+    --nav-item-active-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 97, $brand-color, 3)};
 
-    --nav-item-text-color:        #{ch.mix-str($space, map.get($neutrals, neutral-gray), 90, $brand-color, 10)};
-    --nav-item-hover-text-color:  #{ch.mix-str($space, map.get($neutrals, neutral-gray), 95, $brand-color, 5)};
-    --nav-item-active-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-gray), 85, $brand-color, 15)};
+    --nav-item-text-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 50, $brand-color, 50)};
+    --nav-item-hover-text-color:  #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 75, $brand-color, 25)};
+    --nav-item-active-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 85, $brand-color, 15)};
 
     /* ───────── Text ───────── */
-    --primary-text-color:   #{ch.mix-str($space, map.get($neutrals, neutral-gray),            92, $brand-color, 8)};
+    --primary-text-color:   #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 90, $brand-color, 10)};
     --secondary-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray),  85, $brand-color, 15)};
 
     /* ───────── Headings ───────── */
     --primary-heading-color:   #{ch.mix-str($space, map.get($neutrals, neutral-gray), 88, $brand-color, 12)};
-    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-gray), 85, $accent-color, 15)};
+    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 50, $accent-color, 50)};
     --heading-hover-color:     #{ch.mix-str($space, map.get($neutrals, neutral-gray), 80, $brand-color, 20)};
 
     /* ───────── Cards ───────── */
@@ -214,13 +216,13 @@
     --primary-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-gray), 80, $brand-color, 20)};
 
     /* ───────── Secondary Button ───────── */
-    --secondary-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 85, $brand-color, 15)};
-    --secondary-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 80, $brand-color, 20)};
+    --secondary-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 85, $brand-color, 15)};
+    --secondary-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 90, $brand-color, 10)};
     --secondary-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 92, $brand-color, 8)};
 
-    --secondary-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-gray), 92, $brand-color, 8)};
-    --secondary-button-hover-label-color:      #{ch.mix-str($space, map.get($neutrals, neutral-gray), 95, $brand-color, 5)};
-    --secondary-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 88, $brand-color, 12)};
+    --secondary-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 60, $brand-color, 40)};
+    --secondary-button-hover-label-color:      #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 60, $brand-color, 40)};
+    --secondary-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 90, $brand-color, 10)};
 
     /* ───────── Links ───────── */
     --link-color:        #{ch.mix-str($space, $brand-color, 88, map.get($neutrals, neutral-gray), 12)};
@@ -228,8 +230,9 @@
     --link-active-color: #{ch.mix-str($space, $brand-color, 80, map.get($neutrals, neutral-black), 20)};
 
     /* ───────── Input Fields ───────── */
-    --input-bg-color:             var(--primary-surface-bg-color-1);
-    --input-label-color:          var(--secondary-text-color);
+    --input-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-white), 95, $brand-color, 5)};
+    --input-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 70, $brand-color, 30)};
+    --input-entry-color:          #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 80, $brand-color, 20)};
     --input-placeholder-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 80, $brand-color, 20)};
     --input-border-color:         #{ch.mix-str($space, map.get($neutrals, neutral-light-gray),     78, $brand-color, 22)};
     --input-focus-border-color:   #{ch.mix-str($space, $brand-color, 75, map.get($neutrals, neutral-white), 25)};
@@ -243,15 +246,12 @@
     --scrollbar-track-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 94, $brand-color, 6)};
 
     /* ───────── Modals ───────── */
-    --lightbox-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 80, $brand-color, 30)};
+--lightbox-bg-color: #{ch.overlay-str($space, map.get($neutrals, neutral-black), 85, $brand-color, 15, tokens.$alpha-75)};
 
     /* ───────── Decorations ───────── */
-    /* ───────── Decorations ───────── */
-    --text-shadow-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25)};
-    --box-shadow-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25)};
-    --focus-ring-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 50, $brand-color, 50)};
-
-
+    --text-shadow-color: #{ch.overlay-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25, tokens.$alpha-50)};
+    --box-shadow-color: #{ch.overlay-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25, tokens.$alpha-50)};
+    --focus-ring-color: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 50, $brand-color, 50)};
 
     /* ───────── Status / semantic colors ───────── */
     --success-color: #{$success-color};

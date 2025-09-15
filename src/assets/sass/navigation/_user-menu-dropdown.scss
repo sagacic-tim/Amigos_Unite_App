@@ -73,7 +73,7 @@
 
 .user-menu__label {
   color: var(--nav-item-text-color);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: .02em;
   opacity: .7;
@@ -106,9 +106,21 @@
 }
 
 .theme-switcher select {
-  background-color: var(--secondary-button-bg-color);
+    appearance: none;
+    background-color: var(--secondary-button-bg-color);
+    border-color: var(--secondary-border-color);
+    color: var(--secondary-button-label-color);
+    padding: 0 6px;
+}
+
+.theme-switcher select:hover,
+.theme-switcher select:focus,
+.theme-switcher select:active {
+  background-color: var(--secondary-button-hover-bg-color);
   border-color: var(--secondary-border-color);
-  color: var(--secondary-button-text);
+  color: var(--secondary-button-hover-label-color);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
 }
 
 .fa-user {

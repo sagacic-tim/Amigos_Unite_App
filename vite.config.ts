@@ -4,6 +4,7 @@ import react            from '@vitejs/plugin-react'
 import path             from 'node:path';
 import fs               from 'node:fs';
 import os               from 'node:os';
+import { fileURLToPath, URL } from 'node:url';
 
 const home     = os.homedir()
 const keyPath  = path.join(home, 'ruby_projects', 'localhost+2-key.pem')
@@ -14,6 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
     },
   },
   css: {

@@ -1,7 +1,7 @@
 @use '../layout/grid' as default-grid;
 
 .amigo-location-item {
-  border: 1px solid #ccc;
+  border: 1px solid var(--primary-border-color);
   padding: 10px;
   margin: 10px 0;
 
@@ -13,7 +13,7 @@
   &__field {
     margin-bottom: 0.3rem;
     font-size: 1rem;
-    color: #333;
+    color: var(--input-entry-color);
   }
 }
 

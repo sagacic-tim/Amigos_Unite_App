@@ -1,0 +1,62 @@
+/* src/assets/sass/components/_authentication.scss */
+
+.auth-form {
+  background: transparent;
+  border-radius: var(--border-radius-md);
+  border: none;
+  display: grid;
+  gap: var(--spacing-xxs);
+  grid-area: 1 / 5 / span 1 / span 4;
+  margin: 0 auto;
+  max-width: fit-content;
+  padding: 0;
+
+  h2 {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+
+  label {
+    display: block;
+    color: var(--input-label-color);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 6px;
+    width: 300px;
+  }
+
+  input {
+    background: var(--input-bg-color);
+    border: 1px solid var(--secondary-border-color);
+    color: var(--input-entry-color);
+    margin-top: 6px;
+    margin: var(--spacing-xs) 0 0;
+    padding: var(--spacing-sm);
+    width: 100%;
+  }
+
+  button {
+    width: 150px; 
+    padding: var(--spacing-sm);
+    background-color: var(--primary-button-bg-color);
+    color: var(--primary-button-label-color);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+
+    &:hover {
+      color: var(--primary-button-hover-label-color);
+      background-color: var(--primary-button-hover-bg-color);
+    }
+  }
+
+  .error {
+    color: var(--color-error);                 
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .success {
+    color: var(--color-success);
+    margin-bottom: var(--spacing-sm);
+  }
+}

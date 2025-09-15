@@ -139,6 +139,12 @@ $hsla-neutrals: (
   neutral-black:          hsl(0, 0%, 0%)
 ) !default;
 
+// Transparency (unitless; 0..1)
+$alpha-10: 0.10 !default;
+$alpha-25: 0.25 !default;
+$alpha-50: 0.50 !default;
+$alpha-75: 0.75 !default;
+
 // Spacing Scale
 $spacing-xxs: 0.25rem !default;
 $spacing-xs: 0.5rem !default;
@@ -187,7 +193,6 @@ $focus-ring-width: 2px !default;
 
 // Misc
 $backdrop-blur: blur(8px) !default;
-$overlay-bg: rgba(0, 0, 0, 0.4) !default;
 
 // Breakpoints (compile-time)
 $breakpoints: (

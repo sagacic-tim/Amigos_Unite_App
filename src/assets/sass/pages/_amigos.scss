@@ -9,7 +9,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   margin-bottom: 1rem;
-  background-color: #f9f9f9;
+  background-color: var(--secondary-surface-bg-color-1);
 
   &__avatar {
     position: absolute;
@@ -48,6 +48,7 @@
     }
     &--label {
       font-weight: 600;
+      margin-right: 12px;
     }
   }
 }

@@ -1,19 +1,7 @@
 // src/types/EventTypes.ts
+import type { Amigo } from './AmigoTypes';
 
-export interface Amigo {
-  id: number;
-  first_name: string;
-  last_name: string;
-  user_name: string;
-  email: string;
-  secondary_email?: string;
-  phone_1?: string;
-  phone_2?: string;
-  avatar_url?: string;
-  created_at: string;
-  updated_at: string;
-}
-
+// Core event model
 export interface Event {
   id: number;
   event_name: string;
@@ -25,3 +13,7 @@ export interface Event {
   created_at: string;
   updated_at: string;
 }
+
+// Re-export related connector types so consumers can import from one place
+export type { EventLocationConnector } from './EventLocationConnectorTypes';
+export type { EventAmigoConnector }    from './EventAmigoConnectorTypes';

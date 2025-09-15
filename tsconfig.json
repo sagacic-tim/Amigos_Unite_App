@@ -14,7 +14,10 @@
     "noEmit": true,
     "types": ["vite/client", "react", "react-dom"],
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": {
+      "@/*": ["src/*"],
+      "@pages/*": ["src/pages/*"]
+    }
   },
   "include": ["src"]
 }

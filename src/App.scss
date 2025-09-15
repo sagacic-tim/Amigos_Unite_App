@@ -1,22 +1,29 @@
-// 1) abstracts: gives Sass tokens/mixins to downstream @use
+/* src/App.scss */
 
+/* 1) abstracts / tokens */
 @use './assets/sass/abstracts' as tokens;
 
-// 2) reset: include once, before base/theme
+/* 2) reset (emits CSS) */
 @use './assets/sass/base/reset.emit';
 
-// 3) base: :root, base, typography
-@use './assets/sass/base' as base;
+/* 3) base: ensure these emit :root + base + type */
+@use './assets/sass/base/root';
+@use './assets/sass/base/base';
+@use './assets/sass/base/typography';
 
-// 4) layout primitives
-@use './assets/sass/layout' as layout;
+/* 4) layout primitives */
+@use './assets/sass/layout/header';
+@use './assets/sass/layout/footer';
+@use './assets/sass/layout/grid';
 
-// 5) navigation primitives
-@use './assets/sass/navigation' as nav;
+/* 5) navigation primitives */
+@use './assets/sass/navigation';
 
-// 6) components & utilities
-@use './assets/sass/components' as comps;
-@use './assets/sass/utilities' as util;
+/* 6) components & utilities */
+@use './assets/sass/components/modals';
+@use './assets/sass/components/buttons';
+@use './assets/sass/components/forms';
+@use './assets/sass/utilities';
 
-// 7) pages (optional, or load page bundles on demand)
-@use './assets/sass/pages' as pages;
+/* 7) pages bundle (optional) */
+@use './assets/sass/pages';

@@ -9,19 +9,20 @@
   justify-content: center;
   padding: var(--spacing-md);
   z-index: var(--z-modal);
-  background: var(--overlay-bg);
+  background: var(--lightbox-bg-color);
 
   &.is-open { display: flex; }
 }
 
 .modal__dialog {
-  inline-size: min(90vw, 640px);
-  max-block-size: 90vh;
-  background: var(--primary-surface-bg-color-1);
-  color: var(--primary-text-color);
-  border-radius: var(--border-radius-base); /* was --border-radius (nonexistent) */
-  border: 1px solid var(--primary-color);   /* removed stray comma */
+  background: var(--secondary-surface-bg-color-1);
+  border-radius: 8px;
+  border-radius: var(--border-radius-base);
+  border: 1px solid var(--primary-color);
   box-shadow: var(--shadow-lg);
+  color: var(--primary-text-color);
+  inline-size: min(90vw, 420px);
+  max-block-size: 90vh;
   overflow: hidden;
 
   &--scrollable {

@@ -3,6 +3,7 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import useAuthStatus from "@/hooks/useAuthStatus";
 import UserMenu from "@/components/Header/UserMenu";
+import logoPng from '@/assets/images/home_page/amigos-unite-logo-128.png';
 
 type NavItem = { to: string; label: string };
 
@@ -20,7 +21,7 @@ export interface SiteHeaderProps {
 
 const SiteHeader: React.FC<SiteHeaderProps> = ({
   title = "Amigos Unite",
-  logoSrc = "/src/assets/images/home_page/amigos-unite-logo-128.png",
+  logoSrc = logoPng,
   nav = [
     { to: "/", label: "Home" },
     { to: "/amigos", label: "Amigos" },

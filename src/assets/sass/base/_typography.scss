@@ -4,6 +4,7 @@
 
 /* Base text spacing */
 p {
+  color: var(--primary-text-color);
   margin-block: var(--spacing-sm) 0;
 }
 
@@ -70,16 +71,16 @@ li + li {
 blockquote {
   margin: var(--spacing-md) 0;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-inline-start: 4px solid var(--color-divider);
-  background: var(--color-background-secondary);
-  color: var(--color-foreground);
+  border-inline-start: 4px solid var(--primary-border-color);
+  background: var(--secondary-container-bg-color-1);
+  color: var(--primary-text-color);
 }
 
 /* Code styles */
 code, kbd, samp {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.95em;
-  background: var(--color-background-secondary);
+  background: var(--secondary-container-bg-color-1);
   padding: 0.1em 0.3em;
   border-radius: var(--border-radius-sm);
 }
@@ -87,8 +88,8 @@ code, kbd, samp {
 pre {
   margin: var(--spacing-md) 0;
   padding: var(--spacing-sm);
-  background: var(--color-surface);
-  border: 1px solid var(--color-divider);
+  background: var(--primary-surface-bg-1);
+  border: 1px solid var(--secondary-border-color);
   border-radius: var(--border-radius-md);
   overflow-x: auto;
 }
@@ -106,12 +107,12 @@ em { font-style: italic; }
 
 /* Selection color */
 ::selection {
-  background: color-mix(in oklab, var(--color-primary), transparent 70%);
+  background: var(--primary-surface-color-1);
 }
 
 /* Horizontal rule */
 hr {
   border: 0;
-  border-top: 1px solid var(--color-divider);
+  border-top: 1px solid var(--primary-border-color);
   margin: var(--spacing-md) 0;
 }
