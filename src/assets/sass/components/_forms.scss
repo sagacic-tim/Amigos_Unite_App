@@ -1,14 +1,13 @@
-/* src/assets/sass/components/_authentication.scss */
+/* src/assets/sass/components/_forms.scss */
 
 .auth-form {
   background: transparent;
-  border-radius: var(--border-radius-md);
   border: none;
+  border-radius: var(--border-radius-lg);
   display: grid;
   gap: var(--spacing-xxs);
-  grid-area: 1 / 5 / span 1 / span 4;
   margin: 0 auto;
-  max-width: fit-content;
+  max-width: 320px; /* was fit-content; pick a practical width */
   padding: 0;
 
   h2 {
@@ -16,26 +15,33 @@
     text-align: center;
   }
 
+  /* Inline notice at top of the form */
+  &__notice {
+    color: var(--alert-color);
+    font-size: 1.15rem;
+    padding: var(--spacing-sm) 0;
+    margin-bottom: var(--spacing-sm);
+  }
+
   label {
     display: block;
     color: var(--input-label-color);
     font-weight: var(--font-weight-semibold);
     margin-bottom: 6px;
-    width: 300px;
+    width: 100%;
   }
 
   input {
     background: var(--input-bg-color);
     border: 1px solid var(--secondary-border-color);
     color: var(--input-entry-color);
-    margin-top: 6px;
     margin: var(--spacing-xs) 0 0;
     padding: var(--spacing-sm);
     width: 100%;
   }
 
-  button {
-    width: 150px; 
+  &__button {
+    width: 150px;
     padding: var(--spacing-sm);
     background-color: var(--primary-button-bg-color);
     color: var(--primary-button-label-color);
@@ -43,15 +49,16 @@
     border-radius: var(--border-radius-md);
     cursor: pointer;
     font-weight: var(--font-weight-medium);
+    margin-right: 6px;
 
     &:hover {
-      color: var(--primary-button-hover-label-color);
       background-color: var(--primary-button-hover-bg-color);
+      color: var(--primary-button-hover-label-color);
     }
   }
 
   .error {
-    color: var(--color-error);                 
+    color: var(--color-error);
     margin-bottom: var(--spacing-sm);
   }
 
@@ -60,3 +67,17 @@
     margin-bottom: var(--spacing-sm);
   }
 }
+
+.auth-dialog {
+  min-height: 120px;
+
+  p {
+    color: var(--alert-color);
+    font-weight: 600;
+  }
+
+  &__actions {
+    margin-top: var(--spacing-lg);
+  }
+}
+

@@ -15,7 +15,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
-  &--primary {
+  &__primary {
     background-color: var(--primary-button-bg-color);
     color: var(--primary-button-label-color);
 
@@ -31,7 +31,7 @@
     }
   }
 
-  &--secondary {
+  &__secondary {
     background-color: var(--secondary-button-bg-color);
     border-color: var(--secondary-border-color);
     border-radius: 4px;
@@ -43,6 +43,23 @@
     &:hover {
       background-color: var(--secondary-button-hover-bg-color);
       color: var(--secondary-button-hover-label-color);
+    }
+  }
+
+  &__cancel {
+    background-color: var(--cancel-button-bg-color);
+    border-radius: var(--border-radius-md);
+    border: none;
+    color: var(--cancel-button-label-color);
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    margin-right: 6px;
+    padding: var(--spacing-sm);
+    width: 150px;
+
+    &:hover {
+      background-color: var(--cancel-button-hover-bg-color);
+      color: var(--cancel-button-hover-label-color);
     }
   }
 

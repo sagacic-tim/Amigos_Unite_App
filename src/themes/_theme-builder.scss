@@ -90,10 +90,20 @@
     --secondary-button-hover-label-color:      #{map.get($neutrals, neutral-white)};
     --secondary-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 88, $brand-color, 12)};
 
+    /* ───────── Cancel Button ───────── */
+    --cancel-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-black), 15, $alert-color, 85)};
+    --cancel-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $alert-color, 95)};
+    --cancel-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 35, $alert-color, 65)};
+
+    --cancel-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $info-color, 5)};
+    --cancel-button-hover-label-color:      #{map.get($neutrals, neutral-white)};
+    --cancel-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 90, $info-color, 10)};
+
+
     /* ───────── Links ───────── */
     --link-color:        #{ch.mix-str($space, map.get($neutrals, neutral-white),85, $brand-color, 15)};
-    --link-hover-color:  #{ch.mix-str($space, map.get($neutrals, neutral-white),  90, $brand-color, 10)};
-    --link-active-color: #{ch.mix-str($space, map.get($neutrals, neutral-white), 90, $accent-color, 0)};
+    --link-hover-color:  #{map.get($neutrals, neutral-white)};
+    --link-active-color: #{map.get($neutrals, neutral-white)};
 
     /* ───────── Input Fields ───────── */
     --input-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 95, $brand-color, 5)};
@@ -223,6 +233,16 @@
     --secondary-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 60, $brand-color, 40)};
     --secondary-button-hover-label-color:      #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 60, $brand-color, 40)};
     --secondary-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 90, $brand-color, 10)};
+
+  /* ───────── Cancel Button ───────── */
+    --cancel-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-black), 15, $alert-color, 85)};
+    --cancel-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $alert-color, 95)};
+    --cancel-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 35, $alert-color, 65)};
+
+    --cancel-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $info-color, 5)};
+    --cancel-button-hover-label-color:      #{map.get($neutrals, neutral-white)};
+    --cancel-button-disabled-label-color:   #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 90, $info-color, 10)};
+
 
     /* ───────── Links ───────── */
     --link-color:        #{ch.mix-str($space, $brand-color, 88, map.get($neutrals, neutral-gray), 12)};
