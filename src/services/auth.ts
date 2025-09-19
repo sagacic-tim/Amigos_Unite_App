@@ -27,6 +27,12 @@ export function hydrateAuthFromStorage() {
   if (stored) privateApi.defaults.headers.common['Authorization'] = stored;
 }
 
+/** Let the app know when a new expiry is issued (login or refresh). */
+function announceExpiry(iso?: string) {
+  if (!iso || typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent<string>('auth:expires', { detail: iso }));
+}
+
 // ─────────────────────────── Auth actions ───────────────────────────
 
 export async function loginAmigo(params: LoginParams): Promise<Amigo> {
@@ -40,6 +46,10 @@ export async function loginAmigo(params: LoginParams): Promise<Amigo> {
   );
 
   maybeCaptureAuthHeader(resp);
+
+  // Announce new expiry for proactive refresh scheduling
+  const expiresIso: string | undefined = resp.data?.data?.jwt_expires_at;
+  announceExpiry(expiresIso);
 
   // Unwrap common shapes
   const amigo = resp.data?.data?.amigo ?? resp.data?.amigo ?? resp.data;
@@ -97,6 +107,11 @@ export async function refreshAuthSession(): Promise<boolean> {
 
   if (res.status === 200) {
     maybeCaptureAuthHeader(res);
+
+    // Announce updated expiry so the scheduler can re-arm
+    const expiresIso: string | undefined = res.data?.data?.jwt_expires_at;
+    announceExpiry(expiresIso);
+
     return true;
   } else {
     // Refresh failed; clear state so the next action re-primes CSRF and prompts login
