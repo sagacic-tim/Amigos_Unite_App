@@ -39,6 +39,7 @@
     --secondary-surface-hover-bg-color-1: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 90, $brand-color, 20)};
     --secondary-surface-hover-bg-color-2: #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 75, $brand-color, 25)};
     --empty-surface-bg-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 95, $brand-color, 5)};
+    --highlight-surface-bg-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 75, $brand-color, 25)};
 
 
     /* ───────── Navigation Items ───────── */
@@ -183,6 +184,9 @@
     --secondary-surface-hover-bg-color-1: #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 90, $brand-color, 20)};
     --secondary-surface-hover-bg-color-2: #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 75, $brand-color, 25)};
     --empty-surface-bg-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 95, $brand-color, 5)};
+  --highlight-surface-bg-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 75, $brand-color, 25)};
+
+
 
 
     /* ───────── Navigation Items ───────── */

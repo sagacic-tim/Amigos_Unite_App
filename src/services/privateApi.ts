@@ -1,7 +1,5 @@
 // src/services/privateApi.ts
-import axios, {
-  AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHeaders,
-} from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
 import publicApi from './publicApi';
 import { ensureCsrfToken } from './csrf';
 
@@ -11,7 +9,10 @@ const privateApi: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Also attach CSRF on unsafe methods for private API calls
+let onAuthRequired: ((notice?: string) => void) | null = null;
+export function setAuthRequiredHandler(fn: (notice?: string) => void) { onAuthRequired = fn; }
+
+// attach CSRF on unsafe methods
 privateApi.interceptors.request.use((config) => {
   const method = (config.method ?? 'get').toLowerCase();
   if (['post', 'put', 'patch', 'delete'].includes(method)) {
@@ -25,7 +26,6 @@ privateApi.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401, refresh with CSRF header, then retry
 privateApi.interceptors.response.use(
   (res: AxiosResponse) => res,
   async (err: AxiosError) => {
@@ -35,17 +35,15 @@ privateApi.interceptors.response.use(
     if (status === 401 && orig && !orig._retry) {
       orig._retry = true;
       try {
-        const token = await ensureCsrfToken(); // primes cookie and returns header value
+        const token = await ensureCsrfToken();
         await publicApi.post('/api/v1/refresh_token', undefined, {
-          headers: { 'X-CSRF-Token': token },
-          withCredentials: true,
+          headers: { 'X-CSRF-Token': token }, withCredentials: true,
         });
-        return privateApi(orig); // retry original request
-      } catch (refreshErr) {
-        return Promise.reject(refreshErr);
+        return privateApi(orig); // retry once
+      } catch {
+        onAuthRequired?.('You need to be logged in to view this page.');
       }
     }
-
     return Promise.reject(err);
   }
 );

@@ -1,0 +1,19 @@
+// src/main.tsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+import AppRouter from '@/routes/routes';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { AuthProvider } from '@/context/AuthContext';
+
+import '@/App.scss';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <AuthProvider>
+      <ErrorBoundary>
+        <AppRouter />
+      </ErrorBoundary>
+    </AuthProvider>
+  </React.StrictMode>
+);

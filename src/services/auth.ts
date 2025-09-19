@@ -2,72 +2,107 @@
 import publicApi  from '@/services/publicApi';
 import privateApi from '@/services/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
-
-let csrfToken: string | null = null;
-
-async function ensureCsrf(): Promise<string> {
-  if (csrfToken) return csrfToken;
-
-  // Prime CSRF cookie and capture token header
-  const resp  = await publicApi.get('/api/v1/csrf');
-  const token = resp.headers['x-csrf-token'];
-  if (!token) throw new Error('Failed to obtain CSRF token from server');
-
-  csrfToken = token;
-  publicApi.defaults.headers.common['X-CSRF-Token'] = token;
-  return token;
-}
+import { ensureCsrfToken, resetCsrfToken } from '@/services/csrf';
 
 export interface LoginParams {
   login_attribute: string;
   password: string;
 }
 
+/** If the backend also returns a token in the Authorization header, keep it around. */
+function maybeCaptureAuthHeader(resp: any) {
+  const hdr =
+    (resp?.headers?.authorization as string | undefined) ??
+    (resp?.data?.token as string | undefined);
+  if (!hdr) return;
+
+  const value = hdr.startsWith('Bearer') ? hdr : `Bearer ${hdr}`;
+  privateApi.defaults.headers.common['Authorization'] = value;
+  localStorage.setItem('authToken', value);
+}
+
+/** Call this once on app boot if you do use Authorization headers. */
+export function hydrateAuthFromStorage() {
+  const stored = localStorage.getItem('authToken');
+  if (stored) privateApi.defaults.headers.common['Authorization'] = stored;
+}
+
 // ─────────────────────────── Auth actions ───────────────────────────
 
 export async function loginAmigo(params: LoginParams): Promise<Amigo> {
-  await ensureCsrf();
-  const resp = await publicApi.post<{ data: { amigo: Amigo; jwt_expires_at: string } }>(
+  await ensureCsrfToken();
+
+  // If your SessionsController expects top-level keys, change to `{ ...params }`
+  const resp = await publicApi.post(
     '/api/v1/login',
-    { amigo: params }
+    { amigo: params },
+    { withCredentials: true }
   );
-  return resp.data.data.amigo;
+
+  maybeCaptureAuthHeader(resp);
+
+  // Unwrap common shapes
+  const amigo = resp.data?.data?.amigo ?? resp.data?.amigo ?? resp.data;
+  return amigo as Amigo;
 }
 
 export async function signupAmigo(payload: unknown) {
-  await ensureCsrf();
-  const resp = await publicApi.post('/api/v1/signup', payload);
+  await ensureCsrfToken();
+
+  const resp = await publicApi.post('/api/v1/signup', payload, {
+    withCredentials: true,
+  });
+
+  // Some setups also issue a token on signup
+  maybeCaptureAuthHeader(resp);
+
   return resp.data;
 }
 
 export async function logoutAmigo(): Promise<void> {
-  // CSRF for unsafe method
-  const token = await ensureCsrf();
+  const token = await ensureCsrfToken();
   await privateApi.delete('/api/v1/logout', {
     headers: { 'X-CSRF-Token': token },
     withCredentials: true,
+  }).finally(() => {
+    // Clean up any header-based auth and force CSRF re-prime next time
+    delete privateApi.defaults.headers.common['Authorization'];
+    localStorage.removeItem('authToken');
+    resetCsrfToken();
   });
 }
 
-// Returns the current amigo (if logged in) or null. Never throws on 401.
+/** Returns the current amigo (if logged in) or null; never throws on 401. */
 export async function verifyCurrentAmigo(): Promise<Amigo | null> {
   const res = await privateApi.get('/api/v1/verify_token', {
     validateStatus: s => s === 200 || s === 401,
     withCredentials: true,
   });
+
   if (res.status === 200) {
-    // Adjust if your controller wraps differently
-    return (res.data as Amigo) ?? null;
+    const amigo = res.data?.data?.amigo ?? res.data?.amigo ?? res.data;
+    return amigo as Amigo;
   }
-  return null; // 401 → no active session
+  return null;
 }
 
+/** Attempts to refresh the session (e.g., using your refresh cookie). */
 export async function refreshAuthSession(): Promise<boolean> {
-  const token = await ensureCsrf();
+  const token = await ensureCsrfToken();
   const res = await publicApi.post('/api/v1/refresh_token', undefined, {
     headers: { 'X-CSRF-Token': token },
     withCredentials: true,
     validateStatus: s => s === 200 || s === 401,
   });
-  return res.status === 200;
+
+  if (res.status === 200) {
+    maybeCaptureAuthHeader(res);
+    return true;
+  } else {
+    // Refresh failed; clear state so the next action re-primes CSRF and prompts login
+    delete privateApi.defaults.headers.common['Authorization'];
+    localStorage.removeItem('authToken');
+    resetCsrfToken();
+    return false;
+  }
 }

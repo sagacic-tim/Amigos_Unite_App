@@ -12,13 +12,18 @@
   background-color: var(--secondary-surface-bg-color-1);
 
   &__avatar {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 120px;
-    height: 120px;
+    align-content: center;
+    background-color: var(--highlight-surface-bg-color);
     border-radius: 50%;
+    display: grid;
+    height: 120px;
+    justify-content: center;
     overflow: hidden;
+    padding-bottom: 8px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 120px;
 
     img {
       width: 100%;

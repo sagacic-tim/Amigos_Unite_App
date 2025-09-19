@@ -1,8 +1,9 @@
+// tsconfig.json
 {
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler",          // TS 5+
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "strict": true,
@@ -12,12 +13,13 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "types": ["vite/client", "react", "react-dom"],
+    "types": ["vite/client"],               // react/react-dom types are included via deps
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
       "@pages/*": ["src/pages/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
