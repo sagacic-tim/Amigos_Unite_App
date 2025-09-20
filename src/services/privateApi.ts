@@ -1,12 +1,24 @@
 // src/services/privateApi.ts
-import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+  AxiosHeaders,
+} from 'axios';
+import publicApi from '@/services/publicApi';
 import { ensureCsrfToken, resetCsrfToken } from '@/services/csrf';
-import { refreshAuthSession } from '@/services/auth';
 
 let authRequiredHandler: ((notice?: string) => void) | null = null;
+
 /** Called from main.tsx to open the login modal (and optionally show a message). */
 export function setAuthRequiredHandler(fn: (notice?: string) => void) {
   authRequiredHandler = fn;
+}
+
+/** Utility so any caller (e.g., ProtectedRoute) can open the same modal. */
+export function triggerAuthRequired(notice?: string) {
+  authRequiredHandler?.(notice);
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:3001';
@@ -15,14 +27,13 @@ const privateApi: AxiosInstance = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
-    // No need to force Content-Type for GET; Axios sets JSON for bodies automatically.
   },
 });
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Request: attach CSRF token for mutating methods (your existing behavior)
+   Request: attach CSRF token for mutating methods (POST/PUT/PATCH/DELETE)
    ────────────────────────────────────────────────────────────────────────── */
 privateApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const method = (config.method ?? 'get').toLowerCase();
@@ -38,8 +49,8 @@ privateApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Response: one-time refresh on 401, then retry; on failure: server-logout,
-   open modal, and redirect Home.
+   Response: on 401 → try ONE silent refresh, then retry; on failure → logout,
+   notify UI (modal), and redirect Home.
    ────────────────────────────────────────────────────────────────────────── */
 let isRefreshing = false;
 
@@ -49,42 +60,49 @@ privateApi.interceptors.response.use(
     const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const status = error.response?.status;
 
-    // Handle only 401s, and only once per request
+    // Only handle 401s; don’t loop forever
     if (!original || status !== 401 || original._retry) {
       return Promise.reject(error);
     }
     original._retry = true;
 
-    // Try a single, centralized refresh
+    // One centralized refresh attempt
     try {
       if (!isRefreshing) {
         isRefreshing = true;
-        await ensureCsrfToken();             // make sure CSRF header is available
-        const ok = await refreshAuthSession();
+
+        const csrf = await ensureCsrfToken().catch(() => undefined);
+        const res = await publicApi.post('/api/v1/refresh_token', undefined, {
+          headers: csrf ? { 'X-CSRF-Token': csrf } : undefined,
+          withCredentials: true,
+          validateStatus: (s) => s === 200 || s === 401,
+        });
+
         isRefreshing = false;
-        if (ok) {
-          // Retry original request after successful refresh
+
+        if (res.status === 200) {
+          // Successful refresh → retry original request
           return privateApi.request(original);
         }
       } else {
-        // If a refresh is already in flight, wait briefly and retry original
-        await new Promise((res) => setTimeout(res, 200));
+        // If another tab/request is refreshing, wait briefly and retry
+        await new Promise((r) => setTimeout(r, 200));
         return privateApi.request(original);
       }
     } catch {
       isRefreshing = false;
-      // fall through to logout path
+      // fall through to logout path below
     }
 
-    // Refresh failed — clear server cookies (httpOnly JWT) and local CSRF cache
+    // Refresh failed — clear server cookie (best-effort) and reset CSRF cache
     try {
-      const token = await ensureCsrfToken().catch(() => undefined);
+      const csrf = await ensureCsrfToken().catch(() => undefined);
       await privateApi.delete('/api/v1/logout', {
-        headers: token ? { 'X-CSRF-Token': token } : undefined,
+        headers: csrf ? { 'X-CSRF-Token': csrf } : undefined,
         withCredentials: true,
       });
     } catch {
-      // swallow; goal is best-effort cookie cleanup
+      // swallow — goal is best-effort cleanup
     } finally {
       resetCsrfToken();
     }
