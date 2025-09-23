@@ -53,19 +53,19 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onLoginSuccess, notice }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="form-grid form-grid--auth" onSubmit={handleSubmit}>
         {/* Inline notice from guard */}
         {notice && (
-          <div className="auth-form__notice" role="status">
+          <div className="form_grid__notice" role="status">
             {notice}
           </div>
         )}
 
-        <label className="auth-form__label">
+        <label className="form-grid__label">
           Username, Email, or Phone No.
           <input
             type="text"
-            className="auth-form__input"
+            className="form-grid__input"
             value={loginAttribute}
             onChange={(e) => setLoginAttribute(e.target.value)}
             disabled={loading}
@@ -73,11 +73,11 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onLoginSuccess, notice }
           />
         </label>
 
-        <label className="auth-form__label">
+        <label className="form-grid__label">
           Password
           <input
             type="password"
-            className="auth-form__input"
+            className="form=grid__input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
@@ -85,11 +85,11 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose, onLoginSuccess, notice }
           />
         </label>
 
-        <button type="submit" className="auth-form__button" disabled={loading}>
+        <button type="submit" className="button button--primary" disabled={loading}>
           {loading ? 'Logging in…' : 'Login'}
         </button>
 
-        {errorMessage && <p className="auth-form__error-message">{errorMessage}</p>}
+        {errorMessage && <p className="form-grid__error-message">{errorMessage}</p>}
       </form>
     </Modal>
   );

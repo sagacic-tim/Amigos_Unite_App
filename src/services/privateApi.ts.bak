@@ -10,7 +10,6 @@ import publicApi from '@/services/publicApi';
 import { ensureCsrfToken, resetCsrfToken } from '@/services/csrf';
 
 let authRequiredHandler: ((notice?: string) => void) | null = null;
-let authModalOpen = false;
 
 /** Called from main.tsx to open the login modal (and optionally show a message). */
 export function setAuthRequiredHandler(fn: (notice?: string) => void) {
@@ -19,14 +18,7 @@ export function setAuthRequiredHandler(fn: (notice?: string) => void) {
 
 /** Utility so any caller (e.g., ProtectedRoute) can open the same modal. */
 export function triggerAuthRequired(notice?: string) {
-  if (authModalOpen) return;
-  authModalOpen = true;
   authRequiredHandler?.(notice);
-  // Your UI should call resetAuthModalOpen() when the modal closes.
-}
-
-export function resetAuthModalOpen() {
-  authModalOpen = false;
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:3001';
@@ -40,20 +32,9 @@ const privateApi: AxiosInstance = axios.create({
   },
 });
 
-/* Bootstrap: hydrate Authorization from localStorage */
-try {
-  const stored = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-  if (stored) {
-    (privateApi.defaults.headers as any).common = {
-      ...(privateApi.defaults.headers as any).common,
-      Authorization: stored,
-    };
-  }
-} catch {
-  // ignore storage access errors
-}
-
-/* Request: attach CSRF token on mutations */
+/* ──────────────────────────────────────────────────────────────────────────
+   Request: attach CSRF token for mutating methods (POST/PUT/PATCH/DELETE)
+   ────────────────────────────────────────────────────────────────────────── */
 privateApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const method = (config.method ?? 'get').toLowerCase();
   if (['post', 'put', 'patch', 'delete'].includes(method)) {
@@ -67,9 +48,11 @@ privateApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-/* Response: central 401 handling with one refresh + retry */
+/* ──────────────────────────────────────────────────────────────────────────
+   Response: on 401 → try ONE silent refresh, then retry; on failure → logout,
+   notify UI (modal), and redirect Home.
+   ────────────────────────────────────────────────────────────────────────── */
 let isRefreshing = false;
-let lastAuthModalAt = 0;
 
 privateApi.interceptors.response.use(
   (res: AxiosResponse) => res,
@@ -77,25 +60,20 @@ privateApi.interceptors.response.use(
     const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const status = error.response?.status;
 
+    // Only handle 401s; don’t loop forever
     if (!original || status !== 401 || original._retry) {
       return Promise.reject(error);
     }
     original._retry = true;
 
+    // One centralized refresh attempt
     try {
       if (!isRefreshing) {
         isRefreshing = true;
 
         const csrf = await ensureCsrfToken().catch(() => undefined);
-        const headers = new AxiosHeaders();
-        if (csrf) headers.set('X-CSRF-Token', csrf);
-
-        const currentAuth =
-          (privateApi.defaults.headers as any)?.common?.Authorization as string | undefined;
-        if (currentAuth) headers.set('Authorization', currentAuth);
-
         const res = await publicApi.post('/api/v1/refresh_token', undefined, {
-          headers,
+          headers: csrf ? { 'X-CSRF-Token': csrf } : undefined,
           withCredentials: true,
           validateStatus: (s) => s === 200 || s === 401,
         });
@@ -103,46 +81,36 @@ privateApi.interceptors.response.use(
         isRefreshing = false;
 
         if (res.status === 200) {
-          const hdr =
-            (res.headers as any)?.authorization ||
-            (res.headers as any)?.Authorization ||
-            (res.data as any)?.token;
-
-          if (hdr && typeof hdr === 'string') {
-            const value = hdr.startsWith('Bearer') ? hdr : `Bearer ${hdr}`;
-            (privateApi.defaults.headers as any).common = {
-              ...(privateApi.defaults.headers as any).common,
-              Authorization: value,
-            };
-            try {
-              localStorage.setItem('authToken', value);
-            } catch {/* ignore */}
-          }
-
+          // Successful refresh → retry original request
           return privateApi.request(original);
         }
       } else {
+        // If another tab/request is refreshing, wait briefly and retry
         await new Promise((r) => setTimeout(r, 200));
         return privateApi.request(original);
       }
     } catch {
       isRefreshing = false;
+      // fall through to logout path below
     }
 
+    // Refresh failed — clear server cookie (best-effort) and reset CSRF cache
     try {
-      delete (privateApi.defaults.headers as any)?.common?.Authorization;
-    } catch {}
-    try {
-      localStorage.removeItem('authToken');
-    } catch {}
-    resetCsrfToken();
+      const csrf = await ensureCsrfToken().catch(() => undefined);
+      await privateApi.delete('/api/v1/logout', {
+        headers: csrf ? { 'X-CSRF-Token': csrf } : undefined,
+        withCredentials: true,
+      });
+    } catch {
+      // swallow — goal is best-effort cleanup
+    } finally {
+      resetCsrfToken();
+    }
 
-    (error as any).isAuthRequired = true;
-
-    const now = Date.now();
-    if (now - lastAuthModalAt > 1000) {
-      lastAuthModalAt = now;
-      triggerAuthRequired('Your session expired. Please log in to continue.');
+    // Notify UI and redirect Home
+    authRequiredHandler?.('Your session expired. Please log in again.');
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.history.replaceState(null, '', '/');
     }
 
     return Promise.reject(error);
@@ -150,4 +118,3 @@ privateApi.interceptors.response.use(
 );
 
 export default privateApi;
-// NOTE: no re-export of the named functions here—those are already exported above

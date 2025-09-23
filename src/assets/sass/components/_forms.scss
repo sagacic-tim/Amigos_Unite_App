@@ -1,83 +1,154 @@
 /* src/assets/sass/components/_forms.scss */
 
-.auth-form {
+/* Base, shared form layout */
+.form-grid {
   background: transparent;
   border: none;
   border-radius: var(--border-radius-lg);
-  display: grid;
-  gap: var(--spacing-xxs);
-  margin: 0 auto;
-  max-width: 320px; /* was fit-content; pick a practical width */
-  padding: 0;
+  display: block;
+  font-size: var(--font-size-base);
+  margin: 0;
+  max-width: 640px;
 
-  h2 {
-    margin-bottom: var(--spacing-lg);
-    text-align: center;
+  &__title {
+    margin: 0 0 var(--spacing-sm);
+    font-weight: var(--font-weight-semibold);
   }
 
-  /* Inline notice at top of the form */
   &__notice {
     color: var(--alert-color);
-    font-size: 1.15rem;
-    padding: var(--spacing-sm) 0;
-    margin-bottom: var(--spacing-sm);
+    font-size: 1.05rem;
+    padding: var(--spacing-xs) 0;
+    margin-bottom: var(--spacing-xs);
   }
 
-  label {
-    display: block;
-    color: var(--input-label-color);
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: 6px;
-    width: 100%;
+  /* Fields grid */
+  &__fields {
+    display: grid;
+    gap: var(--form-gap);
+    grid-template-columns: 1fr 1fr;
   }
 
-  input {
-    background: var(--input-bg-color);
-    border: 1px solid var(--secondary-border-color);
-    color: var(--input-entry-color);
-    margin: var(--spacing-xs) 0 0;
-    padding: var(--spacing-sm);
-    width: 100%;
-  }
-
-  &__button {
-    width: 150px;
-    padding: var(--spacing-sm);
-    background-color: var(--primary-button-bg-color);
-    color: var(--primary-button-label-color);
-    border: none;
-    border-radius: var(--border-radius-md);
-    cursor: pointer;
-    font-weight: var(--font-weight-medium);
-    margin-right: 6px;
-
-    &:hover {
-      background-color: var(--primary-button-hover-bg-color);
-      color: var(--primary-button-hover-label-color);
+  /* Single-column variant for narrow forms (optional) */
+  &--one-column {
+    .form-grid__fields {
+      grid-template-columns: 1fr;
     }
   }
 
-  .error {
+  fieldset {
+    border: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+  }
+
+  /* Labels + controls */
+  label {
+    display: block;
+    color: var(--input-label-color);
+    font-style: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 6px;
+    width: 100%;
+
+    span {
+      display: block;
+      font-style: var(--font-size-base);
+      margin-bottom: 6px;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    background: var(--input-bg-color);
+    border: 1px solid var(--secondary-border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--input-entry-color);
+    margin: var(--spacing-xxs) 0 0;
+    padding: var(--spacing-xs);
+    width: 100%;
+    line-height: 1.35;
+
+    &:hover {
+      border-color: var(--secondary-border-hover-color);
+    }
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: translateY(-1px);
+    }
+
+    span {
+      margin: 0;
+      font-weight: var(--font-weight-regular);
+    }
+  }
+
+  .textarea textarea {
+    field-sizing: content;
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  /* Actions row: layout ONLY (buttons come from _buttons.scss) */
+  &__actions,
+  .form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+
+  /* Messages */
+  .form-error {
     color: var(--color-error);
     margin-bottom: var(--spacing-sm);
   }
 
-  .success {
+  .form-success {
     color: var(--color-success);
     margin-bottom: var(--spacing-sm);
   }
-}
 
-.auth-dialog {
-  min-height: 120px;
-
-  p {
-    color: var(--alert-color);
-    font-weight: 600;
+  /* Optional card look for sections inside forms */
+  .card {
+    padding: var(--spacing-lg);
+    border: 1px solid var(--secondary-border-color);
+    border-radius: var(--border-radius-lg);
+    background: var(--surface-bg-color);
   }
 
-  &__actions {
-    margin-top: var(--spacing-lg);
+  @media (max-width: 900px) {
+    &__fields {
+      grid-template-columns: 1fr;
+    }
   }
 }
 
+/* Width/spacing modifiers (BEM) — adjust only the variables */
+/* .form-grid--auth {
+  --form-max-width: 320px;
+}
+
+.form-grid--profile {
+  --form-max-width: 720px; /* wider for profile */
+/*  --form-padding-inline: var(--spacing-sm);
+}
+
+.form-grid--narrow {
+  --form-max-width: 420px;
+}
+
+/* You can also add a 'wide' utility if needed */
+/*.form-grid--wide {
+  --form-max-width: 960px;
+} */

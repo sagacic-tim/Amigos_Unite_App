@@ -105,103 +105,107 @@ const Signup: React.FC<SignupProps> = ({ isOpen, onClose, onSignupSuccess }) => 
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <form className="auth-form" onSubmit={handleSubmit}>
-        {errorMessage && <p className="auth-form__error-message">{errorMessage}</p>}
+      <form className="form-grid form-grid--auth" onSubmit={handleSubmit}>
+        {errorMessage && <p className="form-error">{errorMessage}</p>}
 
-        <label className="auth-form__label">
-          First Name:
-          <input
-            type="text"
-            className="auth-form__input"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            disabled={loading}
-            autoComplete="given-name"
-            required
-          />
-        </label>
+        <fieldset>
+          <label className="form-grid label">
+            First Name:
+            <input
+              type="text"
+              className="form-grid__fields"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              disabled={loading}
+              autoComplete="given-name"
+              required
+            />
+          </label>
 
-        <label className="auth-form__label">
-          Last Name:
-          <input
-            type="text"
-            className="auth-form__input"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            disabled={loading}
-            autoComplete="family-name"
-            required
-          />
-        </label>
+          <label className="form-grid label">
+            Last Name:
+            <input
+              type="text"
+              className="form-grid__fields"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              disabled={loading}
+              autoComplete="family-name"
+              required
+            />
+          </label>
 
-        <label className="auth-form__label">
-          Username:
-          <input
-            type="text"
-            className="auth-form__input"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            disabled={loading}
-            autoComplete="username"
-            required
-          />
-        </label>
+          <label className="form-grid label">
+            Username:
+            <input
+              type="text"
+              className="form-grid__fields"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              disabled={loading}
+              autoComplete="username"
+              required
+            />
+          </label>
 
-        <label className="auth-form__label">
-          Email:
-          <input
-            type="email"
-            className="auth-form__input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-            autoComplete="email"
-            required
-          />
-        </label>
+          <label className="form-grid label">
+            Email:
+            <input
+              type="email"
+              className="form-grid__fields"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              autoComplete="email"
+              required
+            />
+          </label>
 
-        <label className="auth-form__label">
-          Phone (optional):
-          <input
-            type="tel"
-            className="auth-form__input"
-            placeholder="+14155550123"
-            value={phone1}
-            onChange={(e) => setPhone1(e.target.value)}
-            disabled={loading}
-            autoComplete="tel"
-          />
-        </label>
+          <label className="form-grid label">
+            Phone (optional):
+            <input
+              type="tel"
+              className="form-grid__fields"
+              placeholder="+14155550123"
+              value={phone1}
+              onChange={(e) => setPhone1(e.target.value)}
+              disabled={loading}
+              autoComplete="tel"
+            />
+          </label>
 
-        <label className="auth-form__label">
-          Password:
-          <input
-            type="password"
-            className="auth-form__input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
-            autoComplete="new-password"
-            required
-          />
-        </label>
+          <label className="form-grid label">
+            Password:
+            <input
+              type="password"
+              className="form-grid__fields"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              autoComplete="new-password"
+              required
+            />
+          </label>
 
-        <label className="auth-form__label">
-          Confirm Password:
-          <input
-            type="password"
-            className="auth-form__input"
-            value={passwordConfirmation}
-            onChange={(e) => setPasswordConfirmation(e.target.value)}
-            disabled={loading}
-            autoComplete="new-password"
-            required
-          />
-        </label>
+          <label className="form-grid label">
+            Confirm Password:
+            <input
+              type="password"
+              className="form-grid__fields"
+              value={passwordConfirmation}
+              onChange={(e) => setPasswordConfirmation(e.target.value)}
+              disabled={loading}
+              autoComplete="new-password"
+              required
+            />
+          </label>
 
-        <button type="submit" className="auth-form__button" disabled={loading}>
-          {loading ? 'Signing up…' : 'Signup'}
-        </button>
+          <button type="submit" className="button button--primary" disabled={loading}>
+            {loading ? 'Signing up…' : 'Signup'}
+          </button>
+
+        </fieldset>
+
       </form>
     </Modal>
   );

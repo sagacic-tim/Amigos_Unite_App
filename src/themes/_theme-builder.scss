@@ -58,7 +58,7 @@
 
     /* ───────── Headings ───────── */
     --primary-heading-color:   #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 92, $brand-color, 8)};
-    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 88, $accent-color, 12)};
+    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-gray), 70, $brand-color, 30)};
     --heading-hover-color:     #{ch.mix-str($space, map.get($neutrals, neutral-white),     96, $brand-color, 4)};
 
     /* ───────── Cards ───────── */
@@ -71,11 +71,14 @@
 
     /* ───────── Borders ───────── */
     --primary-border-color:   #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 30, $accent-color, 70)};
+    --primary-border-hover-color:   #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray-gray), 30, $accent-color, 70)};
     --secondary-border-color: #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 86, $brand-color,  14)};
+    --secondary-border-hover-color: #{ch.mix-str($space, map.get($neutrals, neutral-gray), 86, $brand-color,  14)};
+
 
     /* ───────── Primary Buttons ───────── */
-    --primary-button-bg-color:          #{ch.mix-str($space, map.get($neutrals, neutral-gray), 50, $brand-color, 50)};
-    --primary-button-hover-bg-color:      #{ch.mix-str($space, map.get($neutrals, neutral-gray), 30, $brand-color, 70)};
+    --primary-button-bg-color:          #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $brand-color, 95)};
+    --primary-button-hover-bg-color:      #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 5, $brand-color, 95)};
     --primary-button-disabled-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 85, $brand-color, 15)};
 
     --primary-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};
@@ -201,10 +204,11 @@
     /* ───────── Text ───────── */
     --primary-text-color:   #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 90, $brand-color, 10)};
     --secondary-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray),  85, $brand-color, 15)};
+    --muted-text-color: #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 90, $brand-color, 10 )};
 
     /* ───────── Headings ───────── */
     --primary-heading-color:   #{ch.mix-str($space, map.get($neutrals, neutral-gray), 88, $brand-color, 12)};
-    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 50, $accent-color, 50)};
+    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 50, $brand-color, 50)};
     --heading-hover-color:     #{ch.mix-str($space, map.get($neutrals, neutral-gray), 80, $brand-color, 20)};
 
     /* ───────── Cards ───────── */
@@ -221,8 +225,8 @@
     --secondary-border-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray),     86, $brand-color,  14)};
 
     /* ───────── Buttons ───────── */
-    --primary-button-bg-color:            #{$brand-color};
-    --primary-button-hover-bg-color:      #{ch.mix-str($space, $brand-color, 94, map.get($neutrals, neutral-white), 6)};
+    --primary-button-bg-color:            #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $brand-color, 95)};
+    --primary-button-hover-bg-color:      #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 5, $brand-color, 95)};
     --primary-button-disabled-bg-color:   #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 90, $brand-color, 10)};
 
     --primary-button-label-color:            #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};

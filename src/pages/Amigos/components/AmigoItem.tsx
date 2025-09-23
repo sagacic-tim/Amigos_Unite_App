@@ -146,7 +146,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
           {canEdit && (
             <button
               className="button__primary"
-              onClick={() => navigate('/profile?edit=amigo')}
+              onClick={() => navigate('/user-profile?edit=amigo')}
             >
               Edit my details
             </button>

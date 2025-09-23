@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
         element: <RequireAuth />, // Outlet-based guard
         children: [
           { path: 'amigos',  element: withSuspense(<Amigos />) },
-          { path: 'profile', element: withSuspense(<Profile />) },
+          { path: 'user-profile', element: withSuspense(<Profile />) },
         ],
       },
 

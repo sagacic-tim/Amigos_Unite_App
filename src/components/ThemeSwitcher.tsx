@@ -39,10 +39,10 @@ export function ThemeSwitcher({ area }: Props) {
         </select>
       )}
 
-      <button className="button__secondary" type="button" aria-pressed={mode === 'light'} onClick={() => setMode('light')}>
+      <button className="button--secondary" type="button" aria-pressed={mode === 'light'} onClick={() => setMode('light')}>
         Light
       </button>
-      <button className="button__secondary" type="button" aria-pressed={mode === 'dark'} onClick={() => setMode('dark')}>
+      <button className="button--secondary" type="button" aria-pressed={mode === 'dark'} onClick={() => setMode('dark')}>
         Dark
       </button>
     </div>

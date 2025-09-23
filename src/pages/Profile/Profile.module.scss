@@ -1,0 +1,18 @@
+
+/* src/pages/Profile/Profile.module.scss */
+.page {
+  background-color: var(--primary-surface-bg-color-1);
+  display: grid;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-md);
+  justify-self: center;
+  grid-template-columns: minmax(640px, 0.5fr);
+}
+
+.header {
+  color: var(--secondary-heading-color);
+  margin-bottom: var(--spacing-md);
+  margin: auto;
+}
+
+/* Put any truly unique Profile styling here */
