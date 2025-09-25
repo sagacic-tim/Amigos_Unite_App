@@ -136,16 +136,16 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
         </ul>
 
         <div className="amigo-item__actions">
-          <button className="button__secondary" onClick={handleOpenDetailModal}>
+          <button className="button--secondary" onClick={handleOpenDetailModal}>
             View Details
           </button>
-          <button className="button__secondary" onClick={handleOpenLocationModal}>
+          <button className="button--secondary" onClick={handleOpenLocationModal}>
             View Address(es)
           </button>
 
           {canEdit && (
             <button
-              className="button__primary"
+              className="button--primary"
               onClick={() => navigate('/user-profile?edit=amigo')}
             >
               Edit my details

@@ -98,7 +98,7 @@ function AuthModalsHost() {
                 document.dispatchEvent(new CustomEvent('auth:changed', { detail: { type: 'logout' } }));
               }}
             />
-            <button type="button" className="button__cancel" onClick={() => setLogoutOpen(false)}>Cancel</button>
+            <button type="button" className="button--cancel" onClick={() => setLogoutOpen(false)}>Cancel</button>
           </div>
         </div>
       </Modal>

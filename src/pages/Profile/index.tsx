@@ -198,18 +198,31 @@ export default function Profile() {
     setSaved(false);
 
     try {
-      // Save Details (PATCH; if 404 then POST)
+      // ─── Amigo Details: clean + upsert ───
+      // (Your GET /show response sometimes includes { message: 'No details...' }.
+      // Strip that out before sending to the server.)
+      const { message, ...cleanDetails } = (details as any) || {};
+
       await privateApi
-        .patch(`/api/v1/amigos/${amigoId}/amigo_detail`, { amigo_detail: details }, { withCredentials: true })
+        .patch(
+          `/api/v1/amigos/${amigoId}/amigo_detail`,
+          { amigo_detail: cleanDetails },
+          { withCredentials: true }
+        )
         .catch(async (err) => {
           if (err?.response?.status === 404) {
-            await privateApi.post(`/api/v1/amigos/${amigoId}/amigo_detail`, { amigo_detail: details }, { withCredentials: true });
+            // If there's no record yet, create it
+            await privateApi.post(
+              `/api/v1/amigos/${amigoId}/amigo_detail`,
+              { amigo_detail: cleanDetails },
+              { withCredentials: true }
+            );
           } else {
             throw err;
           }
         });
 
-      // Save Location (only one allowed)
+      // ─── Amigo Location (single): keep your existing logic ───
       if (location) {
         if (location.id) {
           await privateApi.patch(
@@ -218,18 +231,15 @@ export default function Profile() {
             { withCredentials: true }
           );
         } else {
-          // Create new location
           await privateApi.post(
             `/api/v1/amigos/${amigoId}/amigo_locations`,
             { amigo_location: location },
             { withCredentials: true }
           );
         }
-      } else {
-        // If absolutely nothing is provided, no-op. (Optional: create an empty shell)
       }
 
-      // Refresh to display server-populated fields (lat/lng/time_zone/timestamps)
+      // Refresh UI data to show any server-calculated fields
       await loadAll();
       setSaved(true);
     } catch (e: any) {
