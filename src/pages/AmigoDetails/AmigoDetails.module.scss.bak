@@ -1,19 +1,20 @@
-@use '../layout/grid' as default-grid;
-@use '../abstracts' as tokens;
 
-.amigo-detail-item {
+@use '../../assets/sass/layout/grid' as default-grid;
+@use '../../assets/sass/abstracts' as tokens;
+
+.amigoDetailsItem {
   @include tokens.border-box;
 
   &__header {
-    font-size: var('--font-size-base:');
+    font-size: var('--heading-size-base:');
     margin-bottom: 1rem;
-    color: var('color-header');
+    color: var('secondary-heading-color');
   }
 
   &__field {
     margin-bottom: 0.5rem;
     font-size: 1rem;
-    color: var('color-primary');
+    color: var('secondary-text-color');
   }
 
   &__locations {
@@ -22,7 +23,7 @@
     &-header {
       font-size: 1.25rem;
       margin-bottom: 0.75rem;
-      color: 'color-header';
+      color: var('secondary-heading-color');
     }
   }
 }

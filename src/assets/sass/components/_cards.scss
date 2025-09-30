@@ -1,111 +1,82 @@
+@use '../abstracts' as tokens;
 
-/* src/assets/sass/components/_cards.scss */
-
-/* -----------------------------
-   Card: base + knobs
-   ----------------------------- */
+/* Base card */
 .card {
-  /* Component knobs (override per instance as needed) */
-  --card-radius: var(--border-radius-base);
-  --card-border-width: var(--border-width);
-  --card-shadow: var(--shadow-xs);
-  --card-padding: var(--spacing-md);
-  --card-gap: var(--spacing-sm);
+  border: var(--border-width, 1px) solid var(--secondary-border-color);
+  border-radius: var(--border-radius-lg, 12px);
+  background: var(--secondary-surface-bg-color-1);
+  padding: var(--spacing-md);
+  box-shadow: 0 1px 2px var(--box-shadow-color);
+}
 
+/* Layout helpers */
+.card__body   { display: block; }
+.card__title  {
+  font-size: clamp(1.35rem, 3.5vw, 1.5rem);
+  margin: 0 0 1.5rem;
+}
+.card__list        { list-style: circle inside; margin: 0 0 0 .5rem; padding: 0; }
+.card__list-item   { margin-bottom: .5rem; }
+.card__label       { font-weight: 600; margin-right: .75rem; }
+.card__actions     { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+/* Profile flavor — positions a circular avatar in the top-right */
+.card--profile {
   position: relative;
-  display: block;
-  color: var(--card-text-color);
-  background: var(--card-bg-color);
-  border: var(--card-border-width) solid var(--card-border-color);
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
-  overflow: hidden; /* clip child corners */
 }
 
-/* Section slots */
-.card__header,
-.card__body,
-.card__footer {
-  padding: var(--card-padding);
-}
-
-.card__header + .card__body,
-.card__body + .card__footer {
-  border-top: 1px solid var(--card-border-color);
-}
-
-/* Common content slots */
-.card__title { margin: 0; font-weight: var(--font-weight-semibold); }
-.card__subtitle { margin: 0; color: var(--color-muted-text-color); font-size: var(--font-size-sm); }
-.card__actions { display: inline-flex; gap: var(--spacing-sm); }
-
-/* Media slot (top) */
 .card__media {
-  display: block;
-  inline-size: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+  /* generic media wrapper if needed elsewhere */
 }
 
-/* -----------------------------
-   Variants
-   ----------------------------- */
-
-/* Density */
-.card--compact { --card-padding: var(--spacing-sm); }
-.card--spacious { --card-padding: var(--spacing-lg); }
-
-/* Elevation presets */
-.card--elevation-0 { --card-shadow: none; }
-.card--elevation-1 { --card-shadow: var(--shadow-xs); }
-.card--elevation-2 { --card-shadow: var(--shadow-sm); }
-.card--elevation-3 { --card-shadow: var(--shadow-md); }
-.card--elevation-4 { --card-shadow: var(--shadow-lg); }
-
-/* Bordered / outlined tones */
-.card--outlined { --card-border-color: var(--card-border-color); }
-
-/* Interactive (for clickable cards or anchors with .card) */
-.card--interactive {
-  cursor: pointer;
-  transition:
-    box-shadow var(--transition-duration) var(--transition-ease),
-    transform var(--transition-duration) var(--transition-ease),
-    background var(--transition-duration) var(--transition-ease);
-}
-.card--interactive:hover {
-  --card-shadow: var(--box-shadow-color);
-  background: var(--card-hover-bg-color); 
-}
-.card--interactive:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color), var(--box-shadow-color);
-}
-
-/* Horizontal layout (media + content side by side) */
-.card--horizontal {
+.card__media--avatar {
+  position: absolute;
+  inset: 10px 10px auto auto; /* top-right */
+  width: 120px;
+  height: 120px;
   display: grid;
-  grid-template-columns: var(--card-media-width, 200px) 1fr;
-  gap: var(--card-gap);
-}
-.card--horizontal .card__media {
-  aspect-ratio: auto;
-  block-size: 100%;
-  object-fit: cover;
+  place-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: transparent;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 }
 
-/* Flush sections (no internal separators/padding where needed) */
-.card--flush .card__header,
-.card--flush .card__body,
-.card--flush .card__footer {
+/* --- Details / data card variant ---------------------------------------- */
+.card--details { /* semantic hook; empty by default */ }
+
+.card__subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--secondary-text-color);
+}
+
+.card__fields {
+  margin: 0;
   padding: 0;
-}
-.card--no-dividers .card__header + .card__body,
-.card--no-dividers .card__body + .card__footer {
-  border-top: 0;
+  list-style: none;
 }
 
-/* Accents (left border color cues) */
-.card--success { box-shadow: var(--card-shadow); border-left: 4px solid var(--secondary-border-color); }
-.card--warning { box-shadow: var(--card-shadow); border-left: 4px solid var(--); }
-.card--error   { box-shadow: var(--card-shadow); border-left: 4px solid var(--color-error); }
+.card__field {
+  margin-bottom: .5rem;
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+}
+
+.card__field-label {
+  font-weight: 600;
+  margin-right: .5rem;
+}
+
+.card__message {
+  margin: 0;
+  color: var(--secondary-text-color);
+}
+

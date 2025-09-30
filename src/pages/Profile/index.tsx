@@ -1,7 +1,7 @@
 // src/pages/Profile/index.tsx
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '@/context/AuthContext';
+import useAuth from '@/hooks/useAuth'
 import privateApi, { triggerAuthRequired } from '@/services/privateApi';
 import styles from './Profile.module.scss';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { privateDel } from '../../services/apiHelper';
+import '../../pages/Authentication/Authentication.module.scss';
 
 interface LogoutProps {
   onLogoutSuccess: () => void;

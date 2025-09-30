@@ -2,7 +2,7 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import Modal from '../Common/Modal';
-import '@/assets/sass/pages/_authentication.scss';
+import '../../pages/Authentication/Authentication.module.scss';
 
 import { signupAmigo } from '@/services/auth';
 import { ensureCsrfToken } from '@/services/csrf';

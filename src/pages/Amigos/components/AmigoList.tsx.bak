@@ -3,24 +3,26 @@ import React, { useEffect, useState } from 'react';
 import AmigoItem from './AmigoItem';
 import { Amigo } from '@/types/AmigoTypes';
 import { fetchAmigos } from '@/services/AmigoService';
-import useAuthStatus from '@/hooks/useAuthStatus';
-
-// ❌ remove: import styles from "../Amigos.module.scss";
+import useAuthStatus from '@/hooks/useAuthStatus';  // ← swap hook
+import styles from "../Amigos.module.scss";
 
 const AmigoList: React.FC = () => {
-  const { isLoggedIn, checking } = useAuthStatus();
+  const { isLoggedIn, checking } = useAuthStatus();  // ← use checking to avoid a flash
   const [amigos, setAmigos] = useState<Amigo[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // While verifying session, don’t render “not logged in”
     if (checking) return;
+
     if (!isLoggedIn) {
       setAmigos([]);
       setLoading(false);
       return;
     }
-    (async () => {
+
+    const loadAmigos = async () => {
       try {
         setLoading(true);
         const amigosData = await fetchAmigos();
@@ -31,20 +33,21 @@ const AmigoList: React.FC = () => {
       } finally {
         setLoading(false);
       }
-    })();
-  }, [isLoggedIn, checking]);
+    };
+
+    loadAmigos();
+  }, [isLoggedIn, checking]); // ← refetch when auth changes
 
   if (checking) return <p>Checking session…</p>;
   if (loading)  return <p>Loading amigos...</p>;
   if (error)    return <p>{error}</p>;
 
   return (
-    // Use global layout utilities instead of module CSS
-    <section className="container container--page cards-grid">
+    <div className={styles.amigoList}>
       {amigos.length > 0
         ? amigos.map(amigo => <AmigoItem key={amigo.id} amigo={amigo} />)
         : <p>No amigos found.</p>}
-    </section>
+    </div>
   );
 };
 

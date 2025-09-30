@@ -1,62 +1,76 @@
+// src/pages/AmigoLocations/components/AmigoLocationItem.tsx
 import React from 'react';
-import { AmigoLocation } from '@/types/AmigoLocationTypes';
-import { Amigo } from '@/types/AmigoTypes';
-import '@/assets/sass/pages/_amigoLocations.scss';
+import type { AmigoLocation } from '@/types/AmigoLocationTypes';
+import type { Amigo } from '@/types/AmigoTypes';
 
 interface AmigoLocationItemProps {
-  location: AmigoLocation | null; // Allow location to be null
+  location: AmigoLocation | null;
   amigo: Amigo;
 }
 
-// Utility function to format keys for display
-const formatString = (key: string): string => {
-  return key
-    .replace(/_/g, ' ')   // Replace underscores with spaces
-    .replace(/\b\w/g, c => c.toUpperCase()); // Capitalize first letters
-};
+// Pretty-print keys: "postal_code" → "Postal Code"
+const formatString = (key: string): string =>
+  key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 const AmigoLocationItem: React.FC<AmigoLocationItemProps> = ({ location, amigo }) => {
   const firstName = amigo.first_name || 'Unknown';
-  const lastName = amigo.last_name || 'Unknown';
+  const lastName  = amigo.last_name  || 'Unknown';
+  const headingId = 'amigo-location-heading';
 
-  // If there is no location data, show a "No Address Information Found" message
+  // No location → message card
   if (!location) {
     return (
-      <div className="amigo-location-item" aria-labelledby="amigo-location-item__header">
-        <h2 className="amigo-location-item__header" id="amigo-location-item__header">
+      <article className="card card--details" aria-labelledby={headingId}>
+        <h2 className="card__title" id={headingId}>
           Address(es) for {firstName} {lastName}
         </h2>
-        <p className="amigo-location-item__field">Amigo Id: {amigo.id}</p>
-        <p className="amigo-location-item__message">Message: No Address Information Found.</p>
-      </div>
+        <ul className="card__fields">
+          <li className="card__field">
+            <span className="card__field-label">Amigo Id:</span>{amigo.id}
+          </li>
+          <li className="card__field prose">
+            Message: No Address Information Found.
+          </li>
+        </ul>
+      </article>
     );
   }
 
-  // Collect non-empty fields to display, excluding amigo_id
-  const locationFields = Object.entries(location).filter(([key, value]) => {
-    return value !== null && value !== undefined && key !== 'id' && key !== 'amigo' && key !== 'amigo_id' && typeof value !== 'object';
-  });
+  // Filter to simple, displayable fields
+  const locationFields = Object.entries(location).filter(([key, value]) =>
+    value !== null &&
+    value !== undefined &&
+    key !== 'id' &&
+    key !== 'amigo' &&
+    key !== 'amigo_id' &&
+    typeof value !== 'object'
+  );
 
   return (
-    <div className="amigo-location-item" aria-labelledby="amigo-location-item__header">
-      <h2 className="amigo-location-item__header" id="amigo-location-item__header">
+    <article className="card card--details" aria-labelledby={headingId}>
+      <h3 className="card__title" id={headingId}>
         Address for {firstName} {lastName}
-      </h2>
-      
-      <p className="amigo-location-item__field">Amigo Id: {amigo.id}</p>
+      </h3>
 
-      {locationFields.length > 0 ? (
-        <ul className="amigo-location-item__fields">
-          {locationFields.map(([key, value]) => (
-            <li key={key} className="amigo-location-item__field">
-              {formatString(key)}:&nbsp;{value}
+      <ul className="card__fields">
+        <li className="card__field">
+          <span className="card__field-label">Amigo Id:</span>{amigo.id}
+        </li>
+
+        {locationFields.length > 0 ? (
+          locationFields.map(([key, value]) => (
+            <li key={key} className="card__field prose">
+              <span className="card__field-label">{formatString(key)}:</span>
+              {String(value)}
             </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="amigo-location-item__message">Message: No address information found.</p>
-      )}
-    </div>
+          ))
+        ) : (
+          <li className="card__field prose">
+            Message: No address information found.
+          </li>
+        )}
+      </ul>
+    </article>
   );
 };
 

@@ -1,6 +1,6 @@
 // src/routes/ProtectedRoute.tsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import useAuth from '@/context/AuthContext';
+import useAuth from '@/hooks/useAuth';
 import { triggerAuthRequired } from '@/services/privateApi';
 
 export default function ProtectedRoute() {

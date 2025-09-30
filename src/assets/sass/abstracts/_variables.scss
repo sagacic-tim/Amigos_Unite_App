@@ -13,6 +13,14 @@ $font-size-base: 1rem !default;     // 16px
 $font-size-lg: 1.125rem !default;   // 18px
 $font-size-xl: 1.25rem !default;    // 20px
 
+// Typofgrapohy -- Heading font-sizes
+
+$heading-size-xs: 1.0rem !default;    // 16px
+$heading-size-sm: 1.25rem !default;   // 20px
+$heading-size-base: 1.75rem !default; // 28px
+$heading-size-lg: 2.25rem !default;   // 36px
+$heading-size-xl: 3.0rem !default;    // 48px
+
 // Font Weights
 $font-weight-light: 300 !default;
 $font-weight-regular: 400 !default;
@@ -24,37 +32,37 @@ $font-weight-black: 900 !default;
 // Heading scale (compile-time tokens)
 $heading-scale: (
   h1: (
-    size: clamp(2rem, 5vw, 3.2rem),
+    size: clamp(1.75rem, 4.0vw, 2.5rem),
     weight: $font-weight-black,
     tracking: -0.01em,
     lh: 1.10
   ),
   h2: (
-    size: clamp(1.75rem, 4vw, 2.4rem),
+    size: clamp(1.5rem, 3.0vw, 2.0rem),
     weight: $font-weight-bold,
     tracking: -0.005em,
     lh: 1.12
   ),
   h3: (
-    size: clamp(1.5rem, 3vw, 1.8rem),
+    size: clamp(1.25rem, 2.5vw, 1.75rem),
     weight: $font-weight-semibold,
     tracking: 0em,
     lh: 1.15
   ),
   h4: (
-    size: $font-size-lg,
+    size: clamp(1.15rem, 2.15vw, 1.5rem),
     weight: $font-weight-semibold,
     tracking: 0em,
     lh: 1.20
   ),
   h5: (
-    size: $font-size-base,
+    size: clamp(1.0rem, 2.0vw, 1.25rem),
     weight: $font-weight-medium,
     tracking: 0em,
     lh: 1.25
   ),
   h6: (
-    size: $font-size-sm,
+    size: clamp(0.8rem, 1.75vw, 1.0rem),
     weight: $font-weight-medium,
     tracking: 0.02em,
     lh: 1.30

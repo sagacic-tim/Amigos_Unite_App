@@ -3,19 +3,20 @@
 
 /* Block */
 .button {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font: inherit;
+  border-radius: var(--border-radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-medium);
+  font: inherit;
+  justify-content: center;
   line-height: 1.25;
-  border: 1px solid transparent;
-  border-radius: var(--border-radius-md);
+  margin-top: 10px;
   padding: var(--spacing-xs) var(--spacing-md);
-  cursor: pointer;
-  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
-  text-decoration: none; /* works for <a> as well */
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
   &:disabled {
     cursor: not-allowed;
@@ -33,7 +34,7 @@
 .button--primary {
   background-color: var(--primary-button-bg-color);
   color: var(--primary-button-label-color);
-  max-width: 120px;
+  max-width: 160px;
 
   &:hover:not(:disabled) {
     background-color: var(--primary-button-hover-bg-color);
@@ -49,8 +50,9 @@
   background-color: var(--secondary-button-bg-color);
   color: var(--secondary-button-label-color);
   border-color: var(--secondary-border-color);
-  border-width: 1px;
+  border-width: var(--border-width);
   border-style: solid;
+  margin-right: 6px;
 
   &:hover:not(:disabled) {
     background-color: var(--secondary-button-hover-bg-color);

@@ -1,0 +1,10 @@
+
+// src/assets/sass/components/_amigos.scss
+@use '../../assets/sass/layout/grid' as default-grid;
+@use '../../assets/sass/abstracts' as tokens;
+
+
+.amigoList {
+  @include default-grid.cards-grid();
+  margin: 20px;
+}

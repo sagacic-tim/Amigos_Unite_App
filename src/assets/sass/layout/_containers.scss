@@ -14,6 +14,12 @@
   padding-inline: 0;
 }
 
+/* add this */
+.container--page {
+  margin-block: var(--spacing-lg);
+  padding-inline: var(--spacing-lg);
+}
+
 /* Size modifiers — change the knob, not the property */
 .container--sm  { --container-max-width: 640px; }
 .container--md  { --container-max-width: 768px; }
@@ -24,9 +30,14 @@
 /* =========================================
    Sections
    ========================================= */
-.content-section {
-  margin: 0 auto;
+.sectionContent {
+  margin: 1.5rem auto;
   padding-block: 0;
+  padding: 1.5rem;
+
+  .sectionHeader {
+    margin-bottom: 1.5rem;
+  }
 }
 
 /* =========================================
@@ -43,10 +54,6 @@
 
 .site-main {
   padding: var(--spacing-md) 0;
-}
-
-.section-content {
-  margin: 0 2rem;
 }
 
 /* =========================================

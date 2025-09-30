@@ -6,13 +6,19 @@
 
 :root {
   /* ————— Typography ————— */
-  --font-family-sans: #{tokens.$font-family-sans};
+  --font-family-sans:  #{tokens.$font-family-sans};
   --font-family-serif: #{tokens.$font-family-serif};
-  --font-size-xs: #{tokens.$font-size-xs};
-  --font-size-sm: #{tokens.$font-size-sm};
-  --font-size-base: #{tokens.$font-size-base};
-  --font-size-lg: #{tokens.$font-size-lg};
-  --font-size-xl: #{tokens.$font-size-xl};
+  --font-size-xs:      #{tokens.$font-size-xs};
+  --font-size-sm:      #{tokens.$font-size-sm};
+  --font-size-base:    #{tokens.$font-size-base};
+  --font-size-lg:      #{tokens.$font-size-lg};
+  --font-size-xl:      #{tokens.$font-size-xl};
+
+  --heading-size-xs:  #{tokens.$heading-size-xs};
+  --heading-size-sm:  #{tokens.$heading-size-sm};
+  --heading-size-base:#{tokens.$heading-size-base};
+  --heading-size-lg:  #{tokens.$heading-size-lg}; 
+  --heading-size-xl:  #{tokens.$heading-size-xl};
 
   // Emit heading variabless from the nested Sass map
   @each $tag, $conf in tokens.$heading-scale {

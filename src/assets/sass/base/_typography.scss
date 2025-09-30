@@ -1,54 +1,54 @@
 // src/assets/sass/base/_typography.scss
+@use '../abstracts/mixins' as mixins;
 
-@use '../abstracts' as mixins;
+
+/* Base prose */
+.prose,
+.prose :where(p, li, dd, figcaption, caption) {
+  font-kerning: normal;
+  font-feature-settings: "kern","liga";
+  font-size-adjust: 0.545;
+
+  /* hyphenation + breaking */
+  hyphens: auto;
+  -webkit-hyphens: auto; /* Safari */
+  /* -ms-hyphens: auto;   ← only if you care about legacy Edge/IE */
+
+  text-align: justify;     /* required for text-justify to do anything */
+  text-align-last: left;
+  text-wrap: pretty;       /* ignored where unsupported */
+
+  overflow-wrap: break-word;
+  /* word-spacing: normal;  ← or keep your 0.02rem if you prefer the look */
+}
+
+/* Prefer inter-character where supported (Firefox) */
+@supports (text-justify: inter-character) {
+  .prose,
+  .prose :where(p, li, dd, figcaption, caption):lang(en) {
+    text-justify: inter-character;
+    letter-spacing: normal; /* let justification do the spacing */
+    word-spacing: normal;   /* (optional) avoid double-inflating gaps */
+  }
+}
 
 /* Base text spacing */
 p {
   color: var(--primary-text-color);
+  font-size: var(--font-size-base);
   margin-block: var(--spacing-sm) 0;
 }
 
-/* Shared heading defaults */
-h1, h2, h3, h4, h5, h6 {
-  margin: 0 0 var(--spacing-sm);
-}
 
 /* Per-heading from CSS variables (unitless line-height = proportional) */
-h1 {
-  font-size: var(--font-size-h1);
-  font-weight: var(--font-weight-h1);
-  letter-spacing: var(--letter-spacing-h1, var(--letter-spacing-base));
-  line-height: var(--line-height-h1);
-}
-h2 {
-  font-size: var(--font-size-h2);
-  font-weight: var(--font-weight-h2);
-  letter-spacing: var(--letter-spacing-h2, var(--letter-spacing-base));
-  line-height: var(--line-height-h2);
-}
-h3 {
-  font-size: var(--font-size-h3);
-  font-weight: var(--font-weight-h3);
-  letter-spacing: var(--letter-spacing-h3, var(--letter-spacing-base));
-  line-height: var(--line-height-h3);
-}
-h4 {
-  font-size: var(--font-size-h4);
-  font-weight: var(--font-weight-h4);
-  letter-spacing: var(--letter-spacing-h4, var(--letter-spacing-base));
-  line-height: var(--line-height-h4);
-}
-h5 {
-  font-size: var(--font-size-h5);
-  font-weight: var(--font-weight-h5);
-  letter-spacing: var(--letter-spacing-h5, var(--letter-spacing-base));
-  line-height: var(--line-height-h5);
-}
-h6 {
-  font-size: var(--font-size-h6);
-  font-weight: var(--font-weight-h6);
-  letter-spacing: var(--letter-spacing-h6, var(--letter-spacing-base));
-  line-height: var(--line-height-h6);
+@each $tag in h1, h2, h3, h4, h5, h6 {
+  #{$tag} {
+    font-size: var(--font-size-#{$tag});
+    font-weight: var(--font-weight-#{$tag});
+    letter-spacing: var(--letter-spacing-#{$tag}, var(--letter-spacing-base));
+    line-height: var(--line-height-#{$tag});
+    margin: 0 0 var(--spacing-sm); // optional rhythm
+  }
 }
 
 /* Global link styles */

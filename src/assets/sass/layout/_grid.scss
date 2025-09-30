@@ -15,6 +15,24 @@
   display: grid;
   gap: var(--grid-gap);
 }
+
 .grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
 .grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@mixin cards-grid($min: 380px, $max-card: 480px, $gap: 20px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min, 1fr));
+  gap: $gap;
+
+  /* keep cards from getting wider than 480px and center them in oversized tracks */
+  > .card {
+    width: 100%;
+    max-width: $max-card;
+    justify-self: center;
+  }
+}
+
+.cards-grid {
+  @include cards-grid(380px, 480px, 20px);
+}

@@ -12,18 +12,13 @@
 @use './assets/sass/base/typography';
 
 /* 4) layout primitives */
-@use './assets/sass/layout/header';
-@use './assets/sass/layout/footer';
-@use './assets/sass/layout/grid';
+@use './assets/sass/layout' as * ;
 
 /* 5) navigation primitives */
 @use './assets/sass/navigation';
 
 /* 6) components & utilities */
-@use './assets/sass/components/modals';
-@use './assets/sass/components/buttons';
-@use './assets/sass/components/forms';
-@use './assets/sass/utilities';
+@use './assets/sass/components' as *;
 
 /* 7) pages bundle (optional) */
 @use './assets/sass/pages';

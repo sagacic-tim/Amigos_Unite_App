@@ -1,7 +1,7 @@
 // src/components/Authentication/Login.tsx
 import React, { useState } from 'react';
 import Modal from '../Common/Modal';
-import '../../assets/sass/pages/_authentication.scss';
+import '../../pages/Authentication/Authentication.module.scss';
 import { loginAmigo, LoginParams } from '../../services/auth';
 import { Amigo } from '../../types/AmigoTypes';
 

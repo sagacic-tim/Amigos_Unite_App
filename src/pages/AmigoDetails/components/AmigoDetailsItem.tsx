@@ -1,67 +1,67 @@
 // src/pages/AmigoDetails/components/AmigoDetailsItem.tsx
 import React from 'react';
-import { AmigoDetails } from '@/types/AmigoDetailsTypes';
-import { Amigo } from '@/types/AmigoTypes';
-import '@/assets/sass/pages/_amigoDetails.scss';
+import type { AmigoDetails } from '@/types/AmigoDetailsTypes';
+import type { Amigo } from '@/types/AmigoTypes';
 
 interface AmigoDetailsItemProps {
-  amigoDetails: AmigoDetails | null; // <-- match the prop name used below
+  amigoDetails: AmigoDetails | null;
   amigo: Amigo;
 }
 
-// Utility function to format keys for display
 const formatString = (key: string): string =>
   key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 const AmigoDetailsItem: React.FC<AmigoDetailsItemProps> = ({ amigoDetails, amigo }) => {
   const firstName = amigo.first_name || 'Unknown';
-  const lastName = amigo.last_name || 'Unknown';
+  const lastName  = amigo.last_name  || 'Unknown';
+  const headingId = 'amigo-details-heading';
 
   if (!amigoDetails) {
     return (
-      <div className="amigo-detail-item" aria-labelledby="amigo-detail-item__header">
-        <h2 className="amigo-detail-item__header" id="amigo-detail-item__header">
+      <article className="card card--details" aria-labelledby={headingId}>
+        <h2 className="card__title" id={headingId}>
           Details for {firstName} {lastName}
         </h2>
-        <p className="amigo-detail-item__message">Message: No details information found.</p>
-      </div>
+        <p className="card__message prose">Message: No details information found.</p>
+      </article>
     );
   }
 
-  // Exclude ids/relations/objects (e.g., 'locations') from the list
   const detailFields = Object.entries(amigoDetails).filter(([key, value]) =>
     value !== null &&
     value !== undefined &&
     key !== 'id' &&
     key !== 'amigo' &&
     key !== 'amigo_id' &&
-    key !== 'locations' &&        // explicit, though typeof object covers it
+    key !== 'locations' &&
     typeof value !== 'object'
   );
 
   return (
-    <div className="amigo-detail-item" aria-labelledby="amigo-detail-item__header">
-      <h2 className="amigo-detail-item__header" id="amigo-detail-item__header">
+    <article className="card card--details" aria-labelledby={headingId}>
+      <h3 className="card__title" id={headingId}>
         Details for {firstName} {lastName}
-      </h2>
+      </h3>
 
-      <p className="amigo-detail-item__field">Amigo Id: {amigo.id}</p>
+      <ul className="card__fields">
+        <li className="card__field">
+          <span className="card__field-label">Amigo Id:</span>{amigo.id}
+        </li>
 
-      {detailFields.length > 0 ? (
-        <ul className="amigo-detail-item__fields">
-          {detailFields.map(([key, value]) => {
-            const displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value;
+        {detailFields.length > 0 ? (
+          detailFields.map(([key, value]) => {
+            const display = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
             return (
-              <li key={key} className="amigo-detail-item__field">
-                {formatString(key)}:&nbsp;{displayValue}
+              <li key={key} className="card__field prose">
+                <span className="card__field-label">{formatString(key)}:</span>{display}
               </li>
             );
-          })}
-        </ul>
-      ) : (
-        <p className="amigo-detail-item__message">Message: No details information found.</p>
-      )}
-    </div>
+          })
+        ) : (
+          <li className="card__field prose">No additional details found.</li>
+        )}
+      </ul>
+    </article>
   );
 };
 

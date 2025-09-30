@@ -2,11 +2,15 @@
 // Purpose: Apply project tokens to the now-normalized DOM.
 
 html {
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-base);
+  /* 100% = the UA default (usually 16px) → respects user/OS settings */
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%; /* iOS zoom quirks */
+  text-size-adjust: 100%;
 }
 
 body {
+  font-size: 1rem;              /* 1rem now maps to the html size */
+  line-height: var(--line-height-base, 1.5);
   font-family: var(--font-family-sans);
   font-weight: var(--font-weight-regular);
   color: var(--primary-text-color);

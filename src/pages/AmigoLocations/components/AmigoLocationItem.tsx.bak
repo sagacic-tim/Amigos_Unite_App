@@ -1,0 +1,68 @@
+// src/pages/AmigoLocations/components/AmigoLocationItem.tsx
+
+import React from 'react';
+import type { AmigoLocation } from '@/types/AmigoLocationTypes';
+import type { Amigo } from '@/types/AmigoTypes';
+import styles from '../AmigoLocations.module.scss'; // ✅ correct file & spelling
+
+interface AmigoLocationItemProps {
+  location: AmigoLocation | null;
+  amigo: Amigo;
+}
+
+// Utility to pretty-print keys (e.g., "postal_code" → "Postal Code")
+const formatString = (key: string): string =>
+  key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+const AmigoLocationItem: React.FC<AmigoLocationItemProps> = ({ location, amigo }) => {
+  const firstName = amigo.first_name || 'Unknown';
+  const lastName = amigo.last_name || 'Unknown';
+  const headerId = 'amigo-location-item__header';
+
+  // No location: render message
+  if (!location) {
+    return (
+      <div className={styles.amigoLocationItem} aria-labelledby={headerId}>
+        <h2 className={styles.amigoLocationItem__header} id={headerId}>
+          Address(es) for {firstName} {lastName}
+        </h2>
+        <p className={styles.amigoLocationItem__field}>Amigo Id: {amigo.id}</p>
+        <p className={styles.amigoLocationItem__message}>Message: No Address Information Found.</p>
+      </div>
+    );
+  }
+
+  // Filter displayable fields
+  const locationFields = Object.entries(location).filter(([key, value]) =>
+    value !== null &&
+    value !== undefined &&
+    key !== 'id' &&
+    key !== 'amigo' &&
+    key !== 'amigo_id' &&
+    typeof value !== 'object'
+  );
+
+  return (
+    <div className={styles.amigoLocationItem} aria-labelledby={headerId}>
+      <h2 className={styles.amigoLocationItem__header} id={headerId}>
+        Address for {firstName} {lastName}
+      </h2>
+
+      <p className={styles.amigoLocationItem__field}>Amigo Id: {amigo.id}</p>
+
+      {locationFields.length > 0 ? (
+        <ul className={styles.amigoLocationItem__fields}>
+          {locationFields.map(([key, value]) => (
+            <li key={key} className={styles.amigoLocationItem__field}>
+              {formatString(key)}:&nbsp;{String(value)}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className={styles.amigoLocationItem__message}>Message: No address information found.</p>
+      )}
+    </div>
+  );
+};
+
+export default AmigoLocationItem;

@@ -1,7 +1,7 @@
-// src/pages/Amigos/AmigosItem.tsx
+// src/pages/Amigos/components/AmigoItem.tsx
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/hooks/useAuth'; // <- use the context export you showed earlier
 import Modal from '@/components/Common/Modal';
 import AmigoDetailItem from '@/pages/AmigoDetails/components/AmigoDetailsItem';
 import AmigoLocationItem from '@/pages/AmigoLocations/components/AmigoLocationItem';
@@ -9,19 +9,18 @@ import { fetchAmigoDetails, fetchAmigoLocations } from '@/services/AmigoService'
 import type { Amigo } from '@/types/AmigoTypes';
 import type { AmigoDetails } from '@/types/AmigoDetailsTypes';
 import type { AmigoLocation } from '@/types/AmigoLocationTypes';
-import '@/assets/sass/pages/_amigos.scss';
+// import styles from "../Amigos.module.scss";
 
 interface AmigoItemProps {
   amigo: Amigo;
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-// Safely compute the ORIGIN (protocol + host + optional port), stripping any path like /api/v1
 const API_ORIGIN = (() => {
   try {
-    return new URL(API_BASE).origin; // e.g. "http://localhost:3001"
+    return new URL(API_BASE).origin; // e.g. "https://localhost:3001"
   } catch {
-    return ''; // best-effort fallback
+    return '';
   }
 })();
 
@@ -29,10 +28,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
-  // only allow editing if the viewing user == this amigo (no admin fields required)
   const canEdit = !!currentUser && currentUser.id === amigo.id;
-
-  const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
   const DEFAULT_AVATAR = `${API_ORIGIN}/images/default-amigo-avatar.png`;
 
   const avatarUrl = useMemo(() => {
@@ -40,11 +36,11 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
     const src = (typeof raw === 'string' ? raw : '').trim();
     if (!src) return DEFAULT_AVATAR;
 
-  // Absolute URLs pass through; relative paths get the API origin prefix.
-  return src.startsWith('http://') || src.startsWith('https://')
-    ? src
-    : `${API_ORIGIN}${src}`;
-}, [amigo.avatar_url, API_ORIGIN]);
+    // Absolute URLs pass through; relative paths get the API origin prefix.
+    return src.startsWith('http://') || src.startsWith('https://')
+      ? src
+      : `${API_ORIGIN}${src}`;
+  }, [amigo.avatar_url]);
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -98,35 +94,36 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
     setError(null);
   };
 
+
   return (
-    <div className="amigo-item">
-      <div className="amigo-item__avatar">
+    <article className="card card--profile">
+      <div className="card__media card__media--avatar">
         <img
           src={avatarUrl}
           alt={`${amigo.first_name} ${amigo.last_name}'s avatar`}
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = DEFAULT_AVATAR; }}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = DEFAULT_AVATAR;
+          }}
         />
       </div>
 
-      <div className="amigo-item__details">
-        <h2 className="amigo-item__details--heading">
+      <div className="card__body">
+        <h3 className="card__title">
           {amigo.first_name} {amigo.last_name}
-        </h2>
+        </h3>
 
-        <ul className="amigo-item__details--list">
+        <ul className="card__list">
           {Object.entries(amigo).map(([key, value]) => {
             if (
-              value === null ||
-              value === undefined ||
+              value == null ||
               ['id', 'avatar_url', 'created_at', 'updated_at', 'unformatted_phone_1', 'unformatted_phone_2'].includes(key)
             ) {
               return null;
             }
-            const display =
-              typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
+            const display = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
             return (
-              <li key={key} className="amigo-item__details--list-item">
-                <span className="amigo-item__details--label">
+              <li key={key} className="card__list-item">
+                <span className="card__label">
                   {key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}:
                 </span>
                 {display}
@@ -135,20 +132,20 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
           })}
         </ul>
 
-        <div className="amigo-item__actions">
-          <button className="button--secondary" onClick={handleOpenDetailModal}>
+        <div className="card__actions">
+          <button className="button button--secondary" onClick={handleOpenDetailModal}>
             View Details
           </button>
-          <button className="button--secondary" onClick={handleOpenLocationModal}>
+          <button className="button button--secondary" onClick={handleOpenLocationModal}>
             View Address(es)
           </button>
 
           {canEdit && (
             <button
-              className="button--primary"
+              className="button button--primary"
               onClick={() => navigate('/user-profile?edit=amigo')}
             >
-              Edit my details
+              Edit Profile
             </button>
           )}
         </div>
@@ -172,7 +169,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
         ) : error ? (
           <p>{error}</p>
         ) : amigoLocations.length > 0 ? (
-          <div className="amigo-item__locations">
+          <div className="card__body">
             {amigoLocations.map((location) => (
               <AmigoLocationItem key={location.id} location={location} amigo={amigo} />
             ))}
@@ -181,7 +178,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
           <AmigoLocationItem location={null} amigo={amigo} />
         )}
       </Modal>
-    </div>
+    </article>
   );
 };
 
