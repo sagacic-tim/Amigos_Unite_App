@@ -1,5 +1,5 @@
 // src/pages/Contact/index.tsx
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import logo from '@/assets/images/home_page/amigos-unite-logo-128.png';
 
 type FormData = {
@@ -10,12 +10,6 @@ type FormData = {
   // simple honeypot
   website?: string;
 };
-
-function getCookie(name: string) {
-  // Optional CSRF helper; safe if you skip CSRF in the controller.
-  const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([$?*|{}\]\\^])/g, '\\$1') + '=([^;]*)'));
-  return match ? decodeURIComponent(match[1]) : null;
-}
 
 export default function ContactPage() {
   const [form, setForm] = useState<FormData>({
@@ -29,9 +23,10 @@ export default function ContactPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   }
@@ -40,6 +35,7 @@ export default function ContactPage() {
     if (!form.firstName.trim()) return 'First name is required.';
     if (!form.lastName.trim()) return 'Last name is required.';
     if (!form.email.trim()) return 'Email is required.';
+    // very light email check
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return 'Please enter a valid email.';
     return null;
   }
@@ -49,11 +45,9 @@ export default function ContactPage() {
     setError(null);
     setSuccess(null);
 
-    // Honeypot: if filled, treat as spam and quietly succeed
-    if (form.website && form.website.trim() !== '') {
-      setSuccess('Thanks! Your message has been sent.'); // pretend success for bots
-      formRef.current?.reset();
-      setForm({ firstName: '', lastName: '', email: '', message: '', website: '' });
+    // honeypot: if filled, treat as spam
+    if (form.website) {
+      setError('Submission blocked.');
       return;
     }
 
@@ -65,40 +59,13 @@ export default function ContactPage() {
 
     setSubmitting(true);
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-      const url = `${apiBase}/api/v1/contact_messages`;
-
-      // If your API enforces CSRF, include token (else, the controller can use null_session).
-      const csrf = getCookie('CSRF-TOKEN');
-
-      const res = await fetch(url, {
-        method: 'POST',
-        credentials: 'include', // include cookies/session
-        headers: {
-          'Content-Type': 'application/json',
-          ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
-        },
-        body: JSON.stringify({
-          contact_message: {
-            first_name: form.firstName,
-            last_name: form.lastName,
-            email: form.email,
-            message: form.message,
-          },
-        }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        throw new Error(`API ${res.status}: ${text || 'Failed to send message'}`);
-      }
-
-      setSuccess('Thanks! Your message has been sent.'); // ✅ green banner
-      formRef.current?.reset();
-      setForm({ firstName: '', lastName: '', email: '', message: '', website: '' });
-    } catch (err: any) {
-      console.error('Contact submit failed:', err);
-      setError('Sorry—there was a problem sending your message.');
+      // For now, just demo the payload. Later you’ll POST to your Rails endpoint/ruby gem.
+      console.log('Contact form submitted:', form);
+      setSuccess('Thanks! Your message is ready to send.');
+      // Optionally clear the form:
+      // setForm({ firstName:'', lastName:'', email:'', message:'', website:'' });
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -107,7 +74,7 @@ export default function ContactPage() {
   return (
     <div className="page-container page-container--single">
       <main className="container container--center page-container__inner">
-        {/* Logo */}
+        {/* Logo section */}
         <section className="section">
           <div className="container container--center container--800">
             <img
@@ -123,21 +90,13 @@ export default function ContactPage() {
           <h1 className="page-title">Contact Amigos Unite</h1>
         </section>
 
-        {/* Form */}
+        {/* Form section (narrow) */}
         <section className="section--narrow">
-          <form
-            ref={formRef}
-            className="form-grid form-grid--one-column"
-            onSubmit={handleSubmit}
-            noValidate
-          >
-            {/* Status region at the very top */}
-            <div role="status" aria-live="polite" style={{ marginBottom: '0.5rem' }}>
-              {success && <div className="form-success">{success}</div>}
-              {error && <div className="form-error">{error}</div>}
-            </div>
-
+          <form className="form-grid form-grid--one-column" onSubmit={handleSubmit} noValidate>
             <h2 className="form-grid__title">Send us a message</h2>
+
+            {error && <div className="form-error">{error}</div>}
+            {success && <div className="form-success">{success}</div>}
 
             {/* Honeypot (hidden from users) */}
             <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">

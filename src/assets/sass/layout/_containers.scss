@@ -1,27 +1,23 @@
 /* src/assets/sass/layout/_containers.scss */
 
-/* =========================================
-   Container
-   ========================================= */
+/* ============== Container ================ */
 .container {
-  /* Component "knobs" mapped from global tokens */
+  /* knobs */
   --container-inline-padding: 0;
-  /* Use the global token directly (or alias to a different name if you prefer) */
-  /* --container-max: var(--container-max-width); */
 
+  /* behavior */
   width: 100%;
-  margin-inline: 0;
-  padding-inline: 0;
+  max-inline-size: var(--container-max-width, none); /* <— make the size knob effective */
+  margin-inline: auto;                                   /* default: not centered */
+  padding-inline: var(--container-inline-padding);
 }
 
-/* add this */
-.container--page {
-  margin-block: var(--spacing-lg);
-  padding-inline: var(--spacing-lg);
-}
+/* Center helper to use with any size */
+.container--center { margin-inline: auto; }
 
-/* Size modifiers — change the knob, not the property */
-.container--sm  { --container-max-width: 640px; }
+/* Reusable “narrow” aliases (pick what you need) */
+.container--640 { --container-max-width: 640px; }
+.container--800 { --container-max-width: 800px; }   /* <— your request */
 .container--md  { --container-max-width: 768px; }
 .container--lg  { --container-max-width: 1024px; }
 .container--xl  { --container-max-width: 1200px; }
@@ -52,9 +48,23 @@
   justify-content: start;
 }
 
+.page-container__inner {
+  --container-max-width: 800px;
+  --container-inline-padding: var(--spacing-lg);
+  background: var(--secondary-surface-bg-color-1);
+  border-radius: var(--border-radius-lg);
+}
+
+.page-container--single {
+  grid-template-columns: 1fr;
+}
+
 .site-main {
   padding: var(--spacing-md) 0;
 }
+
+/* Utility aliases */
+.narrow-container { @extend .container, .container--center, .container--800; }
 
 /* =========================================
    Stack

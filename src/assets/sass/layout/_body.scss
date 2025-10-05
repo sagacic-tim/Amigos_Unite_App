@@ -65,7 +65,7 @@ body {
   /* Full width: no max width or centering */
   inline-size: 100%;
   max-inline-size: none;
-  margin: 0;
+  margin: 0 0 30px;
 
   /* If you want a tiny default gutter inside main, change this var to a token */
   padding-inline: var(--page-gutter-inline);

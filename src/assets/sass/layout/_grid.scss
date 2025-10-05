@@ -20,19 +20,48 @@
 .grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
 
-@mixin cards-grid($min: 380px, $max-card: 480px, $gap: 20px) {
+/* Cards grid mixin
+   - $min-card:   min width of a card track
+   - $max-card:   optional max width for cards (center + avoid super-wide lanes)
+   - $gap:        gap between cards (both axes)
+*/
+@mixin cards-grid($min-card: 380px, $max-card: 480px, $gap: 20px) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($min, 1fr));
   gap: $gap;
+  align-items: stretch; // equal height per row
 
-  /* keep cards from getting wider than 480px and center them in oversized tracks */
+  // Allow a CSS variable override, with SCSS fallback:
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--min-card, #{$min-card}), 1fr)
+  );
+
+  // Direct .card children (your Amigos page structure)
   > .card {
     width: 100%;
-    max-width: $max-card;
-    justify-self: center;
+    @if $max-card != null {
+      max-width: $max-card;
+      justify-self: center;
+    }
+  }
+
+  // If you ever wrap in a list (<ul class="cards-grid"><li><article class="card">…)
+  > li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > .card {
+      width: 100%;
+      @if $max-card != null {
+        max-width: $max-card;
+        justify-self: center;
+      }
+    }
   }
 }
 
+/* Your default recipe for this project */
 .cards-grid {
   @include cards-grid(380px, 480px, 20px);
 }

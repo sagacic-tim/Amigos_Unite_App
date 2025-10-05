@@ -13,8 +13,6 @@ const Contact= lazy(() => import('@pages/Contact'));
 const Profile= lazy(() => import('@pages/Profile'));
 const NotFound = lazy(() => import('@pages/NotFound'));
 const EventAmigoConnectors = lazy(() => import('@pages/EventAmigoConnectors'));
-const ConfirmAccount = lazy(() => import('@pages/Authentication/ConfirmAccount'));
-const ResendConfirmation = lazy(() => import('@pages/Authentication/ResendConfirmation'));
 
 const withSuspense = (el: JSX.Element) => (
   <Suspense fallback={<div>Loading…</div>}>{el}</Suspense>
@@ -31,24 +29,20 @@ export const router = createBrowserRouter([
     errorElement: <RouteError />,
     children: [
       { index: true, element: withSuspense(<Home />) },
-
-      // public routes
-      { path: 'confirm', element: withSuspense(<ConfirmAccount />) },
-      { path: 'confirm/resend', element: withSuspense(<ResendConfirmation />) },
       { path: 'about', element: withSuspense(<About />) },
       { path: 'contact', element: withSuspense(<Contact />) },
       { path: 'events', element: withSuspense(<Events />) },
+      { path: 'event-amigo-connectors', element: withSuspense(<EventAmigoConnectors />) },
 
-      // protected routes
+      // Protected routes
       {
-        element: <RequireAuth />,
+        element: <RequireAuth />, // Outlet-based guard
         children: [
           { path: 'amigos',  element: withSuspense(<Amigos />) },
           { path: 'user-profile', element: withSuspense(<Profile />) },
         ],
       },
 
-      // keep this last
       { path: '*', element: withSuspense(<NotFound />) },
     ],
   },

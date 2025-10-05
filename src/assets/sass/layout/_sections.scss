@@ -1,15 +1,52 @@
-.sectionContent {
-  margin: 1.5rem auto;
-  padding-block: 0;
-  padding: 1.5rem;
+/* assets/sass/layout/_sections.scss */
+.section {
+  /* section behavior */
+  width: 100%;
+  max-inline-size: var(--section-max-width, none);
+  margin-inline: auto; /* center horizontally by default */
+  padding-inline: var(--section-inline-padding, 0);
 
-  .sectionHeader {
-    margin-bottom: 1.5rem;
-  }
+  /* section rhythm */
+  margin-block: var(--spacing-lg);
+  padding-block: var(--spacing-md);
+
+  /* optional visual defaults */
+  background: var(--section-bg, transparent);
+  border-radius: var(--border-radius-base, 0);
 }
 
+/* Page heading (if you use it) */
 .sectionPageHeading {
-  margin: 1.5rem auto;
-  padding-block: 0;
-  padding: 1.5rem;
+  @extend .section !optional;
+  padding-block: var(--spacing-md);
 }
+
+/* Narrow preset (640) plus secondary styling */
+.section--narrow {
+  --section-max-width: 640px;
+  --section-inline-padding: var(--spacing-md);
+  --section-bg: var(--secondary-surface-bg-color-2);
+  box-shadow: 0 1px 2px var(--box-shadow-color);
+}
+
+/* Center content inside the section (both axes) */
+.section--centered {
+  display: grid;
+  justify-self: center;
+  place-items: center;
+}
+
+/* Title rhythm */
+.section__title {
+  margin: 0 0 var(--spacing-sm);
+  /* If the section isn’t grid, justify-self does nothing (that’s OK). */
+  justify-self: start;
+}
+
+/* Width presets (now these work because .section uses max-inline-size) */
+.section--240  { --section-max-width: 240px; }
+.section--360  { --section-max-width: 360px; }
+.section--480  { --section-max-width: 480px; }
+.section--640  { --section-max-width: 640px; }
+.section--800  { --section-max-width: 800px; }
+.section--1024 { --section-max-width: 1024px; }

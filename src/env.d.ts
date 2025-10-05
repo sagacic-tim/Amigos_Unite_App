@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+/// <reference types="vite/client" />``
 
 // Whitelist your VITE_ environment variables here:
 interface ImportMetaEnv {

@@ -2,23 +2,45 @@
 
 /* Base card */
 .card {
-  border: var(--border-width, 1px) solid var(--secondary-border-color);
-  border-radius: var(--border-radius-lg, 12px);
   background: var(--secondary-surface-bg-color-1);
-  padding: var(--spacing-md);
+  border-radius: var(--border-radius-lg, 12px);
+  border: var(--border-width, 1px) solid var(--secondary-border-color);
   box-shadow: 0 1px 2px var(--box-shadow-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;              /* rely on grid gap only */
+  padding: var(--spacing-md);
 }
 
+.card > :last-child { margin-bottom: 0; }
+
 /* Layout helpers */
-.card__body   { display: block; }
+.card__body {
+  display: block;
+  flex: 1 1 auto;
+}
 .card__title  {
   font-size: clamp(1.35rem, 3.5vw, 1.5rem);
   margin: 0 0 1.5rem;
 }
-.card__list        { list-style: circle inside; margin: 0 0 0 .5rem; padding: 0; }
-.card__list-item   { margin-bottom: .5rem; }
-.card__label       { font-weight: 600; margin-right: .75rem; }
-.card__actions     { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+.card__list {
+  list-style: circle inside;
+  margin: 0 0 0 .5rem;
+  padding: 0;
+}
+.card__list-item {
+  margin-bottom: .5rem;
+}
+.card__label {
+  font-weight: 600;
+  margin-right: .75rem;
+}
+.card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
 
 /* Profile flavor — positions a circular avatar in the top-right */
 .card--profile {
@@ -26,48 +48,48 @@
 }
 
 .card__media {
-  /* generic media wrapper if needed elsewhere */
+  display: inline-block;/* generic media wrapper if needed elsewhere */
 }
 
 .card__media--avatar {
-  position: absolute;
-  inset: 10px 10px auto auto; /* top-right */
-  width: 120px;
-  height: 120px;
-  display: grid;
-  place-content: center;
-  border-radius: 50%;
-  overflow: hidden;
   background: transparent;
+  border-radius: 50%;
+  display: grid;
+  height: 120px;
+  inset: 10px 10px auto auto; /* top-right */
+  overflow: hidden;
+  place-content: center;
+  position: absolute;
+  width: 120px;
 
   img {
-    inline-size: 100%;
     block-size: 100%;
-    object-fit: cover;
     border-radius: 50%;
+    inline-size: 100%;
+    object-fit: cover;
   }
 }
 
 /* --- Details / data card variant ---------------------------------------- */
-.card--details { /* semantic hook; empty by default */ }
+.card--details { display: block/* semantic hook; empty by default */ }
 
 .card__subtitle {
+  color: var(--secondary-text-color);
   font-size: 1rem;
   font-weight: 500;
   margin: 0 0 var(--spacing-sm);
-  color: var(--secondary-text-color);
 }
 
 .card__fields {
+  list-style: none;
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
 .card__field {
-  margin-bottom: .5rem;
-  font-size: 1rem;
   color: var(--secondary-text-color);
+  font-size: 1rem;
+  margin-bottom: .5rem;
 }
 
 .card__field-label {
@@ -76,7 +98,7 @@
 }
 
 .card__message {
-  margin: 0;
   color: var(--secondary-text-color);
+  margin: 0;
 }
 

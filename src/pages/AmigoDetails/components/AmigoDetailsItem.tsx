@@ -22,7 +22,7 @@ const AmigoDetailsItem: React.FC<AmigoDetailsItemProps> = ({ amigoDetails, amigo
         <h2 className="card__title" id={headingId}>
           Details for {firstName} {lastName}
         </h2>
-        <p className="card__message prose">Message: No details information found.</p>
+        <p className="card__message">Message: No details information found.</p>
       </article>
     );
   }
@@ -58,7 +58,7 @@ const AmigoDetailsItem: React.FC<AmigoDetailsItemProps> = ({ amigoDetails, amigo
             );
           })
         ) : (
-          <li className="card__field prose">No additional details found.</li>
+          <li className="card__field">No additional details found.</li>
         )}
       </ul>
     </article>
