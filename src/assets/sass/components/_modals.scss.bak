@@ -1,0 +1,122 @@
+// src/assets/sass/components/_modals.scss
+// Components: Modals (Amigos Unite)
+
+.modal {
+  background: var(--lightbox-bg-color);
+  display: none; /* hidden by default; shown via .is-open */
+  inset: 0;
+  justify-content: center;
+  padding: var(--spacing-md);
+  position: fixed;
+  z-index: var(--z-modal);
+
+  &.is-open {
+    display: flex;
+  }
+}
+
+.modal__dialog {
+/* NEW: stack header/body/footer and let body flex */
+  background: var(--secondary-surface-bg-color-1);
+  border-radius: var(--border-radius-base);
+  border: 1px solid var(--primary-color);
+  box-shadow: var(--shadow-lg);
+  color: var(--primary-text-color);
+  display: flex;          /* NEW: stack header/body/footer and let body flex */
+  flex-direction: column;
+  inline-size: min(90vw, 420px);
+  max-block-size: 90dvh;  /* use dynamic vh for mobile chrome */
+  overflow: hidden; 
+}
+
+/* Header/Footer fixed height */
+.modal__header,
+.modal__footer {
+  background: var(--secondary-surface-color-1);
+  border-bottom: 1px solid var(--secondary-border-color);
+  flex: 0 0 auto;                 /* don’t grow */
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.modal__footer {
+  border-bottom: 0;
+  border-top: 1px solid var(--secondary-border-color);
+}
+
+.modal__title {
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+/* BODY SCROLLS */
+.modal__body {
+  align-content: center;
+  color: var(--primary-surface-color-1);
+  flex: 1 1 auto;       /* make this area take remaining height and scroll */
+  line-height: var(--line-height-base);
+  min-block-size: 0;    /* make this area take remaining height and scroll */
+  overflow: auto;       /* critical for overflow in flex children */
+  overscroll-behavior: contain;
+  padding: var(--spacing-lg);
+  scrollbar-gutter: stable both-edges;  /* nice-to-haves */
+  scrollbar-width: thin; /* or auto */
+  scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+
+.modal__close {
+  background: transparent;
+  border-radius: var(--border-radius-sm);
+  border: 0;
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  line-height: 1;
+  padding: var(--spacing-xs);
+  position: absolute;
+  right: var(--spacing-sm);
+  top: var(--spacing-sm);
+
+  &:hover {
+    background: var(--primary-surface-hover-bg-color-1);
+    color: var(--primary-text-color);
+  }
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.modal__body::-webkit-scrollbar {
+  /*If you see no effect in your Chrome version, rely on ::-webkit-scrollbar-track. */
+  /* This sometimes paints the track “gutter” behind the thumb in Safari/Chromium.*/
+  background: var(--scrollbar-bg-color);
+  height: 16px;
+  width: 16px;
+}
+
+.modal__body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);      /* gutter/track color */
+}
+
+.modal__body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 999px;
+  /* Optional: add a border to create a “pill” with track peeking through */
+  border: 4px solid var(--scrollbar-track-color);
+}
+
+/* HOVER/ACTIVE states — prevent fallback look */
+.modal__body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
+}
+
+.modal__body::-webkit-scrollbar-thumb:active {
+  background: var(--scrollbar-thumb-active-color);
+}
+
+.modal__body::-webkit-scrollbar-track:hover {
+  background: var(--scrollbar-track-hover-color);
+}
+
+/* Corner where vertical+horizontal bars meet */
+.modal__body::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track-color);
+}
+/* Firefox: only coarse control */
+.modal__body { scrollbar-width: thin; } /* or 'thin' */

@@ -40,6 +40,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
+  justify-self: left;
 }
 
 /* Profile flavor — positions a circular avatar in the top-right */

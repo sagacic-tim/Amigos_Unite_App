@@ -13,7 +13,7 @@
   font: inherit;
   justify-content: center;
   line-height: 1.25;
-  margin-top: 10px;
+  margin: 10px 6px auto auto;
   padding: var(--spacing-xs) var(--spacing-md);
   text-decoration: none;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
@@ -63,10 +63,15 @@
 .button--cancel {
   background-color: var(--cancel-button-bg-color);
   color: var(--cancel-button-label-color);
+  max-width: 160px;
 
   &:hover:not(:disabled) {
     background-color: var(--cancel-button-hover-bg-color);
     color: var(--cancel-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--cancel-button-disabled-bg-color);
+    color: var(--cancel-button-disabled-label-color);
   }
 }
 

@@ -29,7 +29,7 @@ const Logout: React.FC<LogoutProps> = ({ onLogoutSuccess }) => {
     }
   };
 
-  return <button onClick={handleLogout} type="button" className="button--primary">Logout</button>;
+  return <button onClick={handleLogout} type="button" className="button button--primary">Logout</button>;
 };
 
 export default Logout;
