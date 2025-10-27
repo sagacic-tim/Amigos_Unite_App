@@ -2,8 +2,10 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth'
+import md5 from 'blueimp-md5';
 import privateApi, { triggerAuthRequired } from '@/services/privateApi';
 import styles from './Profile.module.scss';
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -90,9 +92,21 @@ const CA_PROVINCES = [
   { short: 'YT', long: 'Yukon' },
 ];
 
+function gravatarIdenticon(email: string, size = 80) {
+  const hash = md5(email.trim().toLowerCase());
+  return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+}
+
+const apiOrigin = import.meta.env.VITE_API_ORIGIN;
+
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
+
+
+
 function composeAddress(loc: Partial<AmigoLocationPayload>): string {
   const parts = [
     [loc.street_number, loc.street_name].filter(Boolean).join(' '),
@@ -128,6 +142,17 @@ export default function Profile() {
     } as Record<string, { short: string; long: string }[]>;
   }, []);
 
+  // ⬇️ ADD THESE LINES
+  const apiOrigin = import.meta.env.VITE_API_ORIGIN as string;
+
+  const initialAvatarSrc = useMemo(() => {
+    if (currentUser?.avatar_url) return `${apiOrigin}${currentUser.avatar_url}`;
+    const email = (currentUser?.email || '').trim().toLowerCase();
+    if (email) return gravatarIdenticon(email, 80);
+    return '/images/default-amigo-avatar.png';
+  }, [apiOrigin, currentUser?.avatar_url, currentUser?.email]);
+  // ⬆️ ADD THESE LINES
+
   const loadAll = useCallback(async () => {
     if (!amigoId) return;
     setLoading(true);
@@ -135,7 +160,6 @@ export default function Profile() {
     setSaved(false);
 
     try {
-      // Details
       const d = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_detail`, { withCredentials: true });
       setDetails(d?.data ?? {});
     } catch {
@@ -143,7 +167,6 @@ export default function Profile() {
     }
 
     try {
-      // Locations (only keep the first one)
       const l = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_locations`, { withCredentials: true });
       const list = Array.isArray(l?.data) ? l.data : (l?.data?.data ?? []);
       setLocation(list?.[0] ?? null);
@@ -153,7 +176,6 @@ export default function Profile() {
 
     setLoading(false);
   }, [amigoId]);
-
   // Auth guard
   useEffect(() => {
     if (!isLoggedIn) {
@@ -490,9 +512,153 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* ───────────────── Actions (single Save) ──────── */}
-          <div className="actions">
-            <button className="button button--primary" onClick={saveAll} disabled={saving}>
+          {/* ───────────────── Avatar ───────────────── */}
+          <div className="card card--details">
+            <h2>Avatar</h2>
+
+            <div className="form-grid">
+              {/* Current avatar */}
+              <label>
+                <span>Current</span>
+                <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+                  <img
+                    src={initialAvatarSrc}
+                    alt="Current avatar"
+                    width={80}
+                    height={80}
+                    style={{ borderRadius: '50%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      const email = (currentUser?.email || '').trim().toLowerCase();
+                      const stage = img.dataset.fallbackStage || '0';
+                      if (stage === '0' && email) {
+                        img.dataset.fallbackStage = '1';
+                        img.src = gravatarIdenticon(email, 80);
+                        return;
+                      }
+                      img.onerror = null;
+                      img.src = '/images/default-amigo-avatar.png';
+                    }}
+                  />
+                  <span>Shown across the app</span>
+                </div>
+              </label>
+
+              {/* Choose source */}
+              <fieldset>
+                <legend>Choose source</legend>
+
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name="avatar_source"
+                    value="upload"
+                    onChange={() => setDetails((d:any) => ({...d, avatar_source: 'upload'}))}
+                  />
+                  <span>Upload a file</span>
+                </label>
+
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name="avatar_source"
+                    value="gravatar"
+                    onChange={() => setDetails((d:any) => ({...d, avatar_source: 'gravatar'}))}
+                  />
+                  <span>Use Gravatar (based on your email)</span>
+                </label>
+
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name="avatar_source"
+                    value="url"
+                    onChange={() => setDetails((d:any) => ({...d, avatar_source: 'url'}))}
+                  />
+                  <span>External image URL (Disqus or other)</span>
+                </label>
+
+                <label style={{marginTop: '8px'}}>
+                  <span>External URL (if chosen)</span>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/avatar.jpg"
+                    onChange={(e) => setDetails((d:any) => ({...d, avatar_remote_url: e.target.value}))}
+                  />
+                </label>
+
+                {/* File upload input (only if 'upload' selected) */}
+                {(details as any)?.avatar_source === 'upload' && (
+                  <label>
+                    <span>Upload image (PNG/JPG/SVG, ~200×200)</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setDetails((d:any) => ({...d, _avatar_file: e.target.files?.[0] ?? null}))}
+                    />
+                  </label>
+                )}
+              </fieldset>
+
+              {/* Save avatar source immediately (optional), or piggy-back on Save button */}
+              <button
+                className="button button--secondary"
+                disabled={saving}
+                onClick={async () => {
+                  if (!amigoId) return;
+                  setSaving(true);
+                  setError(null);
+                  try {
+                    const data: any = new FormData();
+                    data.append('amigo[avatar_source]', (details as any)?.avatar_source || 'default');
+                    if ((details as any)?.avatar_source === 'url' && (details as any)?.avatar_remote_url) {
+                      data.append('amigo[avatar_remote_url]', (details as any).avatar_remote_url);
+                    }
+                    if ((details as any)?.avatar_source === 'upload' && (details as any)?._avatar_file) {
+                      data.append('amigo[avatar]', (details as any)._avatar_file);
+                    }
+
+                    await privateApi.patch(
+                      `/api/v1/amigos/${amigoId}`,
+                      data,
+                      {
+                        withCredentials: true,
+                        headers: { 'Accept': 'application/json' }
+                        // NOTE: do NOT set Content-Type; browser sets multipart boundary automatically
+                      }
+                    );
+
+                    await loadAll(); // refresh to get new avatar_url
+                    setSaved(true);
+                  } catch (e: any) {
+                    setError(e?.response?.data?.errors?.[0] ?? 'Failed to update avatar.');
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+              >
+                Update Avatar
+              </button>
+            </div>
+          </div>
+          
+          {/* ───────────────── Actions (Save + Cancel) ──────── */}
+          <div className="actions" style={{ display: 'flex', gap: '12px' }}>
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={() => navigate('/amigos')}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={saveAll}
+              disabled={saving}
+            >
               {saving ? 'Saving…' : 'Save'}
             </button>
           </div>

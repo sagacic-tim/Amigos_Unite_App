@@ -61,6 +61,7 @@
   flex: 0 1 auto; /* allow dialog to size to content; body should NOT force growth */
   line-height: var(--line-height-base);
   min-block-size: 0; /* safe for flex overflow */
+  min-inline-size: 320px;
   overflow: auto; /* scroll only when content exceeds max-block-size */
   overscroll-behavior: contain;
   padding: 30px 20px;
