@@ -19,6 +19,15 @@ type AmigoDetailsPayload = {
   personal_bio?: string | null;
 };
 
+const buildAmigoDetailsPayload = (src: any): AmigoDetailsPayload => ({
+  date_of_birth: src.date_of_birth ?? null,
+  member_in_good_standing: !!src.member_in_good_standing,
+  available_to_host: !!src.available_to_host,
+  willing_to_help: !!src.willing_to_help,
+  willing_to_donate: !!src.willing_to_donate,
+  personal_bio: src.personal_bio ?? null,
+});
+
 type AmigoLocationPayload = {
   id?: number; // optional: new/unsaved location has no id yet
   address?: string | null; // view-only (composed)
@@ -43,6 +52,35 @@ type AmigoLocationPayload = {
   time_zone?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
+};
+
+
+const buildAmigoLocationPayloadForSave = (src: Partial<AmigoLocationPayload>) => {
+  const composedAddress = composeAddress(src);
+
+  return {
+    // use explicit address if present, otherwise fall back to composedAddress (or null)
+    address: src.address ?? (composedAddress || null),
+
+    floor: src.floor ?? null,
+    street_number: src.street_number ?? null,
+    street_name: src.street_name ?? null,
+    room_no: src.room_no ?? null,
+    apartment_suite_number: src.apartment_suite_number ?? null,
+    city_sublocality: src.city_sublocality ?? null,
+    city: src.city ?? null,
+    state_province_subdivision: src.state_province_subdivision ?? null,
+    state_province: src.state_province ?? null,
+    state_province_short: src.state_province_short ?? null,
+    country: src.country ?? null,
+    country_short: src.country_short ?? null,
+    postal_code: src.postal_code ?? null,
+    postal_code_suffix: src.postal_code_suffix ?? null,
+    post_box: src.post_box ?? null,
+    latitude: src.latitude ?? null,
+    longitude: src.longitude ?? null,
+    time_zone: src.time_zone ?? null,
+  };
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -97,14 +135,10 @@ function gravatarIdenticon(email: string, size = 80) {
   return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
 }
 
-const apiOrigin = import.meta.env.VITE_API_ORIGIN;
-
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
-
 
 
 function composeAddress(loc: Partial<AmigoLocationPayload>): string {
@@ -161,21 +195,29 @@ export default function Profile() {
 
     try {
       const d = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_detail`, { withCredentials: true });
-      setDetails(d?.data ?? {});
-    } catch {
+      const rawDetails = d?.data ?? {};
+        setDetails(buildAmigoDetailsPayload(rawDetails));    }
+    catch {
       setDetails({});
     }
 
     try {
       const l = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_locations`, { withCredentials: true });
       const list = Array.isArray(l?.data) ? l.data : (l?.data?.data ?? []);
-      setLocation(list?.[0] ?? null);
+      const first = list?.[0] ?? null;
+
+      if (first) {
+        const { amigo, ...rest } = first; // drop nested amigo; id stays
+        setLocation(rest as AmigoLocationPayload);
+      } else {
+        setLocation(null);
+      }
     } catch {
       setLocation(null);
     }
-
     setLoading(false);
   }, [amigoId]);
+
   // Auth guard
   useEffect(() => {
     if (!isLoggedIn) {
@@ -221,9 +263,8 @@ export default function Profile() {
 
     try {
       // ─── Amigo Details: clean + upsert ───
-      // (Your GET /show response sometimes includes { message: 'No details...' }.
-      // Strip that out before sending to the server.)
-      const { message, ...cleanDetails } = (details as any) || {};
+      // details is already a normalized AmigoDetailsPayload
+      const cleanDetails = buildAmigoDetailsPayload(details || {});
 
       await privateApi
         .patch(
@@ -233,7 +274,6 @@ export default function Profile() {
         )
         .catch(async (err) => {
           if (err?.response?.status === 404) {
-            // If there's no record yet, create it
             await privateApi.post(
               `/api/v1/amigos/${amigoId}/amigo_detail`,
               { amigo_detail: cleanDetails },
@@ -244,23 +284,24 @@ export default function Profile() {
           }
         });
 
-      // ─── Amigo Location (single): keep your existing logic ───
-      if (location) {
-        if (location.id) {
-          await privateApi.patch(
-            `/api/v1/amigos/${amigoId}/amigo_locations/${location.id}`,
-            { amigo_location: location },
-            { withCredentials: true }
-          );
-        } else {
-          await privateApi.post(
-            `/api/v1/amigos/${amigoId}/amigo_locations`,
-            { amigo_location: location },
-            { withCredentials: true }
-          );
-        }
-      }
+    // ─── Amigo Location (single): send only permitted fields ───
+    if (location) {
+      const cleanLocation = buildAmigoLocationPayloadForSave(location);
 
+      if (location.id) {
+        await privateApi.patch(
+          `/api/v1/amigos/${amigoId}/amigo_locations/${location.id}`,
+          { amigo_location: cleanLocation },
+          { withCredentials: true }
+        );
+      } else {
+        await privateApi.post(
+          `/api/v1/amigos/${amigoId}/amigo_locations`,
+          { amigo_location: cleanLocation },
+          { withCredentials: true }
+        );
+      }
+    }
       // Refresh UI data to show any server-calculated fields
       await loadAll();
       setSaved(true);
@@ -644,14 +685,6 @@ export default function Profile() {
           
           {/* ───────────────── Actions (Save + Cancel) ──────── */}
           <div className="actions" style={{ display: 'flex', gap: '12px' }}>
-            <button
-              type="button"
-              className="button button--secondary"
-              onClick={() => navigate('/amigos')}
-              disabled={saving}
-            >
-              Cancel
-            </button>
 
             <button
               type="button"
@@ -660,6 +693,14 @@ export default function Profile() {
               disabled={saving}
             >
               {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              className="button button--cancel"
+              onClick={() => navigate('/amigos')}
+              disabled={saving}
+            >
+              Cancel
             </button>
           </div>
         </>

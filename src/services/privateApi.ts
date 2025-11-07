@@ -22,14 +22,15 @@ export function triggerAuthRequired(notice?: string) {
   if (authModalOpen) return;
   authModalOpen = true;
   authRequiredHandler?.(notice);
-  // Your UI should call resetAuthModalOpen() when the modal closes.
 }
 
 export function resetAuthModalOpen() {
   authModalOpen = false;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:3001';
+// IMPORTANT: this should be just the origin, e.g. "https://localhost:3001"
+const RAW_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:3001';
+const API_BASE = RAW_BASE.replace(/\/+$/, '');
 
 const privateApi: AxiosInstance = axios.create({
   baseURL: API_BASE,
@@ -40,7 +41,7 @@ const privateApi: AxiosInstance = axios.create({
   },
 });
 
-/* Bootstrap: hydrate Authorization from localStorage */
+/* Bootstrap: hydrate Authorization from localStorage (optional, not required for cookie auth) */
 try {
   const stored = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
   if (stored) {
@@ -67,6 +68,20 @@ privateApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
+/** Auth-related endpoints where we *must not* try to auto-refresh on 401. */
+const AUTH_ENDPOINTS = [
+  '/api/v1/login',
+  '/api/v1/logout',
+  '/api/v1/refresh_token',
+  '/api/v1/verify_token',
+  '/api/v1/csrf',
+];
+
+function isAuthEndpoint(url?: string) {
+  if (!url) return false;
+  return AUTH_ENDPOINTS.some((p) => url.includes(p));
+}
+
 /* Response: central 401 handling with one refresh + retry */
 let isRefreshing = false;
 let lastAuthModalAt = 0;
@@ -76,8 +91,14 @@ privateApi.interceptors.response.use(
   async (error: AxiosError) => {
     const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const status = error.response?.status;
+    const url = original?.url;
 
-    if (!original || status !== 401 || original._retry) {
+    // Don’t try to refresh on:
+    // - no config
+    // - not 401
+    // - already retried
+    // - auth endpoints themselves (login/logout/refresh/verify/csrf)
+    if (!original || status !== 401 || original._retry || isAuthEndpoint(url)) {
       return Promise.reject(error);
     }
     original._retry = true;
@@ -116,12 +137,15 @@ privateApi.interceptors.response.use(
             };
             try {
               localStorage.setItem('authToken', value);
-            } catch {/* ignore */}
+            } catch {
+              /* ignore */
+            }
           }
 
           return privateApi.request(original);
         }
       } else {
+        // if another request is already refreshing, wait briefly and retry
         await new Promise((r) => setTimeout(r, 200));
         return privateApi.request(original);
       }
@@ -129,6 +153,7 @@ privateApi.interceptors.response.use(
       isRefreshing = false;
     }
 
+    // Refresh failed → clear local auth hints and force re-login
     try {
       delete (privateApi.defaults.headers as any)?.common?.Authorization;
     } catch {}
@@ -150,4 +175,3 @@ privateApi.interceptors.response.use(
 );
 
 export default privateApi;
-// NOTE: no re-export of the named functions here—those are already exported above

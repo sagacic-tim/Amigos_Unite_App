@@ -1,30 +1,46 @@
 // src/services/csrf.ts
-import publicApi from './publicApi';
+import publicApi from '@/services/publicApi';
 
-let cached: string | null = null;
+let cachedToken: string | null = null;
+let inflight: Promise<string> | null = null;
 
-export function resetCsrfToken() {
-  cached = null;
+function readCookieToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const m = document.cookie.match(/(?:^|;\s*)CSRF-TOKEN=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
 }
 
 export async function ensureCsrfToken(): Promise<string> {
-  if (cached) return cached;
+  // 1. If we already have a cached token, use it.
+  if (cachedToken) return cachedToken;
 
-  const resp = await publicApi.get('/api/v1/csrf', { withCredentials: true });
+  // 2. Try to read from cookies first.
+  const fromCookie = readCookieToken();
+  if (fromCookie) {
+    cachedToken = fromCookie;
+    return cachedToken;
+  }
 
-  // Axios v1 headers can be an object or AxiosHeaders; support both:
-  const headerToken =
-    (resp.headers as any)['x-csrf-token'] ??
-    (resp.headers as any).get?.('x-csrf-token');
+  // 3. Only one network call at a time.
+  if (!inflight) {
+    inflight = publicApi
+      .get('/api/v1/csrf', { withCredentials: true })
+      .then(() => {
+        inflight = null;
+        const after = readCookieToken();
+        if (!after) throw new Error('CSRF cookie missing after /csrf');
+        cachedToken = after;
+        return cachedToken;
+      })
+      .catch((err) => {
+        inflight = null;
+        throw err;
+      });
+  }
 
-  // Fallback to cookie in case a proxy drops the exposed header:
-  const cookieMatch = document.cookie.match(/(?:^|;\s*)CSRF-TOKEN=([^;]+)/);
-  const cookieToken = cookieMatch ? decodeURIComponent(cookieMatch[1]) : undefined;
+  return inflight;
+}
 
-  const token = headerToken || cookieToken;
-  if (!token) throw new Error('Failed to obtain CSRF token');
-
-  cached = token;
-  publicApi.defaults.headers.common['X-CSRF-Token'] = token; // convenience
-  return token;
+export function resetCsrfToken() {
+  cachedToken = null;
 }

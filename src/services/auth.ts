@@ -38,7 +38,6 @@ function announceExpiry(iso?: string) {
 export async function loginAmigo(params: LoginParams): Promise<Amigo> {
   await ensureCsrfToken();
 
-  // If your SessionsController expects top-level keys, change to `{ ...params }`
   const resp = await publicApi.post(
     '/api/v1/login',
     { amigo: params },
@@ -47,14 +46,17 @@ export async function loginAmigo(params: LoginParams): Promise<Amigo> {
 
   maybeCaptureAuthHeader(resp);
 
-  // Announce new expiry for proactive refresh scheduling
   const expiresIso: string | undefined = resp.data?.data?.jwt_expires_at;
   announceExpiry(expiresIso);
 
-  // Unwrap common shapes
   const amigo = resp.data?.data?.amigo ?? resp.data?.amigo ?? resp.data;
+
+  // 🔽 tell AuthProvider to re-check /me + /amigos
+  document.dispatchEvent(new Event('auth:changed'));
+
   return amigo as Amigo;
 }
+
 
 export async function signupAmigo(payload: unknown) {
   await ensureCsrfToken();
@@ -84,7 +86,7 @@ export async function logoutAmigo(): Promise<void> {
 
 /** Returns the current amigo (if logged in) or null; never throws on 401. */
 export async function verifyCurrentAmigo(): Promise<Amigo | null> {
-  const res = await privateApi.get('/api/v1/verify_token', {
+  const res = await privateApi.get('/api/v1/me', {
     validateStatus: s => s === 200 || s === 401,
     withCredentials: true,
   });

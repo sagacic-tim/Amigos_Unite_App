@@ -1,7 +1,6 @@
 // src/context/AuthContext.tsx
 import { createContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import publicApi from '@/services/publicApi';
 import privateApi from '@/services/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
 
@@ -45,24 +44,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<Amigo | null>(null);
   const [error, setError]             = useState<string | null>(null);
 
-  const ensureCsrf = useCallback(async () => {
-    try { await publicApi.get('/api/v1/csrf'); } catch {}
-  }, []);
-
-  const verifyToken = useCallback(async (): Promise<boolean> => {
-    try {
-      const res = await publicApi.get<{ valid: boolean }>('/api/v1/verify_token');
-      return !!res.data?.valid;
-    } catch { return false; }
-  }, []);
-
-  const refreshToken = useCallback(async (): Promise<boolean> => {
-    try {
-      const res = await publicApi.post('/api/v1/refresh_token');
-      return res.status === 200;
-    } catch { return false; }
-  }, []);
-
   const loadAmigos = useCallback(async () => {
     try {
       const res = await privateApi.get('/api/v1/amigos', { withCredentials: true });
@@ -73,14 +54,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const loadMe = useCallback(async () => {
+  const loadMe = useCallback(async (): Promise<boolean> => {
     try {
-      const res = await privateApi.get('/api/v1/me', { withCredentials: true });
-      const me = normalizeMePayload(res.data);
-      if (me?.id) {
-        setCurrentUser(me);
-        return true;
+      const res = await privateApi.get('/api/v1/me', {
+        withCredentials: true,
+        validateStatus: (s) => s === 200 || s === 401,
+      });
+
+      if (res.status === 200) {
+        const me = normalizeMePayload(res.data);
+        if (me?.id) {
+          setCurrentUser(me);
+          return true;
+        }
       }
+
       setCurrentUser(null);
       return false;
     } catch {
@@ -93,30 +81,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
 
-    await ensureCsrf();
-
-    let ok = await verifyToken();
-    if (!ok) {
-      ok = await refreshToken();
-      if (ok) ok = await verifyToken();
-    }
-
-    setIsLoggedIn(ok);
+    const ok = await loadMe();
 
     if (ok) {
-      const meOk = await loadMe();
+      setIsLoggedIn(true);
       await loadAmigos();
-      if (!meOk) setIsLoggedIn(false);
     } else {
+      setIsLoggedIn(false);
       setCurrentUser(null);
       setAmigos([]);
     }
 
     setLoading(false);
-  }, [ensureCsrf, verifyToken, refreshToken, loadMe, loadAmigos]);
+  }, [loadMe, loadAmigos]);
 
-  useEffect(() => { void refreshAuth(); }, [refreshAuth]);
+  // Initial auth check on app boot
+  useEffect(() => {
+    void refreshAuth();
+  }, [refreshAuth]);
 
+  // Re-check on auth changes (login/logout)
   useEffect(() => {
     const onAuthChanged = () => { void refreshAuth(); };
     document.addEventListener('auth:changed', onAuthChanged as EventListener);
@@ -126,5 +110,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthState = { isLoggedIn, loading, error, amigos, currentUser, refreshAuth };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
-// NOTE: no default export here; no hook defined here.

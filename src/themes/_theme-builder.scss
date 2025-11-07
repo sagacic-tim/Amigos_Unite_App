@@ -3,21 +3,24 @@
 @use '../assets/sass/abstracts/colors-helper' as ch;
 
 /* ───── Helper mixins (top-level only) ───── */
-@mixin _emit-semantic-vars($success, $warning, $error, $info, $alert, $accent) {
+@mixin _emit-semantic-vars($success, $warning, $error, $info, $alert, $accent, $cancel) {
   --success-color: #{$success};
   --warning-color: #{$warning};
   --error-color:   #{$error};
   --info-color:    #{$info};
   --alert-color:   #{$alert};
   --accent-color:  #{$accent};
+  --cancel-color:  #{cancel};
 }
 
-@mixin _emit-semantic-hover-vars($space, $neutrals, $success, $warning, $error, $info, $alert) {
+@mixin _emit-semantic-hover-vars($space, $neutrals, $success, $warning, $error, $info, $alert, $cancel) {
   --success-hover-color: #{ch.mix-str($space, $success, 95, map.get($neutrals, neutral-white), 5)};
   --warning-hover-color: #{ch.mix-str($space, $warning, 95, map.get($neutrals, neutral-white), 5)};
   --error-hover-color:   #{ch.mix-str($space, $error,   95, map.get($neutrals, neutral-white), 5)};
   --info-hover-color:    #{ch.mix-str($space, $info,    95, map.get($neutrals, neutral-white), 5)};
   --alert-hover-color:   #{ch.mix-str($space, $alert,   95, map.get($neutrals, neutral-white), 5)};
+  --cancel-hover-color:   #{ch.mix-str($space, $cancel,   95, map.get($neutrals, neutral-white), 5)};
+
 }
 
 /* ───── DARK THEME ───── */
@@ -28,7 +31,8 @@
   $warning: base-yellow-orange,
   $error:   base-red,
   $info:    base-cobalt-blue,
-  $alert:   base-red-orange
+  $alert:   base-red-orange,
+  $cancel:  base-red-orange
 ) {
   $brand-color:   ch.from-palette($palette, $brand);
   $accent-color:  ch.from-palette($palette, $accent);
@@ -37,6 +41,8 @@
   $error-color:   ch.from-palette($palette, $error);
   $info-color:    ch.from-palette($palette, $info);
   $alert-color:   ch.from-palette($palette, $alert);
+  $cancel-color:  ch.from-palette($palette, $cancel);
+
 
   :root {
     /* ───────── Container BGs ───────── */
@@ -106,9 +112,9 @@
     --secondary-button-disabled-label-color:#{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 88, $brand-color, 12)};
 
     /* ───────── Cancel Button ───────── */
-    --cancel-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-black), 15, $alert-color, 85)};
-    --cancel-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $alert-color, 95)};
-    --cancel-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 35, $alert-color, 65)};
+    --cancel-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-black), 15, $cancel-color, 85)};
+    --cancel-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $cancel-color, 95)};
+    --cancel-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 35, $cancel-color, 65)};
     --cancel-button-label-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $info-color, 5)};
     --cancel-button-hover-label-color:  #{map.get($neutrals, neutral-white)};
     --cancel-button-disabled-label-color:#{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 90, $info-color, 10)};
@@ -143,10 +149,10 @@
     --focus-ring-color:  #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 50, $brand-color, 50)};
 
     /* semantic colors */
-    @include _emit-semantic-vars($success-color, $warning-color, $error-color, $info-color, $alert-color, $accent-color);
+    @include _emit-semantic-vars($success-color, $warning-color, $error-color, $info-color, $alert-color, $accent-color, $cancel-color);
 
     /* semantic hover colors */
-    @include _emit-semantic-hover-vars($space, $neutrals, $success-color, $warning-color, $error-color, $info-color, $alert-color);
+    @include _emit-semantic-hover-vars($space, $neutrals, $success-color, $warning-color, $error-color, $info-color, $alert-color, $cancel-color);
   }
 }
 
@@ -158,7 +164,8 @@
   $warning: base-yellow-orange,
   $error:   base-red,
   $info:    base-cobalt-blue,
-  $alert:   base-red-orange
+  $alert:   base-red-orange,
+  $cancel:  base-red-orange
 ) {
   $brand-color:   ch.from-palette($palette, $brand);
   $accent-color:  ch.from-palette($palette, $accent);
@@ -167,6 +174,8 @@
   $error-color:   ch.from-palette($palette, $error);
   $info-color:    ch.from-palette($palette, $info);
   $alert-color:   ch.from-palette($palette, $alert);
+  $cancel-color:   ch.from-palette($palette, $cancel);
+
 
   :root {
     /* ───────── Container BGs ───────── */
@@ -233,9 +242,9 @@
     --secondary-button-disabled-label-color:#{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 90, $brand-color, 10)};
 
     /* ───────── Cancel Button ───────── */
-    --cancel-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-black), 15, $alert-color, 85)};
-    --cancel-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $alert-color, 95)};
-    --cancel-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 35, $alert-color, 65)};
+    --cancel-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-black), 15, $cancel-color, 85)};
+    --cancel-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $cancel-color, 95)};
+    --cancel-button-disabled-bg-color:  #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 35, $cancel-color, 65)};
     --cancel-button-label-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $info-color, 5)};
     --cancel-button-hover-label-color:  #{map.get($neutrals, neutral-white)};
     --cancel-button-disabled-label-color:#{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 90, $info-color, 10)};
@@ -270,9 +279,9 @@
     --focus-ring-color:  #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 50, $brand-color, 50)};
 
     /* semantic colors */
-    @include _emit-semantic-vars($success-color, $warning-color, $error-color, $info-color, $alert-color, $accent-color);
+    @include _emit-semantic-vars($success-color, $warning-color, $error-color, $info-color, $alert-color, $accent-color, $cancel-color);
 
     /* semantic hover colors */
-    @include _emit-semantic-hover-vars($space, $neutrals, $success-color, $warning-color, $error-color, $info-color, $alert-color);
+    @include _emit-semantic-hover-vars($space, $neutrals, $success-color, $warning-color, $error-color, $info-color, $alert-color, $cancel_color);
   }
 }

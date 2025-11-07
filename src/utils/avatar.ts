@@ -1,22 +1,32 @@
-// src/lib/avatar.ts
-import md5 from 'blueimp-md5';
+// src/utils/avatar.ts
+import md5 from 'crypto-js/md5';
+import type { Amigo } from '@/types/AmigoTypes';
+import { resolveApiUrl } from '@/utils/resolveApiUrl';
+
+export const DEFAULT_AVATAR = '/images/default-amigo-avatar.png';
 
 /**
- * Build a Gravatar URL (or return null if email missing).
- * Uses d=404 so you can detect absence with a HEAD/GET if you want.
+ * Choose the best avatar URL:
+ * 1) explicit amigo.avatar_url (your API / ActiveStorage)
+ * 2) Gravatar, based on amigo.email, with a generic fallback style
+ * 3) local default image
  */
-export function gravatarUrl(email?: string, size = 200): string | null {
-  if (!email) return null;
-  const hash = md5(email.trim().toLowerCase());
-  return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=404`;
-}
+export function buildAvatarUrl(amigo: Amigo | null | undefined): string {
+  // 1) explicit avatar from backend
+  const explicit = resolveApiUrl(amigo?.avatar_url);
+  if (explicit) return explicit;
 
-/**
- * Optionally: build a Disqus avatar URL.
- * Note: Disqus avatars are forum/user-contextual; often you’ll rely on
- * Disqus’ embed to render them. This is a placeholder if you have a direct URL.
- */
-export function disqusAvatarUrl(_identifier: string, size = 200): string | null {
-  // Unless you have a stable Disqus image URL pattern, prefer Gravatar or upload.
-  return null;
+  // 2) Gravatar from email (if present)
+  const email = amigo?.email?.trim().toLowerCase() ?? '';
+  if (email) {
+    const hash = md5(email).toString();
+    const params = new URLSearchParams({
+      d: 'retro', // or 'identicon', 'monsterid', etc.
+      s: '160',
+    });
+    return `https://www.gravatar.com/avatar/${hash}?${params.toString()}`;
+  }
+
+  // 3) fallback to local default
+  return DEFAULT_AVATAR;
 }

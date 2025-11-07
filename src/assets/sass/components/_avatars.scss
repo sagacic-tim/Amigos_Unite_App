@@ -35,3 +35,11 @@
     box-shadow: 0 0 0 2px var(--primry-shadow-color);
   }
 }
+
+/* New: generic layout helper for avatar + text */
+.avatar-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 16px;
+}

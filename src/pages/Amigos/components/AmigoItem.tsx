@@ -1,7 +1,7 @@
 // src/pages/Amigos/components/AmigoItem.tsx
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '@/hooks/useAuth'; // <- use the context export you showed earlier
+import useAuth from '@/hooks/useAuth';
 import Modal from '@/components/Common/Modal';
 import AmigoDetailItem from '@/pages/AmigoDetails/components/AmigoDetailsItem';
 import AmigoLocationItem from '@/pages/AmigoLocations/components/AmigoLocationItem';
@@ -9,38 +9,19 @@ import { fetchAmigoDetails, fetchAmigoLocations } from '@/services/AmigoService'
 import type { Amigo } from '@/types/AmigoTypes';
 import type { AmigoDetails } from '@/types/AmigoDetailsTypes';
 import type { AmigoLocation } from '@/types/AmigoLocationTypes';
-// import styles from "../Amigos.module.scss";
+import { buildAvatarUrl, DEFAULT_AVATAR } from '@/utils/avatar';
 
 interface AmigoItemProps {
   amigo: Amigo;
 }
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-const API_ORIGIN = (() => {
-  try {
-    return new URL(API_BASE).origin; // e.g. "https://localhost:3001"
-  } catch {
-    return '';
-  }
-})();
 
 const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
   const canEdit = !!currentUser && currentUser.id === amigo.id;
-  const DEFAULT_AVATAR = `${API_ORIGIN}/images/default-amigo-avatar.png`;
 
-  const avatarUrl = useMemo(() => {
-    const raw = amigo.avatar_url;
-    const src = (typeof raw === 'string' ? raw : '').trim();
-    if (!src) return DEFAULT_AVATAR;
-
-    // Absolute URLs pass through; relative paths get the API origin prefix.
-    return src.startsWith('http://') || src.startsWith('https://')
-      ? src
-      : `${API_ORIGIN}${src}`;
-  }, [amigo.avatar_url]);
+  const avatarUrl = useMemo(() => buildAvatarUrl(amigo), [amigo]);
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -48,6 +29,13 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
   const [amigoLocations, setAmigoLocations] = useState<AmigoLocation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.dataset.fallbackApplied === 'true') return; // prevent loops if default fails
+    img.dataset.fallbackApplied = 'true';
+    img.src = DEFAULT_AVATAR;
+  };
 
   const handleOpenDetailModal = async () => {
     setIsDetailModalOpen(true);
@@ -94,16 +82,14 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
     setError(null);
   };
 
-
   return (
     <article className="card card--profile">
       <div className="card__media card__media--avatar">
         <img
           src={avatarUrl}
           alt={`${amigo.first_name} ${amigo.last_name}'s avatar`}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = DEFAULT_AVATAR;
-          }}
+          loading="lazy"
+          onError={handleImgError}
         />
       </div>
 
@@ -116,7 +102,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
           {Object.entries(amigo).map(([key, value]) => {
             if (
               value == null ||
-              ['id', 'avatar_url', 'created_at', 'updated_at', 'unformatted_phone_1', 'unformatted_phone_2'].includes(key)
+              ['id', 'avatar-url', 'created_at', 'updated_at', 'unformatted_phone_1', 'unformatted_phone_2'].includes(key)
             ) {
               return null;
             }

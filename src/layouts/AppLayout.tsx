@@ -91,14 +91,22 @@ function AuthModalsHost() {
         <div className="auth-dialog">
           <h2>Logout</h2>
           <p>Are you sure you want to log out?</p>
-          <div className="auth-dialog__actions">
+          <div className="form-grid__actions">
             <Logout
               onLogoutSuccess={() => {
                 setLogoutOpen(false);
-                document.dispatchEvent(new CustomEvent('auth:changed', { detail: { type: 'logout' } }));
+                document.dispatchEvent(
+                  new CustomEvent('auth:changed', { detail: { type: 'logout' } }),
+                );
               }}
             />
-            <button type="button" className="button button--cancel" onClick={() => setLogoutOpen(false)}>Cancel</button>
+            <button
+              type="button"
+              className="button button--cancel"
+              onClick={() => setLogoutOpen(false)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </Modal>

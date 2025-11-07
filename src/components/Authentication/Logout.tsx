@@ -1,3 +1,4 @@
+// src/components/Authentication/Logout.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { privateDel } from '../../services/apiHelper';
@@ -7,7 +8,8 @@ interface LogoutProps {
   onLogoutSuccess: () => void;
 }
 
-const clearCookies = () => {
+// Optional: make this more surgical later (JWT + CSRF only)
+const clearAuthCookies = () => {
   document.cookie.split(';').forEach((c) => {
     document.cookie = c
       .replace(/^ +/, '')
@@ -21,7 +23,7 @@ const Logout: React.FC<LogoutProps> = ({ onLogoutSuccess }) => {
   const handleLogout = async () => {
     try {
       await privateDel<void>('/api/v1/logout');
-      clearCookies();
+      clearAuthCookies();
       onLogoutSuccess();
       navigate('/');
     } catch (error) {
@@ -29,7 +31,15 @@ const Logout: React.FC<LogoutProps> = ({ onLogoutSuccess }) => {
     }
   };
 
-  return <button onClick={handleLogout} type="button" className="button button--primary">Logout</button>;
+  return (
+    <button
+      onClick={handleLogout}
+      type="button"
+      className="button button--primary"
+    >
+      Logout
+    </button>
+  );
 };
 
 export default Logout;

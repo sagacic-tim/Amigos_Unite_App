@@ -1,6 +1,5 @@
 /* src/assets/sass/components/_forms.scss */
 
-/* Base, shared form layout */
 .form-grid {
   background: transparent;
   border: none;
@@ -22,14 +21,13 @@
     margin-bottom: var(--spacing-xs);
   }
 
-  /* Fields grid */
+  /* Fields grid container (when used) */
   &__fields {
     display: grid;
     gap: var(--form-gap);
     grid-template-columns: 1fr 1fr;
   }
 
-  /* Single-column variant for narrow forms (optional) */
   &--one-column {
     .form-grid__fields {
       grid-template-columns: 1fr;
@@ -81,7 +79,7 @@
     align-items: center;
     gap: var(--spacing-xs);
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       width: auto;
       margin: 0;
       transform: translateY(-1px);
@@ -101,11 +99,16 @@
 
   /* Actions row: layout ONLY (buttons come from _buttons.scss) */
   &__actions,
+  .form__actions,
   .form-actions {
-    display: flex;
+    display: grid;
+    grid-auto-rows: auto;
+    grid-auto-flow: column; // lay out items in a row
+    grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
     gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
-    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: start;
   }
 
   /* Messages */
@@ -119,7 +122,6 @@
     margin-bottom: var(--spacing-sm);
   }
 
-  /* Optional card look for sections inside forms */
   .card {
     padding: var(--spacing-lg);
     border: 1px solid var(--secondary-border-color);
@@ -133,22 +135,3 @@
     }
   }
 }
-
-/* Width/spacing modifiers (BEM) — adjust only the variables */
-/* .form-grid--auth {
-  --form-max-width: 320px;
-}
-
-.form-grid--profile {
-  --form-max-width: 720px; /* wider for profile */
-/*  --form-padding-inline: var(--spacing-sm);
-}
-
-.form-grid--narrow {
-  --form-max-width: 420px;
-}
-
-/* You can also add a 'wide' utility if needed */
-/*.form-grid--wide {
-  --form-max-width: 960px;
-} */
