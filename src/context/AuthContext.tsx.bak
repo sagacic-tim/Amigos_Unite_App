@@ -1,6 +1,6 @@
 // src/context/AuthContext.tsx
 import { createContext, useEffect, useState, useCallback } from 'react';
-import type { ReactNode, Dispatch, SetStateAction } from 'react';
+import type { ReactNode } from 'react';
 import privateApi from '@/services/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
 
@@ -11,8 +11,6 @@ export type AuthState = {
   amigos: Amigo[];
   currentUser: Amigo | null;
   refreshAuth: () => Promise<void>;
-  refreshCurrentUser: () => Promise<void>;
-  setCurrentUser: Dispatch<SetStateAction<Amigo | null>>;
 };
 
 export const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -79,10 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-   const refreshCurrentUser = useCallback(async () => {
-    await loadMe();
-  }, [loadMe]);
-
   const refreshAuth = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -113,16 +107,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('auth:changed', onAuthChanged as EventListener);
   }, [refreshAuth]);
 
-  const value: AuthState = {
-    isLoggedIn,
-    loading,
-    error,
-    amigos,
-    currentUser,
-    refreshAuth,
-    refreshCurrentUser,
-    setCurrentUser,
-  };
-
+  const value: AuthState = { isLoggedIn, loading, error, amigos, currentUser, refreshAuth };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

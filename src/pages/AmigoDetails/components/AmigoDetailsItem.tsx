@@ -1,8 +1,9 @@
 // src/pages/AmigoDetails/components/AmigoDetailsItem.tsx
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { AmigoDetails } from '@/types/AmigoDetailsTypes';
 import type { Amigo } from '@/types/AmigoTypes';
 import { buildAvatarUrl, DEFAULT_AVATAR } from '@/utils/avatar';
+import useAuth from '@/hooks/useAuth';
 import styles from '../AmigoDetails.module.scss';
 
 interface AmigoDetailsItemProps {
@@ -10,16 +11,22 @@ interface AmigoDetailsItemProps {
   amigo: Amigo;
 }
 
-
 const formatString = (key: string): string =>
   key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 const AmigoDetailsItem: React.FC<AmigoDetailsItemProps> = ({ amigoDetails, amigo }) => {
-  const firstName = amigo.first_name || 'Unknown';
-  const lastName  = amigo.last_name  || 'Unknown';
-  const headingId = `amigo-details-heading-${amigo.id}`;
+  const { currentUser } = useAuth();               // ⬅️ read auth state
 
-  const avatarSrc = useMemo(() => buildAvatarUrl(amigo), [amigo]);
+  // If this card is showing the logged-in amigo, prefer currentUser,
+  // which you refresh after avatar upload. Otherwise fall back to the prop.
+  const effectiveAmigo: Amigo =
+    currentUser && currentUser.id === amigo.id ? { ...amigo, ...currentUser } : amigo;
+
+  const firstName = effectiveAmigo.first_name || 'Unknown';
+  const lastName  = effectiveAmigo.last_name  || 'Unknown';
+  const headingId = `amigo-details-heading-${effectiveAmigo.id}`;
+
+  const avatarSrc = buildAvatarUrl(effectiveAmigo); // ⬅️ use effectiveAmigo here
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -77,7 +84,7 @@ const AmigoDetailsItem: React.FC<AmigoDetailsItemProps> = ({ amigoDetails, amigo
 
       <ul className="card__fields">
         <li className="card__field">
-          <span className="card__field-label">Amigo Id:</span>{amigo.id}
+          <span className="card__field-label">Amigo Id:</span>{effectiveAmigo.id}
         </li>
 
         {detailFields.length > 0 ? (

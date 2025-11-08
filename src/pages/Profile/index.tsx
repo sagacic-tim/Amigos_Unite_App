@@ -10,6 +10,7 @@ import styles from './Profile.module.scss';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
+
 type AmigoDetailsPayload = {
   date_of_birth?: string | null;
   member_in_good_standing?: boolean;
@@ -157,9 +158,13 @@ function composeAddress(loc: Partial<AmigoLocationPayload>): string {
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Profile() {
-  const { isLoggedIn, currentUser } = useAuth();
+  const {
+    isLoggedIn,
+    currentUser,
+    refreshAuth,        // ← use this instead
+    refreshCurrentUser
+  } = useAuth();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState<AmigoDetailsPayload>({});
   const [location, setLocation] = useState<AmigoLocationPayload | null>(null);
@@ -659,18 +664,21 @@ export default function Profile() {
                       data.append('amigo[avatar]', (details as any)._avatar_file);
                     }
 
-                    await privateApi.patch(
-                      `/api/v1/amigos/${amigoId}`,
-                      data,
-                      {
-                        withCredentials: true,
-                        headers: { 'Accept': 'application/json' }
-                        // NOTE: do NOT set Content-Type; browser sets multipart boundary automatically
-                      }
-                    );
+                  await privateApi.patch(
+                    `/api/v1/amigos/${amigoId}`,
+                    data,
+                    {
+                      withCredentials: true,
+                      headers: { 'Accept': 'application/json' }
+                      // NOTE: do NOT set Content-Type; browser sets multipart boundary automatically
+                    }
+                  );
+                  // 1) Refresh auth-wide state: currentUser + amigos list
+                  await refreshAuth();
+                  // 2) Still refresh profile-specific details & locations
+                  await loadAll();
 
-                    await loadAll(); // refresh to get new avatar_url
-                    setSaved(true);
+                  setSaved(true);
                   } catch (e: any) {
                     setError(e?.response?.data?.errors?.[0] ?? 'Failed to update avatar.');
                   } finally {
@@ -684,8 +692,7 @@ export default function Profile() {
           </div>
           
           {/* ───────────────── Actions (Save + Cancel) ──────── */}
-          <div className="actions" style={{ display: 'flex', gap: '12px' }}>
-
+          <div className="form-grid__actions">
             <button
               type="button"
               className="button button--primary"
