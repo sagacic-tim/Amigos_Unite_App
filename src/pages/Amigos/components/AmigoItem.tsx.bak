@@ -19,22 +19,9 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
-  // Is this card the logged-in amigo?
   const canEdit = !!currentUser && currentUser.id === amigo.id;
 
-  // Prefer currentUser when this card represents the logged-in amigo
-  const effectiveAmigo = useMemo<Amigo>(() => {
-    if (currentUser && currentUser.id === amigo.id) {
-      return { ...amigo, ...currentUser };
-    }
-    return amigo;
-  }, [amigo, currentUser]);
-
-  // Build avatar from the effective amigo (so new avatar shows up immediately)
-  const avatarUrl = useMemo(
-    () => buildAvatarUrl(effectiveAmigo),
-    [effectiveAmigo]
-  );
+  const avatarUrl = useMemo(() => buildAvatarUrl(amigo), [amigo]);
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -55,7 +42,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchAmigoDetails(effectiveAmigo.id);
+      const data = await fetchAmigoDetails(amigo.id);
       if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
         setError('No Details Information Found');
         setAmigoDetail(null);
@@ -76,7 +63,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
     setLoading(true);
     setError(null);
     try {
-      const list = await fetchAmigoLocations(effectiveAmigo.id);
+      const list = await fetchAmigoLocations(amigo.id);
       setAmigoLocations(Array.isArray(list) ? list : []);
     } catch (err) {
       console.error('Error fetching amigo locations:', err);
@@ -100,7 +87,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
       <div className="card__media card__media--avatar">
         <img
           src={avatarUrl}
-          alt={`${effectiveAmigo.first_name} ${effectiveAmigo.last_name}'s avatar`}
+          alt={`${amigo.first_name} ${amigo.last_name}'s avatar`}
           loading="lazy"
           onError={handleImgError}
         />
@@ -108,27 +95,18 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
 
       <div className="card__body">
         <h3 className="card__title">
-          {effectiveAmigo.first_name} {effectiveAmigo.last_name}
+          {amigo.first_name} {amigo.last_name}
         </h3>
 
         <ul className="card__list">
-          {Object.entries(effectiveAmigo).map(([key, value]) => {
+          {Object.entries(amigo).map(([key, value]) => {
             if (
               value == null ||
-              [
-                'id',
-                'avatar-url',
-                'avatar_url',
-                'created_at',
-                'updated_at',
-                'unformatted_phone_1',
-                'unformatted_phone_2',
-              ].includes(key)
+              ['id', 'avatar-url', 'created_at', 'updated_at', 'unformatted_phone_1', 'unformatted_phone_2'].includes(key)
             ) {
               return null;
             }
-            const display =
-              typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
+            const display = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
             return (
               <li key={key} className="card__list-item">
                 <span className="card__label">
@@ -165,7 +143,7 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
         ) : error ? (
           <p>{error}</p>
         ) : amigoDetail ? (
-          <AmigoDetailItem amigoDetails={amigoDetail} amigo={effectiveAmigo} />
+          <AmigoDetailItem amigoDetails={amigoDetail} amigo={amigo} />
         ) : (
           <p>No Details Information Found.</p>
         )}
@@ -179,11 +157,11 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
         ) : amigoLocations.length > 0 ? (
           <div className="card__body">
             {amigoLocations.map((location) => (
-              <AmigoLocationItem key={location.id} location={location} amigo={effectiveAmigo} />
+              <AmigoLocationItem key={location.id} location={location} amigo={amigo} />
             ))}
           </div>
         ) : (
-          <AmigoLocationItem location={null} amigo={effectiveAmigo} />
+          <AmigoLocationItem location={null} amigo={amigo} />
         )}
       </Modal>
     </article>

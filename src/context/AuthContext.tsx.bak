@@ -1,6 +1,6 @@
 // src/context/AuthContext.tsx
 import { createContext, useEffect, useState, useCallback } from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, Dispatch, SetStateAction } from 'react';
 import privateApi from '@/services/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
 
@@ -11,6 +11,8 @@ export type AuthState = {
   amigos: Amigo[];
   currentUser: Amigo | null;
   refreshAuth: () => Promise<void>;
+  refreshCurrentUser: () => Promise<void>;
+  setCurrentUser: Dispatch<SetStateAction<Amigo | null>>;
 };
 
 export const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -18,22 +20,30 @@ export const AuthContext = createContext<AuthState | undefined>(undefined);
 /* ────────────────────────────────────────────────────────────────────────────
    Normalizers so the FE tolerates different backend response shapes
 ──────────────────────────────────────────────────────────────────────────── */
-function normalizeMePayload(data: any): Amigo | null {
-  const fromNested = data?.data?.amigo;
-  if (fromNested && typeof fromNested === 'object' && fromNested.id) return fromNested;
 
-  const fromKey = data?.amigo;
-  if (fromKey && typeof fromKey === 'object' && fromKey.id) return fromKey;
-
-  if (data && typeof data === 'object' && 'id' in data) return data as Amigo;
-
-  return null;
-}
 
 function normalizeAmigosList(data: any): Amigo[] {
+  // 1) Already-flat array
   if (Array.isArray(data)) return data as Amigo[];
+
+  // 2) { amigos: [...] }
   if (Array.isArray(data?.amigos)) return data.amigos as Amigo[];
-  if (Array.isArray(data?.data)) return data.data as Amigo[];
+
+  // 3) JSON:API: { data: [ { id, type, attributes: {...} } ] }
+  if (Array.isArray(data?.data)) {
+    const arr = data.data;
+
+    if (arr.length && typeof arr[0] === 'object' && 'attributes' in arr[0]) {
+      return arr.map((item: any) => ({
+        // ensure numeric id if your Amigo type expects a number
+        id: typeof item.id === 'string' ? parseInt(item.id, 10) : item.id,
+        ...item.attributes,
+      })) as Amigo[];
+    }
+
+    return arr as Amigo[];
+  }
+
   return [];
 }
 
@@ -77,6 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+   const refreshCurrentUser = useCallback(async () => {
+    await loadMe();
+  }, [loadMe]);
+
   const refreshAuth = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -107,6 +121,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('auth:changed', onAuthChanged as EventListener);
   }, [refreshAuth]);
 
-  const value: AuthState = { isLoggedIn, loading, error, amigos, currentUser, refreshAuth };
+  const value: AuthState = {
+    isLoggedIn,
+    loading,
+    error,
+    amigos,
+    currentUser,
+    refreshAuth,
+    refreshCurrentUser,
+    setCurrentUser,
+  };
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

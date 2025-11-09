@@ -20,22 +20,59 @@ export const AuthContext = createContext<AuthState | undefined>(undefined);
 /* ────────────────────────────────────────────────────────────────────────────
    Normalizers so the FE tolerates different backend response shapes
 ──────────────────────────────────────────────────────────────────────────── */
+
 function normalizeMePayload(data: any): Amigo | null {
+  // 1) { data: { amigo: {...} } }
   const fromNested = data?.data?.amigo;
-  if (fromNested && typeof fromNested === 'object' && fromNested.id) return fromNested;
+  if (fromNested && typeof fromNested === 'object' && fromNested.id) {
+    return fromNested as Amigo;
+  }
 
+  // 2) { amigo: {...} }
   const fromKey = data?.amigo;
-  if (fromKey && typeof fromKey === 'object' && fromKey.id) return fromKey;
+  if (fromKey && typeof fromKey === 'object' && fromKey.id) {
+    return fromKey as Amigo;
+  }
 
-  if (data && typeof data === 'object' && 'id' in data) return data as Amigo;
+  // 3) JSON:API: { data: { id, type, attributes: {...} } }
+  const jsonApiData = data?.data;
+  if (jsonApiData && typeof jsonApiData === 'object' && 'attributes' in jsonApiData) {
+    const item = jsonApiData as any;
+    return {
+      id: typeof item.id === 'string' ? parseInt(item.id, 10) : item.id,
+      ...item.attributes,
+    } as Amigo;
+  }
+
+  // 4) Already an Amigo-shaped object
+  if (data && typeof data === 'object' && 'id' in data) {
+    return data as Amigo;
+  }
 
   return null;
 }
 
 function normalizeAmigosList(data: any): Amigo[] {
+  // 1) Already-flat array
   if (Array.isArray(data)) return data as Amigo[];
+
+  // 2) { amigos: [...] }
   if (Array.isArray(data?.amigos)) return data.amigos as Amigo[];
-  if (Array.isArray(data?.data)) return data.data as Amigo[];
+
+  // 3) JSON:API: { data: [ { id, type, attributes: {...} } ] }
+  if (Array.isArray(data?.data)) {
+    const arr = data.data;
+
+    if (arr.length && typeof arr[0] === 'object' && 'attributes' in arr[0]) {
+      return arr.map((item: any) => ({
+        id: typeof item.id === 'string' ? parseInt(item.id, 10) : item.id,
+        ...item.attributes,
+      })) as Amigo[];
+    }
+
+    return arr as Amigo[];
+  }
+
   return [];
 }
 
@@ -79,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-   const refreshCurrentUser = useCallback(async () => {
+  const refreshCurrentUser = useCallback(async () => {
     await loadMe();
   }, [loadMe]);
 
