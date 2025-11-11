@@ -38,9 +38,25 @@ function normalizeMePayload(data: any): Amigo | null {
   const jsonApiData = data?.data;
   if (jsonApiData && typeof jsonApiData === 'object' && 'attributes' in jsonApiData) {
     const item = jsonApiData as any;
+    const attrs = item.attributes || {};
+
+    const {
+      'avatar-url': avatarDash,
+      'phone-1': phone1Dash,
+      'phone-2': phone2Dash,
+      'created-at': createdAtDash,
+      'updated-at': updatedAtDash,
+      ...rest
+    } = attrs;
+
     return {
       id: typeof item.id === 'string' ? parseInt(item.id, 10) : item.id,
-      ...item.attributes,
+      ...rest,
+      avatar_url: avatarDash ?? attrs.avatar_url ?? null,
+      phone_1:    phone1Dash ?? attrs.phone_1    ?? null,
+      phone_2:    phone2Dash ?? attrs.phone_2    ?? null,
+      created_at: createdAtDash ?? attrs.created_at ?? null,
+      updated_at: updatedAtDash ?? attrs.updated_at ?? null,
     } as Amigo;
   }
 
@@ -53,27 +69,51 @@ function normalizeMePayload(data: any): Amigo | null {
 }
 
 function normalizeAmigosList(data: any): Amigo[] {
-  // 1) Already-flat array
+  // 1) Already-flat array of amigos
   if (Array.isArray(data)) return data as Amigo[];
 
   // 2) { amigos: [...] }
   if (Array.isArray(data?.amigos)) return data.amigos as Amigo[];
 
-  // 3) JSON:API: { data: [ { id, type, attributes: {...} } ] }
-  if (Array.isArray(data?.data)) {
-    const arr = data.data;
+  // 3) JSON:API style: { data: [ { id, type, attributes: {...} } ] }
+  if (!Array.isArray(data?.data)) return [];
 
-    if (arr.length && typeof arr[0] === 'object' && 'attributes' in arr[0]) {
-      return arr.map((item: any) => ({
+  const arr = data.data;
+
+  if (arr.length && typeof arr[0] === 'object' && 'attributes' in arr[0]) {
+    return arr.map((item: any) => {
+      const attrs = item.attributes || {};
+
+      // Pull off any dashed keys we care about, and keep the rest
+      const {
+        'avatar-url': avatarDash,
+        'phone-1':    phone1Dash,
+        'phone-2':    phone2Dash,
+        'created-at': createdAtDash,
+        'updated-at': updatedAtDash,
+        'first-name': firstNameDash,
+        'last-name':  lastNameDash,
+        'user-name':  userNameDash,
+        ...rest
+      } = attrs;
+
+      return {
         id: typeof item.id === 'string' ? parseInt(item.id, 10) : item.id,
-        ...item.attributes,
-      })) as Amigo[];
-    }
-
-    return arr as Amigo[];
+        ...rest,
+        first_name: firstNameDash ?? attrs.first_name ?? null,
+        last_name:  lastNameDash  ?? attrs.last_name  ?? null,
+        user_name:  userNameDash  ?? attrs.user_name  ?? null,
+        avatar_url: avatarDash    ?? attrs.avatar_url ?? null,
+        phone_1:    phone1Dash    ?? attrs.phone_1    ?? null,
+        phone_2:    phone2Dash    ?? attrs.phone_2    ?? null,
+        created_at: createdAtDash ?? attrs.created_at ?? null,
+        updated_at: updatedAtDash ?? attrs.updated_at ?? null,
+      } as Amigo;
+    });
   }
 
-  return [];
+  // Fallback: treat data.data as already normalized
+  return arr as Amigo[];
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

@@ -45,11 +45,11 @@
   gap: var(--spacing-sm);
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: auto;
-  justify-content: start;
+  justify-content: center;
 }
 
 .page-container__inner {
-  --container-max-width: 800px;
+  --container-max-width: .container--640;
   --container-inline-padding: var(--spacing-lg);
   background: var(--secondary-surface-bg-color-1);
   border-radius: var(--border-radius-lg);

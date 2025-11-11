@@ -59,9 +59,10 @@ body {
 /* Main content region (full-bleed) */
 .app-main {
   /* Keep if you plan to use container queries; harmless otherwise */
-  container-type: inline-size;
   container-name: app;
-
+  container-type: inline-size;
+  display: grid;
+  justify-content: center;
   /* Full width: no max width or centering */
   inline-size: 100%;
   max-inline-size: none;

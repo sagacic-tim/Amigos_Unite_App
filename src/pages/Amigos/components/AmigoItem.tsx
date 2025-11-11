@@ -117,8 +117,8 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
               value == null ||
               [
                 'id',
-                'avatar-url',
                 'avatar_url',
+                'avatar-url',
                 'created_at',
                 'updated_at',
                 'unformatted_phone_1',

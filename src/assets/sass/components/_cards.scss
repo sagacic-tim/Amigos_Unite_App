@@ -51,6 +51,7 @@
 
 /* Profile flavor — positions a circular avatar in the top-right */
 .card--profile {
+  border: 1px solid var(--primary-border-color);
   position: relative;
 }
 

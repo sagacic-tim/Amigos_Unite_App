@@ -12,10 +12,8 @@ export const DEFAULT_AVATAR = '/images/default-amigo-avatar.png';
  * 3) local default image
  */
 export function buildAvatarUrl(amigo: Amigo | null | undefined): string {
-  const rawAvatar =
-    amigo?.avatar_url ?? (amigo as any)?.['avatar-url'] ?? null;
-
-  const explicit = resolveApiUrl(rawAvatar);
+  // 1) explicit avatar from backend
+  const explicit = resolveApiUrl(amigo?.avatar_url);
   if (explicit) return explicit;
 
   // 2) Gravatar from email (if present)

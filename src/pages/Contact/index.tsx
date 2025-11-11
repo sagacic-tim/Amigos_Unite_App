@@ -1,6 +1,7 @@
 // src/pages/Contact/index.tsx
 import { useState, useRef } from 'react';
 import logo from '@/assets/images/home_page/amigos-unite-logo-128.png';
+import styles from "./Contact.module.scss";
 
 type FormData = {
   firstName: string;
@@ -105,7 +106,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="page-container page-container--single">
+    <div className={`page-container page-container--single ${styles.pageContainer}`}>
       <main className="container container--center page-container__inner">
         {/* Logo */}
         <section className="section">

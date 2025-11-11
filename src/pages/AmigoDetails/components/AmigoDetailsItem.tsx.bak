@@ -16,8 +16,8 @@ const EXCLUDED_DETAIL_KEYS = new Set([
   'amigo',
   'amigo_id',
   'locations',
-  'avatar_url',  // snake_case
-  'avatar-url',  // kebab-case
+  'avatar_url', // snake_case
+  'avatar-url', // kebab-case, in case it leaks through
 ]);
 
 const formatString = (key: string): string =>

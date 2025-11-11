@@ -101,14 +101,15 @@
   &__actions,
   .form__actions,
   .form-actions {
-    display: grid;
-    grid-auto-rows: auto;
-    grid-auto-flow: column; // lay out items in a row
-    grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
     align-items: stretch;
+    display: grid;
+    gap: var(--spacing-sm);
+    grid-auto-flow: column; // lay out items in a row
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
     justify-content: start;
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
   }
 
   /* Messages */

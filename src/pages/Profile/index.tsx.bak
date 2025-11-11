@@ -1,24 +1,15 @@
 // src/pages/Profile/index.tsx
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/hooks/useAuth'
 import md5 from 'blueimp-md5';
 import privateApi, { triggerAuthRequired } from '@/services/privateApi';
 import styles from './Profile.module.scss';
 
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-type AmigoCorePayload = {
-  first_name: string;
-  last_name: string;
-  user_name: string;
-  email: string;
-  secondary_email: string;
-  phone_1: string;
-  phone_2: string;
-};
 
 type AmigoDetailsPayload = {
   date_of_birth?: string | null;
@@ -63,6 +54,7 @@ type AmigoLocationPayload = {
   created_at?: string | null;
   updated_at?: string | null;
 };
+
 
 const buildAmigoLocationPayloadForSave = (src: Partial<AmigoLocationPayload>) => {
   const composedAddress = composeAddress(src);
@@ -144,9 +136,11 @@ function gravatarIdenticon(email: string, size = 80) {
   return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
 }
 
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
+
 
 function composeAddress(loc: Partial<AmigoLocationPayload>): string {
   const parts = [
@@ -167,13 +161,11 @@ export default function Profile() {
   const {
     isLoggedIn,
     currentUser,
-    refreshAuth,
-    refreshCurrentUser, // (still available if you want it separately)
+    refreshAuth,        // ← use this instead
+    refreshCurrentUser
   } = useAuth();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
-  const [amigoCore, setAmigoCore] = useState<AmigoCorePayload | null>(null);
   const [details, setDetails] = useState<AmigoDetailsPayload>({});
   const [location, setLocation] = useState<AmigoLocationPayload | null>(null);
   const [saving, setSaving] = useState(false);
@@ -189,6 +181,7 @@ export default function Profile() {
     } as Record<string, { short: string; long: string }[]>;
   }, []);
 
+  // ⬇️ ADD THESE LINES
   const apiOrigin = import.meta.env.VITE_API_ORIGIN as string;
 
   const initialAvatarSrc = useMemo(() => {
@@ -197,6 +190,7 @@ export default function Profile() {
     if (email) return gravatarIdenticon(email, 80);
     return '/images/default-amigo-avatar.png';
   }, [apiOrigin, currentUser?.avatar_url, currentUser?.email]);
+  // ⬆️ ADD THESE LINES
 
   const loadAll = useCallback(async () => {
     if (!amigoId) return;
@@ -204,52 +198,16 @@ export default function Profile() {
     setError(null);
     setSaved(false);
 
-    // ─── Core amigo info: name, emails, phones ───
     try {
-      const a = await privateApi.get(`/api/v1/amigos/${amigoId}`, {
-        withCredentials: true,
-      });
-      const raw = (a?.data ?? {}) as any;
-
-      setAmigoCore({
-        first_name: raw.first_name ?? currentUser?.first_name ?? '',
-        last_name: raw.last_name ?? currentUser?.last_name ?? '',
-        user_name: raw.user_name ?? currentUser?.user_name ?? '',
-        email: raw.email ?? currentUser?.email ?? '',
-        secondary_email: raw.secondary_email ?? '',
-        // These may already be in international format thanks to the backend
-        phone_1: raw.phone_1 ?? '',
-        phone_2: raw.phone_2 ?? '',
-      });
-    } catch {
-      // Fallback: at least populate from currentUser if the show endpoint fails
-      setAmigoCore({
-        first_name: currentUser?.first_name ?? '',
-        last_name: currentUser?.last_name ?? '',
-        user_name: currentUser?.user_name ?? '',
-        email: currentUser?.email ?? '',
-        secondary_email: '',
-        phone_1: '',
-        phone_2: '',
-      });
-    }
-
-    // ─── Amigo Details ───
-    try {
-      const d = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_detail`, {
-        withCredentials: true,
-      });
+      const d = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_detail`, { withCredentials: true });
       const rawDetails = d?.data ?? {};
-      setDetails(buildAmigoDetailsPayload(rawDetails));
-    } catch {
+        setDetails(buildAmigoDetailsPayload(rawDetails));    }
+    catch {
       setDetails({});
     }
 
-    // ─── Amigo Location(s) ───
     try {
-      const l = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_locations`, {
-        withCredentials: true,
-      });
+      const l = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_locations`, { withCredentials: true });
       const list = Array.isArray(l?.data) ? l.data : (l?.data?.data ?? []);
       const first = list?.[0] ?? null;
 
@@ -262,9 +220,8 @@ export default function Profile() {
     } catch {
       setLocation(null);
     }
-
     setLoading(false);
-  }, [amigoId, currentUser]);
+  }, [amigoId]);
 
   // Auth guard
   useEffect(() => {
@@ -293,22 +250,7 @@ export default function Profile() {
     );
   }
 
-  // ── Handlers: Core, Details & Location ─────────────────────────────────────
-  const handleCoreChange = (field: keyof AmigoCorePayload, value: string) => {
-    setAmigoCore((prev) => ({
-      ...(prev ?? {
-        first_name: '',
-        last_name: '',
-        user_name: '',
-        email: '',
-        secondary_email: '',
-        phone_1: '',
-        phone_2: '',
-      }),
-      [field]: value,
-    }));
-  };
-
+  // ── Handlers: Details & Location ───────────────────────────────────────────
   const handleDetailsChange = (field: keyof AmigoDetailsPayload, value: any) => {
     setDetails((prev) => ({ ...(prev ?? {}), [field]: value }));
   };
@@ -317,7 +259,7 @@ export default function Profile() {
     setLocation((prev) => ({ ...(prev ?? {}), [field]: value } as AmigoLocationPayload));
   };
 
-  // Single save for core Amigo + Details + Location
+  // Single save for both Details and Location
   const saveAll = async () => {
     if (!amigoId) return;
     setSaving(true);
@@ -325,36 +267,8 @@ export default function Profile() {
     setSaved(false);
 
     try {
-      // ─── Core Amigo (name, email, phones) ───
-      if (amigoCore) {
-        const core = amigoCore;
-        const amigoPayload: any = {
-          first_name: (core.first_name || '').trim(),
-          last_name: (core.last_name || '').trim(),
-          user_name: (core.user_name || '').trim(),
-          email: (core.email || '').trim(),
-          secondary_email: (core.secondary_email || '').trim(),
-        };
-
-        // Let backend normalize whatever the user typed
-        if (core.phone_1) {
-          amigoPayload.phone_1 = core.phone_1.trim();
-        }
-        if (core.phone_2) {
-          amigoPayload.phone_2 = core.phone_2.trim();
-        }
-
-        await privateApi.patch(
-          `/api/v1/amigos/${amigoId}`,
-          { amigo: amigoPayload },
-          { withCredentials: true }
-        );
-
-        // Keep auth-layer currentUser + amigos list in sync
-        await refreshAuth();
-      }
-
       // ─── Amigo Details: clean + upsert ───
+      // details is already a normalized AmigoDetailsPayload
       const cleanDetails = buildAmigoDetailsPayload(details || {});
 
       await privateApi
@@ -375,26 +289,25 @@ export default function Profile() {
           }
         });
 
-      // ─── Amigo Location (single): send only permitted fields ───
-      if (location) {
-        const cleanLocation = buildAmigoLocationPayloadForSave(location);
+    // ─── Amigo Location (single): send only permitted fields ───
+    if (location) {
+      const cleanLocation = buildAmigoLocationPayloadForSave(location);
 
-        if (location.id) {
-          await privateApi.patch(
-            `/api/v1/amigos/${amigoId}/amigo_locations/${location.id}`,
-            { amigo_location: cleanLocation },
-            { withCredentials: true }
-          );
-        } else {
-          await privateApi.post(
-            `/api/v1/amigos/${amigoId}/amigo_locations`,
-            { amigo_location: cleanLocation },
-            { withCredentials: true }
-          );
-        }
+      if (location.id) {
+        await privateApi.patch(
+          `/api/v1/amigos/${amigoId}/amigo_locations/${location.id}`,
+          { amigo_location: cleanLocation },
+          { withCredentials: true }
+        );
+      } else {
+        await privateApi.post(
+          `/api/v1/amigos/${amigoId}/amigo_locations`,
+          { amigo_location: cleanLocation },
+          { withCredentials: true }
+        );
       }
-
-      // Refresh UI data to show any server-calculated fields (e.g., normalized phones)
+    }
+      // Refresh UI data to show any server-calculated fields
       await loadAll();
       setSaved(true);
     } catch (e: any) {
@@ -419,86 +332,6 @@ export default function Profile() {
         <p>Loading…</p>
       ) : (
         <>
-          {/* ───────────────── Account Info (Amigo core) ───────────────── */}
-          <div className="card card--details">
-            <h2>Account Info</h2>
-
-            <div className="form-grid">
-              <fieldset>
-                <label>
-                  <span>First Name</span>
-                  <input
-                    type="text"
-                    value={amigoCore?.first_name ?? ''}
-                    onChange={(e) => handleCoreChange('first_name', e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  <span>Last Name</span>
-                  <input
-                    type="text"
-                    value={amigoCore?.last_name ?? ''}
-                    onChange={(e) => handleCoreChange('last_name', e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  <span>Username</span>
-                  <input
-                    type="text"
-                    value={amigoCore?.user_name ?? ''}
-                    onChange={(e) => handleCoreChange('user_name', e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  <span>Email</span>
-                  <input
-                    type="email"
-                    value={amigoCore?.email ?? ''}
-                    onChange={(e) => handleCoreChange('email', e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  <span>Secondary Email</span>
-                  <input
-                    type="email"
-                    value={amigoCore?.secondary_email ?? ''}
-                    onChange={(e) => handleCoreChange('secondary_email', e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  <span>Phone 1</span>
-                  <input
-                    type="tel"
-                    value={amigoCore?.phone_1 ?? ''}
-                    onChange={(e) => handleCoreChange('phone_1', e.target.value)}
-                    placeholder="+1 (626) 998-2531"
-                  />
-                  <small className="form-hint">
-                    Enter any format; we&apos;ll store it in international format.
-                  </small>
-                </label>
-
-                <label>
-                  <span>Phone 2</span>
-                  <input
-                    type="tel"
-                    value={amigoCore?.phone_2 ?? ''}
-                    onChange={(e) => handleCoreChange('phone_2', e.target.value)}
-                    placeholder="+1 (626) 998-2531"
-                  />
-                  <small className="form-hint">
-                    Enter any format; we&apos;ll store it in international format.
-                  </small>
-                </label>
-              </fieldset>
-            </div>
-          </div>
-
           {/* ───────────────── Amigo Details ───────────────── */}
           <div className="card card--details">
             <h2>Amigo Details</h2>
@@ -510,9 +343,7 @@ export default function Profile() {
                   <input
                     type="date"
                     value={details?.date_of_birth ?? ''}
-                    onChange={(e) =>
-                      handleDetailsChange('date_of_birth', e.target.value || null)
-                    }
+                    onChange={(e) => handleDetailsChange('date_of_birth', e.target.value || null)}
                   />
                 </label>
 
@@ -520,9 +351,7 @@ export default function Profile() {
                   <input
                     type="checkbox"
                     checked={!!details?.member_in_good_standing}
-                    onChange={(e) =>
-                      handleDetailsChange('member_in_good_standing', e.target.checked)
-                    }
+                    onChange={(e) => handleDetailsChange('member_in_good_standing', e.target.checked)}
                   />
                   <span>Member in good standing</span>
                 </label>
@@ -531,9 +360,7 @@ export default function Profile() {
                   <input
                     type="checkbox"
                     checked={!!details?.available_to_host}
-                    onChange={(e) =>
-                      handleDetailsChange('available_to_host', e.target.checked)
-                    }
+                    onChange={(e) => handleDetailsChange('available_to_host', e.target.checked)}
                   />
                   <span>Available to host</span>
                 </label>
@@ -542,9 +369,7 @@ export default function Profile() {
                   <input
                     type="checkbox"
                     checked={!!details?.willing_to_help}
-                    onChange={(e) =>
-                      handleDetailsChange('willing_to_help', e.target.checked)
-                    }
+                    onChange={(e) => handleDetailsChange('willing_to_help', e.target.checked)}
                   />
                   <span>Willing to help</span>
                 </label>
@@ -553,9 +378,7 @@ export default function Profile() {
                   <input
                     type="checkbox"
                     checked={!!details?.willing_to_donate}
-                    onChange={(e) =>
-                      handleDetailsChange('willing_to_donate', e.target.checked)
-                    }
+                    onChange={(e) => handleDetailsChange('willing_to_donate', e.target.checked)}
                   />
                   <span>Willing to donate</span>
                 </label>
@@ -564,9 +387,7 @@ export default function Profile() {
                   <span>Personal Bio</span>
                   <textarea
                     value={details?.personal_bio ?? ''}
-                    onChange={(e) =>
-                      handleDetailsChange('personal_bio', e.target.value || null)
-                    }
+                    onChange={(e) => handleDetailsChange('personal_bio', e.target.value || null)}
                     rows={5}
                   />
                 </label>
@@ -626,9 +447,7 @@ export default function Profile() {
                 <input
                   type="text"
                   value={location?.apartment_suite_number ?? ''}
-                  onChange={(e) =>
-                    handleLocationChange('apartment_suite_number', e.target.value)
-                  }
+                  onChange={(e) => handleLocationChange('apartment_suite_number', e.target.value)}
                 />
               </label>
 
@@ -637,9 +456,7 @@ export default function Profile() {
                 <input
                   type="text"
                   value={location?.city_sublocality ?? ''}
-                  onChange={(e) =>
-                    handleLocationChange('city_sublocality', e.target.value)
-                  }
+                  onChange={(e) => handleLocationChange('city_sublocality', e.target.value)}
                 />
               </label>
 
@@ -659,7 +476,7 @@ export default function Profile() {
                   value={location?.country_short ?? ''}
                   onChange={(e) => {
                     const code = e.target.value || '';
-                    const long = COUNTRIES.find((c) => c.code === code)?.name ?? '';
+                    const long = COUNTRIES.find(c => c.code === code)?.name ?? '';
                     handleLocationChange('country_short', code);
                     handleLocationChange('country', long);
                     // Reset region fields when country changes
@@ -670,9 +487,7 @@ export default function Profile() {
                 >
                   <option value="">— Select country —</option>
                   {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.name}
-                    </option>
+                    <option key={c.code} value={c.code}>{c.name}</option>
                   ))}
                 </select>
               </label>
@@ -684,7 +499,7 @@ export default function Profile() {
                   value={location?.state_province_short ?? ''}
                   onChange={(e) => {
                     const s = e.target.value || '';
-                    const entry = regions.find((r) => r.short === s);
+                    const entry = regions.find(r => r.short === s);
                     handleLocationChange('state_province_short', s);
                     handleLocationChange('state_province', entry?.long ?? '');
                     handleLocationChange('state_province_subdivision', entry?.long ?? '');
@@ -705,9 +520,7 @@ export default function Profile() {
                 <input
                   type="text"
                   value={location?.postal_code ?? ''}
-                  onChange={(e) =>
-                    handleLocationChange('postal_code', e.target.value)
-                  }
+                  onChange={(e) => handleLocationChange('postal_code', e.target.value)}
                 />
               </label>
 
@@ -716,9 +529,7 @@ export default function Profile() {
                 <input
                   type="text"
                   value={location?.postal_code_suffix ?? ''}
-                  onChange={(e) =>
-                    handleLocationChange('postal_code_suffix', e.target.value)
-                  }
+                  onChange={(e) => handleLocationChange('postal_code_suffix', e.target.value)}
                 />
               </label>
 
@@ -755,7 +566,7 @@ export default function Profile() {
               {/* Current avatar */}
               <label>
                 <span>Current</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
                   <img
                     src={initialAvatarSrc}
                     alt="Current avatar"
@@ -788,9 +599,7 @@ export default function Profile() {
                     type="radio"
                     name="avatar_source"
                     value="upload"
-                    onChange={() =>
-                      setDetails((d: any) => ({ ...d, avatar_source: 'upload' }))
-                    }
+                    onChange={() => setDetails((d:any) => ({...d, avatar_source: 'upload'}))}
                   />
                   <span>Upload a file</span>
                 </label>
@@ -800,9 +609,7 @@ export default function Profile() {
                     type="radio"
                     name="avatar_source"
                     value="gravatar"
-                    onChange={() =>
-                      setDetails((d: any) => ({ ...d, avatar_source: 'gravatar' }))
-                    }
+                    onChange={() => setDetails((d:any) => ({...d, avatar_source: 'gravatar'}))}
                   />
                   <span>Use Gravatar (based on your email)</span>
                 </label>
@@ -812,24 +619,17 @@ export default function Profile() {
                     type="radio"
                     name="avatar_source"
                     value="url"
-                    onChange={() =>
-                      setDetails((d: any) => ({ ...d, avatar_source: 'url' }))
-                    }
+                    onChange={() => setDetails((d:any) => ({...d, avatar_source: 'url'}))}
                   />
                   <span>External image URL (Disqus or other)</span>
                 </label>
 
-                <label style={{ marginTop: '8px' }}>
+                <label style={{marginTop: '8px'}}>
                   <span>External URL (if chosen)</span>
                   <input
                     type="url"
                     placeholder="https://example.com/avatar.jpg"
-                    onChange={(e) =>
-                      setDetails((d: any) => ({
-                        ...d,
-                        avatar_remote_url: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setDetails((d:any) => ({...d, avatar_remote_url: e.target.value}))}
                   />
                 </label>
 
@@ -840,12 +640,7 @@ export default function Profile() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) =>
-                        setDetails((d: any) => ({
-                          ...d,
-                          _avatar_file: e.target.files?.[0] ?? null,
-                        }))
-                      }
+                      onChange={(e) => setDetails((d:any) => ({...d, _avatar_file: e.target.files?.[0] ?? null}))}
                     />
                   </label>
                 )}
@@ -861,41 +656,31 @@ export default function Profile() {
                   setError(null);
                   try {
                     const data: any = new FormData();
-                    data.append(
-                      'amigo[avatar_source]',
-                      (details as any)?.avatar_source || 'default'
-                    );
-                    if (
-                      (details as any)?.avatar_source === 'url' &&
-                      (details as any)?.avatar_remote_url
-                    ) {
-                      data.append(
-                        'amigo[avatar_remote_url]',
-                        (details as any).avatar_remote_url
-                      );
+                    data.append('amigo[avatar_source]', (details as any)?.avatar_source || 'default');
+                    if ((details as any)?.avatar_source === 'url' && (details as any)?.avatar_remote_url) {
+                      data.append('amigo[avatar_remote_url]', (details as any).avatar_remote_url);
                     }
-                    if (
-                      (details as any)?.avatar_source === 'upload' &&
-                      (details as any)?._avatar_file
-                    ) {
+                    if ((details as any)?.avatar_source === 'upload' && (details as any)?._avatar_file) {
                       data.append('amigo[avatar]', (details as any)._avatar_file);
                     }
 
-                    await privateApi.patch(`/api/v1/amigos/${amigoId}`, data, {
+                  await privateApi.patch(
+                    `/api/v1/amigos/${amigoId}`,
+                    data,
+                    {
                       withCredentials: true,
-                      headers: { Accept: 'application/json' },
+                      headers: { 'Accept': 'application/json' }
                       // NOTE: do NOT set Content-Type; browser sets multipart boundary automatically
-                    });
-                    // 1) Refresh auth-wide state: currentUser + amigos list
-                    await refreshAuth();
-                    // 2) Still refresh profile-specific details & locations
-                    await loadAll();
+                    }
+                  );
+                  // 1) Refresh auth-wide state: currentUser + amigos list
+                  await refreshAuth();
+                  // 2) Still refresh profile-specific details & locations
+                  await loadAll();
 
-                    setSaved(true);
+                  setSaved(true);
                   } catch (e: any) {
-                    setError(
-                      e?.response?.data?.errors?.[0] ?? 'Failed to update avatar.'
-                    );
+                    setError(e?.response?.data?.errors?.[0] ?? 'Failed to update avatar.');
                   } finally {
                     setSaving(false);
                   }
@@ -905,7 +690,7 @@ export default function Profile() {
               </button>
             </div>
           </div>
-
+          
           {/* ───────────────── Actions (Save + Cancel) ──────── */}
           <div className="form-grid__actions">
             <button
