@@ -1,35 +1,57 @@
 // src/services/AmigoService.ts
-import {
-  privateGet,
-  privatePost,
-  privatePut,
-  // privatePatch,
-  privateDel
-} from './apiHelper';
-import { Amigo } from '../types/AmigoTypes';
+import privateApi from '@/services/privateApi';
+import type { Amigo } from '@/types/AmigoTypes';
+
+// Helpers mirroring AuthContext’s shape handling
+function unwrapAmigosList(payload: any): Amigo[] {
+  if (Array.isArray(payload)) return payload as Amigo[];
+  if (Array.isArray(payload?.amigos)) return payload.amigos as Amigo[];
+  if (Array.isArray(payload?.data)) return payload.data as Amigo[];
+  return [];
+}
+
+function unwrapAmigo(payload: any): Amigo {
+  if (payload?.amigo) return payload.amigo as Amigo;
+  if (payload?.data?.amigo) return payload.data.amigo as Amigo;
+  return payload as Amigo;
+}
 
 // ─── fetch all amigos ───────────────────────
-export const fetchAmigos = (): Promise<Amigo[]> =>
-  privateGet<Amigo[]>('/api/v1/amigos');
+export const fetchAmigos = async (): Promise<Amigo[]> => {
+  const res = await privateApi.get('/api/v1/amigos', { withCredentials: true });
+  return unwrapAmigosList(res.data);
+};
 
 // ─── fetch single amigo ─────────────────────
-export const fetchAmigoById = (id: number): Promise<Amigo> =>
-  privateGet<Amigo>(`/api/v1/amigos/${id}`);
+export const fetchAmigoById = async (id: number): Promise<Amigo> => {
+  const res = await privateApi.get(`/api/v1/amigos/${id}`, { withCredentials: true });
+  return unwrapAmigo(res.data);
+};
 
 // ─── fetch amigo details ────────────────────
 export const fetchAmigoDetails = (amigoId: number) =>
-  privateGet<any>(`/api/v1/amigos/${amigoId}/amigo_detail`);
+  privateApi
+    .get(`/api/v1/amigos/${amigoId}/amigo_detail`, { withCredentials: true })
+    .then((res) => res.data);
 
 // ─── fetch amigo locations ──────────────────
 export const fetchAmigoLocations = (amigoId: number) =>
-  privateGet<any>(`/api/v1/amigos/${amigoId}/amigo_locations`);
+  privateApi
+    .get(`/api/v1/amigos/${amigoId}/amigo_locations`, { withCredentials: true })
+    .then((res) => res.data);
 
 // ─── create/update/delete ──────────────────
 export const createAmigo = (data: Partial<Amigo>) =>
-  privatePost<Amigo>('/api/v1/amigos', data);
+  privateApi
+    .post('/api/v1/amigos', { amigo: data }, { withCredentials: true })
+    .then((res) => unwrapAmigo(res.data));
 
 export const updateAmigo = (id: number, data: Partial<Amigo>) =>
-  privatePut<Amigo>(`/api/v1/amigos/${id}`, data);
+  privateApi
+    .put(`/api/v1/amigos/${id}`, { amigo: data }, { withCredentials: true })
+    .then((res) => unwrapAmigo(res.data));
 
 export const deleteAmigo = (id: number) =>
-  privateDel<void>(`/api/v1/amigos/${id}`);
+  privateApi
+    .delete(`/api/v1/amigos/${id}`, { withCredentials: true })
+    .then(() => {});
