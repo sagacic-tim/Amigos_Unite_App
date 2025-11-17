@@ -1,0 +1,119 @@
+/* src/assets/sass/components/_dropdowns.scss */
+
+/* Container for Events dropdown in the main nav */
+.events-menu {
+  position: relative;
+  display: inline-block; // so the panel can sit relative to the trigger
+}
+
+/* Panel that appears just below the Events badge */
+.events-menu__panel {
+  background: var(--surface-elevated, #fff);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-md);
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+  position: absolute;
+  right: 0;              // align to the right edge of the badge; adjust if needed
+  top: calc(100% + 1px); // 1px below the trigger as you described
+  z-index: 60;           // higher than the header/nav, but below modals if any
+}
+
+.events-menu__header {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.events-menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.events-menu__list-item + .events-menu__list-item {
+  margin-top: 0.25rem;
+}
+
+.events-menu__item {
+  background: none;
+  border-radius: 0.4rem;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--surface-hover, rgba(0, 0, 0, 0.06));
+    outline: none;
+  }
+}
+
+/* Nav badge style for Events */
+.main-nav__item {
+  background: var(--nav-item-active-bg-color);
+  border-radius: 999px;
+  border: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  text-decoration: none;
+
+  &.is-active {
+    background: var(--accent-soft, rgba(0, 120, 255, 0.08));
+    color: var(--accent-strong, #0050b3);
+  }
+}
+
+.main-nav__item--events {
+  background: var(--accent-soft, rgba(0, 120, 255, 0.1));
+  color: var(--accent-strong, #0050b3);
+  font-weight: 600;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent-soft-stronger, rgba(0, 120, 255, 0.18));
+    outline: none;
+  }
+}
+
+.events-overlay {
+  background: var(--surface, #fff);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.15));
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+}
+
+.events-overlay__label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.events-overlay__list {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0 0;
+}
+
+.events-overlay__item {
+  background: none;
+  border-radius: 4px;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+
+  &:hover {
+    background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+  }
+}

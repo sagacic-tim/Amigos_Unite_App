@@ -1,8 +1,8 @@
 // src/pages/Events/components/EventList.tsx
 import React, { useEffect, useState } from 'react';
 import EventItem from './EventItem';
-import { Event } from '@/types/EventTypes';
-import '@/assets/sass/components/_events.scss';
+import { Event } from '@/types/events';
+import styles from "../Events.module.scss";
 import { fetchEvents } from '@/services/EventService';
 
 const EventList: React.FC = () => {

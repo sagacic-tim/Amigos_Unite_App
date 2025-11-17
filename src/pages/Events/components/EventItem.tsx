@@ -1,24 +1,38 @@
 // src/components/Events/EventItem.tsx
 import React from 'react';
-import { Event } from '@/types/EventTypes';
-import '@/assets/sass/components/_events.scss';
+import { Event } from '@/types/events';
+import styles from "../Events.module.scss";
 
 interface EventItemProps {
   event: Event;
 }
 
 const EventItem: React.FC<EventItemProps> = ({ event }) => {
+  const speakers = event.event_speakers_performers ?? []; // normalize to []
+  const lead = event.lead_coordinator ?? null;           // normalize to null
+
   return (
-    <div className="event-item">
-      <h2>{event.event_name}</h2>
-      <p>Type: {event.event_type}</p>
-      <p>Date: {event.event_date}</p>
-      <p>Time: {event.event_time}</p>
-      <p>Speakers/Performers: {event.event_speakers_performers.join(', ')}</p>
-      <p>Lead Coordinator: {event.lead_coordinator.first_name} {event.lead_coordinator.last_name}</p>
-      <p>Created At: {event.created_at}</p>
-      <p>Updated At: {event.updated_at}</p>
-    </div>
+    <article className="event-item">
+      <h3 className="event-item__title">{event.event_name}</h3>
+
+      {/* Speakers – only render if there are any */}
+      {speakers.length > 0 && (
+        <p className="event-item__speakers">
+          <span className="event-item__label">Speakers:</span>{" "}
+          {speakers.join(", ")}
+        </p>
+      )}
+
+      {/* Lead coordinator – only render if present */}
+      {lead && (
+        <p className="event-item__lead">
+          <span className="event-item__label">Lead coordinator:</span>{" "}
+          {lead.first_name || lead.last_name
+            ? [lead.first_name, lead.last_name].filter(Boolean).join(" ")
+            : lead.user_name}
+        </p>
+      )}
+    </article>
   );
 };
 

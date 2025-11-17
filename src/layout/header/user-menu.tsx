@@ -1,7 +1,7 @@
 // src/components/Header/UserMenu.tsx
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher"; // or "@/components/UserProfile/ThemeSwitcher"
+import { Link } from "react-router-dom";// or "@/components/UserProfile/ThemeSwitcher"
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 type Props = {
   /** <- add this */

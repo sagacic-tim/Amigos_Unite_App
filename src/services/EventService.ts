@@ -1,90 +1,151 @@
 // src/services/EventService.ts
-import {
-  privateGet,
-  privatePost,
-  privatePut,
-  privateDel,
-} from '@/services/apiHelper';
+import axios from 'axios';
+import privateApi from '@/services/privateApi';
+import type {
+  Event,
+  EventCreateParams,
+  EventAmigoConnector,
+  EventLocation,
+  EventLocationConnector,
+  AmigoMinimal,
+} from '@/types/events';
 
-import type { Event as EventModel } from '@/types/EventTypes';
-import type { EventAmigoConnector } from '@/types/EventAmigoConnectorTypes';
-import type { EventLocationConnector } from '@/types/EventLocationConnectorTypes';
+const API = '/api/v1';
 
-// ─── Events ────────────────────────────────────
-export const fetchEvents = (): Promise<EventModel[]> =>
-  privateGet<EventModel[]>('/api/v1/events');
+export const EventService = {
+  // --- Events ---
+  async list(params?: { status?: string; upcoming_only?: boolean }) {
+    const { data } = await axios.get<Event[]>(`${API}/events`, { params });
+    return data;
+  },
 
-export const fetchEventById = (id: number): Promise<EventModel> =>
-  privateGet<EventModel>(`/api/v1/events/${id}`);
+  async get(id: number) {
+    const { data } = await axios.get<Event>(`${API}/events/${id}`);
+    return data;
+  },
 
-export const createEvent = (data: Partial<EventModel>): Promise<EventModel> =>
-  privatePost<EventModel>('/api/v1/events', data);
+  async create(payload: EventCreateParams) {
+    const { data } = await axios.post<Event>(`${API}/events`, { event: payload });
+    return data;
+  },
 
-export const updateEvent = (
-  id: number,
-  data: Partial<EventModel>
-): Promise<EventModel> =>
-  privatePut<EventModel>(`/api/v1/events/${id}`, data);
+  async update(
+    id: number,
+    attrs: Partial<EventCreateParams> & { new_lead_coordinator_id?: number }
+  ) {
+    const { data } = await axios.put<Event>(`${API}/events/${id}`, {
+      event: attrs,
+      new_lead_coordinator_id: attrs['new_lead_coordinator_id'],
+    });
+    return data;
+  },
 
-export const deleteEvent = (id: number): Promise<void> =>
-  privateDel<void>(`/api/v1/events/${id}`);
+  async destroy(id: number) {
+    await axios.delete(`${API}/events/${id}`);
+  },
 
-// ─── Event ↔ Amigo connectors ─────────────────
-export const fetchEventAmigoConnectors = (
-  eventId: number
-): Promise<EventAmigoConnector[]> =>
-  privateGet<EventAmigoConnector[]>(
-    `/api/v1/events/${eventId}/event_amigo_connectors`
-  );
+  // --- Membership (EventAmigoConnectors) ---
+  async listConnectors(eventId: number) {
+    const { data } = await axios.get<EventAmigoConnector[]>(
+      `${API}/events/${eventId}/event_amigo_connectors`
+    );
+    return data;
+  },
 
-export const createEventAmigoConnector = (
-  eventId: number,
-  data: { amigo_id: number }
-): Promise<EventAmigoConnector> =>
-  privatePost<EventAmigoConnector>(
-    `/api/v1/events/${eventId}/event_amigo_connectors`,
-    data
-  );
+  async registerSelf(eventId: number) {
+    const { data } = await axios.post<EventAmigoConnector>(
+      `${API}/events/${eventId}/event_amigo_connectors`,
+      {}
+    );
+    return data;
+  },
 
-export const deleteEventAmigoConnector = (
-  eventId: number,
-  connectorId: number
-): Promise<void> =>
-  privateDel<void>(
-    `/api/v1/events/${eventId}/event_amigo_connectors/${connectorId}`
-  );
+  async changeRole(
+    eventId: number,
+    connectorId: number,
+    newRole: 'participant' | 'assistant_coordinator' | 'lead_coordinator'
+  ) {
+    const { data } = await axios.put<EventAmigoConnector>(
+      `${API}/events/${eventId}/event_amigo_connectors/${connectorId}`,
+      { event_amigo_connector: { role: newRole } }
+    );
+    return data;
+  },
 
-// ─── Event ↔ Location connectors ──────────────
-export const fetchEventLocationConnectors = (
-  eventId: number
-): Promise<EventLocationConnector[]> =>
-  privateGet<EventLocationConnector[]>(
-    `/api/v1/events/${eventId}/event_location_connectors`
-  );
+  async leave(eventId: number, connectorId: number) {
+    await axios.delete(`${API}/events/${eventId}/event_amigo_connectors/${connectorId}`);
+  },
 
-// Global list (no event filter) — used by the connectors pages
-export const fetchAllEventLocationConnectors = ():
-  Promise<EventLocationConnector[]> =>
-  privateGet<EventLocationConnector[]>('/api/v1/event_location_connectors');
+  // 🔹 Global connectors list (the function you care about)
+  async fetchAllEventAmigoConnectors(): Promise<EventAmigoConnector[]> {
+    const res = await privateApi.get('/event_amigo_connectors');
+    return res.data.event_amigo_connectors ?? res.data.data ?? res.data;
+  },
 
-export const createEventLocationConnector = (
-  eventId: number,
-  data: { event_location_id: number }
-): Promise<EventLocationConnector> =>
-  privatePost<EventLocationConnector>(
-    `/api/v1/events/${eventId}/event_location_connectors`,
-    data
-  );
+  // 🔹 Global location connectors list
+  async fetchAllEventLocationConnectors(): Promise<EventLocationConnector[]> {
+    const res = await privateApi.get('/event_location_connectors');
+    return res.data.event_location_connectors ?? res.data.data ?? res.data;
+  },
 
-export const deleteEventLocationConnector = (
-  eventId: number,
-  connectorId: number
-): Promise<void> =>
-  privateDel<void>(
-    `/api/v1/events/${eventId}/event_location_connectors/${connectorId}`
-  );
+  // --- Locations ---
+  async listLocationConnectors(eventId: number) {
+    const { data } = await axios.get<EventLocationConnector[]>(
+      `${API}/events/${eventId}/event_location_connectors`
+    );
+    return data;
+  },
 
-// Global list (no event filter) — used by the connectors pages
-export const fetchAllEventAmigoConnectors = ():
-  Promise<EventAmigoConnector[]> =>
-  privateGet<EventAmigoConnector[]>('/api/v1/event_amigo_connectors');
+  async connectLocation(eventId: number, event_location_id: number, is_primary = false) {
+    const { data } = await axios.post<EventLocationConnector>(
+      `${API}/events/${eventId}/event_location_connectors`,
+      {
+        event_location_connector: { event_location_id, is_primary },
+      }
+    );
+    return data;
+  },
+
+  async updateLocationConnector(
+    eventId: number,
+    connectorId: number,
+    attrs: Partial<{ is_primary: boolean; status: 'pending' | 'confirmed' | 'rejected' }>
+  ) {
+    const { data } = await axios.put<EventLocationConnector>(
+      `${API}/events/${eventId}/event_location_connectors/${connectorId}`,
+      { event_location_connector: attrs }
+    );
+    return data;
+  },
+
+  async disconnectLocation(eventId: number, connectorId: number) {
+    await axios.delete(`${API}/events/${eventId}/event_location_connectors/${connectorId}`);
+  },
+};
+
+// Separate service for locations themselves:
+export const EventLocationService = {
+  async create(loc: Partial<EventLocation>) {
+    const { data } = await axios.post<EventLocation>(`${API}/event_locations`, {
+      event_location: loc,
+    });
+    return data;
+  },
+};
+
+// For navigation gating:
+export const MyEventsService = {
+  async hasManagedEvents(): Promise<boolean> {
+    const { data } = await axios.get<Event[]>(`${API}/events`, {
+      params: { managed_by: 'me', limit: 1 },
+    });
+    return (data?.length ?? 0) > 0;
+  },
+};
+
+// Convenience wrapper for the Events index
+export async function fetchEvents(
+  params?: { status?: string; upcoming_only?: boolean }): Promise<Event[]> {
+    return EventService.list(params);
+}
+

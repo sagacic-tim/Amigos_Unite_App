@@ -1,7 +1,7 @@
-// src/components/EventLocations/EventLocationList.tsx
+// src/pages/EventLocations/components/EventLocationList.tsx
 import React, { useEffect, useState } from 'react';
 import EventLocationItem from './EventLocationItem';
-import { EventLocation } from '@/types/EventLocationTypes';
+import type { EventLocation } from '@/types/events';
 import '@/assets/sass/components/_eventLocations.scss';
 
 const EventLocationList: React.FC = () => {
@@ -26,7 +26,7 @@ const EventLocationList: React.FC = () => {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (error)   return <p>{error}</p>;
 
   return (
     <div className="event-location-list">

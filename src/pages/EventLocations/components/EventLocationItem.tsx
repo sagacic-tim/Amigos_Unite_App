@@ -1,6 +1,6 @@
-// src/components/EventLocations/EventLocationItem.tsx
+// src/pages/EventLocations/components/EventLocationItem.tsx
 import React from 'react';
-import { EventLocation } from '@/types/EventLocationTypes';
+import type { EventLocation } from '@/types/events';
 import '@/assets/sass/components/_eventLocations.scss';
 
 interface EventLocationItemProps {

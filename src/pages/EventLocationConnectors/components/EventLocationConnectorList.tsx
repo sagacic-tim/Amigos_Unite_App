@@ -1,8 +1,8 @@
 // src/pages/EventLocationConnectors/components/EventLocationConnectorList.tsx
 import React, { useEffect, useState } from 'react';
 import EventLocationConnectorItem from './EventLocationConnectorItem';
-import { EventLocationConnector } from '@/types/EventLocationConnectorTypes';
-import { fetchAllEventLocationConnectors } from '@/services/EventService';
+import type { EventLocationConnector } from '@/types/events';
+import { EventService } from '@/services/EventService';
 import '@/assets/sass/components/_eventLocationConnectors.scss';
 
 const EventLocationConnectorList: React.FC = () => {
@@ -15,7 +15,7 @@ const EventLocationConnectorList: React.FC = () => {
     (async () => {
       try {
         setLoading(true);
-        const data = await fetchAllEventLocationConnectors();
+        const data = await EventService.fetchAllEventLocationConnectors(); // 👈 call method on object
         if (mounted) setConnectors(data);
       } catch (err) {
         console.error(err);
@@ -24,7 +24,9 @@ const EventLocationConnectorList: React.FC = () => {
         if (mounted) setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) return <p>Loading...</p>;

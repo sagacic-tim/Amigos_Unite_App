@@ -2,7 +2,7 @@
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import AppLayout from '@/layouts/AppLayout';
+import AppLayout from '@/layout/app-layout';
 import RequireAuth from './RequireAuth';
 
 const Home   = lazy(() => import('@pages/Home'));

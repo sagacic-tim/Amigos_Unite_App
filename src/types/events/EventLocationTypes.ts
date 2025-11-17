@@ -1,5 +1,5 @@
-// src/types/EventLocationTypes.ts
 
+// Canonical location shape (matches your backend fields)
 export interface EventLocation {
   id: number;
   business_name: string;

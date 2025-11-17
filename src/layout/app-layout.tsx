@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import SiteHeader from '@/components/Header/SiteHeader';
-import SiteFooter from '@/components/Footer/SiteFooter';
+import SiteHeader from '@/layout/header/site-header';
+import SiteFooter from '@/layout/footer/site-footer';
 
 import Modal from '@/components/Common/Modal';
 import Login from '@/components/Authentication/Login';

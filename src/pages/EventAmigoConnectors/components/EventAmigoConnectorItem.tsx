@@ -1,13 +1,20 @@
 // src/pages/EventAmigoConnectors/components/EventAmigoConnectorItem.tsx
 import React from 'react';
-import type { EventAmigoConnector } from '@/types/EventAmigoConnectorTypes';
+import type { EventAmigoConnector } from '@/types/events';
 import '@/assets/sass/components/_eventAmigoConnectors.scss';
 
+type EventAmigoConnectorWithTimestamps = EventAmigoConnector & {
+  created_at?: string;
+  updated_at?: string;
+};
+
 interface EventAmigoConnectorItemProps {
-  eventAmigoConnector: EventAmigoConnector;
+  eventAmigoConnector: EventAmigoConnectorWithTimestamps;
 }
 
 const EventAmigoConnectorItem: React.FC<EventAmigoConnectorItemProps> = ({ eventAmigoConnector }) => {
+  const a = eventAmigoConnector.amigo; // may be undefined
+
   return (
     <div className="event-amigo-connector-item">
       <h2>Event Amigo Connector ID: {eventAmigoConnector.id}</h2>
@@ -15,22 +22,25 @@ const EventAmigoConnectorItem: React.FC<EventAmigoConnectorItemProps> = ({ event
       <p>Amigo ID: {eventAmigoConnector.amigo_id}</p>
       <p>Role: {eventAmigoConnector.role}</p>
 
-      <div className="amigo-details">
-        <h3>Amigo Details:</h3>
-        <p>First Name: {eventAmigoConnector.amigo.first_name}</p>
-        <p>Last Name: {eventAmigoConnector.amigo.last_name}</p>
-        <p>Username: {eventAmigoConnector.amigo.user_name}</p>
-        <p>Email: {eventAmigoConnector.amigo.email}</p>
-        {eventAmigoConnector.amigo.avatar_url && (
-          <img
-            src={eventAmigoConnector.amigo.avatar_url}
-            alt={`${eventAmigoConnector.amigo.first_name}'s avatar`}
-          />
-        )}
-      </div>
+      {a && (
+        <div className="amigo-details">
+          <h3>Amigo Details:</h3>
+          <p>First Name: {a.first_name ?? '—'}</p>
+          <p>Last Name: {a.last_name ?? '—'}</p>
+          <p>Username: {a.user_name}</p>
+          <p>Email: {a.email ?? '—'}</p>
+          {a.avatar_url && (
+            <img
+              src={a.avatar_url}
+              alt={`${a.first_name ?? 'Amigo'}'s avatar`}
+            />
+          )}
+        </div>
+      )}
 
-      <p>Created At: {eventAmigoConnector.created_at}</p>
-      <p>Updated At: {eventAmigoConnector.updated_at}</p>
+      {/* Render only if included by API */}
+      {eventAmigoConnector.created_at && <p>Created At: {eventAmigoConnector.created_at}</p>}
+      {eventAmigoConnector.updated_at && <p>Updated At: {eventAmigoConnector.updated_at}</p>}
     </div>
   );
 };
