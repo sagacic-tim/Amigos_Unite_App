@@ -123,6 +123,11 @@ export const EventService = {
   },
 };
 
+export async function createEvent(params: EventCreateParams): Promise<Event> {
+  const res = await privateApi.post("/api/v1/events", { event: params });
+  return res.data.event ?? res.data; // however your API structures it
+}
+
 // Separate service for locations themselves:
 export const EventLocationService = {
   async create(loc: Partial<EventLocation>) {

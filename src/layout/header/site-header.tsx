@@ -6,8 +6,8 @@ import useAuthStatus from "@/hooks/useAuthStatus";
 import { useManagedEventsFlag } from "@/hooks/useManagedEventsFlag";
 
 import MainNavBar, { NavItem } from "@/layout/navigation/main-nav-bar";
-import EventsMenuOverlay from "@/layout/navigation/events-menu-overlay";
-import UserMenu from "@/layout/header/user-menu";
+import EventsMenuOverlay from "@/layout/navigation/events-nav-dropdown";
+import UserMenu from "@/layout/header/user-menu-dropdown";
 
 import logoPng from "@/assets/images/home_page/amigos-unite-logo-128.png";
 

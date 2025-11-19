@@ -59,6 +59,7 @@ body {
 /* Main content region (full-bleed) */
 .app-main {
   /* Keep if you plan to use container queries; harmless otherwise */
+  background-color: var(--primary-surface-bg-color-1);
   container-name: app;
   container-type: inline-size;
   display: grid;

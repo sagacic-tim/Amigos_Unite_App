@@ -18,7 +18,7 @@ export function ThemeSwitcher({ area }: Props) {
     <div className="theme-switcher" style={{ display: 'inline-flex', gap: 8 }}>
       {!area && (
         <select
-          className="user-menu__select"
+          className="nav-menu__select"
           aria-label="Area"
           value={currentArea}
           onChange={(e) => setCurrentArea(e.target.value as 'public' | 'admin')}
@@ -30,6 +30,7 @@ export function ThemeSwitcher({ area }: Props) {
 
       {currentArea === 'public' && (
         <select
+          className = "nav-menu-item__select"
           aria-label="Palette"
           value={palette}
           onChange={(e) => setPalette(e.target.value)}

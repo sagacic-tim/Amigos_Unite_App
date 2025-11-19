@@ -24,6 +24,7 @@ export interface Event {
   // Optional expansions (index/show payload convenience)
   event_type?: string | null;
   event_speakers_performers?: string[] | null;
+  description?: string | null;
   created_at?: string;
   updated_at?: string;
   lead_coordinator?: AmigoMinimal | null;
@@ -41,4 +42,5 @@ export interface EventCreateParams {
   status?: EventStatus;
   event_type?: string;
   event_speakers_performers?: string[];
+  description?: string;
 }

@@ -1,6 +1,6 @@
 // src/layout/navigation/main-nav-bar.tsx
 import React, { useCallback } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export type NavItem = { to: string; label: string };
 
@@ -16,6 +16,11 @@ const MainNavBar: React.FC<MainNavBarProps> = ({
   onEventsToggle,
   eventsAnchorRef,
 }) => {
+  const location = useLocation();
+
+  // Any route under /events should light up the "Events" badge
+  const isEventsSectionActive = location.pathname.startsWith("/events");
+
   const handleClick = useCallback(
     (
       e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
@@ -27,27 +32,46 @@ const MainNavBar: React.FC<MainNavBarProps> = ({
         e.preventDefault();
         onEventsToggle?.();
       }
-      // All other items behave as normal NavLinks
+      // all other items behave as usual
     },
     [onEventsToggle]
   );
 
   return (
     <nav className="main-nav" aria-label="Main">
-      {nav.map(({ to, label }) => (
-        <NavLink
-          key={label}
-          to={to}
-          end={to === "/"} // can tweak; or remove `end` if not desired
-          className={({ isActive }) =>
-            isActive ? "main-nav__item is-active" : "main-nav__item"
-          }
-          ref={label === "Events" ? eventsAnchorRef : undefined}
-          onClick={(e) => handleClick(e, label, to)}
-        >
-          {label}
-        </NavLink>
-      ))}
+      {nav.map(({ to, label }) => {
+        if (label === "Events") {
+          // Pure trigger, styled like a nav item and manually “active” for /events*
+          const className =
+            "main-nav__item" + (isEventsSectionActive ? " is-active" : "");
+
+          return (
+            <a
+              key="events"
+              href="#events"
+              ref={eventsAnchorRef}
+              className={className}
+              onClick={(e) => handleClick(e, label, to)}
+            >
+              {label}
+            </a>
+          );
+        }
+
+        // Normal navigation items use NavLink, so they get automatic active state
+        return (
+          <NavLink
+            key={label}
+            to={to}
+            end={to === "/"} // keep Home exact, others can match prefixes
+            className={({ isActive }) =>
+              isActive ? "main-nav__item is-active" : "main-nav__item"
+            }
+          >
+            {label}
+          </NavLink>
+        );
+      })}
     </nav>
   );
 };

@@ -1,12 +1,33 @@
+// src/pages/Events/index.tsx
+import React from "react";
+import useAuth from "@/hooks/useAuth";
+import EventList from "@/pages/Events/components/EventList";
 
-import React from 'react';
-import EventList from './components/EventList';
+const EventsPage: React.FC = () => {
+  const { isLoggedIn } = useAuth();
 
-export default function EventsPage() {
+  if (!isLoggedIn) {
+    return (
+      <section className="sectionPageHeading">
+        <h1 className="page-title">Events</h1>
+        <p>Please log in to view the list of events.</p>
+      </section>
+    );
+  }
+
   return (
-    <section className="section-content">
-      <h1 className="page-title">Events</h1>
+    <div className="container container--page">
+      <section className="sectionPageHeading">
+        <h1 className="page-title">Events</h1>
+        <p className="page-description">
+          This page lists all scheduled events in Amigos Unite,
+          including when they will be held and a brief description.
+        </p>
+      </section>
+
       <EventList />
-    </section>
+    </div>
   );
-}
+};
+
+export default EventsPage;

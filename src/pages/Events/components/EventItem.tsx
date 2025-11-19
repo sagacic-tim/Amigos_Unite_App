@@ -1,37 +1,86 @@
-// src/components/Events/EventItem.tsx
-import React from 'react';
-import { Event } from '@/types/events';
-import styles from "../Events.module.scss";
+// src/pages/Events/components/EventItem.tsx
+import React from "react";
+import type { Event } from "@/types/events/EventTypes";
 
 interface EventItemProps {
   event: Event;
 }
 
 const EventItem: React.FC<EventItemProps> = ({ event }) => {
-  const speakers = event.event_speakers_performers ?? []; // normalize to []
-  const lead = event.lead_coordinator ?? null;           // normalize to null
+  const {
+    event_name,
+    event_type,
+    formatted_event_date,
+    formatted_event_time,
+    event_date,
+    event_time,
+    description,
+    status_label,
+  } = event;
+
+  const displayDate = formatted_event_date ?? event_date ?? "";
+  const displayTime = formatted_event_time ?? event_time ?? "";
+  const displayDescription = description || "No description provided.";
 
   return (
-    <article className="event-item">
-      <h3 className="event-item__title">{event.event_name}</h3>
+    <article className="card card--profile">
+      <div className="card__body">
+        <h3 className="card__title">{event_name}</h3>
 
-      {/* Speakers – only render if there are any */}
-      {speakers.length > 0 && (
-        <p className="event-item__speakers">
-          <span className="event-item__label">Speakers:</span>{" "}
-          {speakers.join(", ")}
+        <p className="card__subtitle">
+          {displayDate && displayTime
+            ? `Scheduled for ${displayDate} at ${displayTime}`
+            : displayDate
+            ? `Scheduled for ${displayDate}`
+            : displayTime
+            ? `Scheduled at ${displayTime}`
+            : "Schedule not yet set"}
         </p>
-      )}
 
-      {/* Lead coordinator – only render if present */}
-      {lead && (
-        <p className="event-item__lead">
-          <span className="event-item__label">Lead coordinator:</span>{" "}
-          {lead.first_name || lead.last_name
-            ? [lead.first_name, lead.last_name].filter(Boolean).join(" ")
-            : lead.user_name}
+        {event_type && (
+          <p className="card__field">
+            <span className="card__field-label">Type:</span>
+            {event_type}
+          </p>
+        )}
+
+        <p className="card__field">
+          <span className="card__field-label">Status:</span>
+          {status_label}
         </p>
-      )}
+
+        <p className="card__message">{displayDescription}</p>
+
+        <div className="card__actions">
+          {/* These buttons hook into your future flows */}
+          <button
+            type="button"
+            className="button button--secondary"
+            // onClick={... open Event details modal later ...}
+          >
+            View Details
+          </button>
+
+          <button
+            type="button"
+            className="button button--secondary"
+            disabled
+            title="Location details coming soon"
+          >
+            View Location
+          </button>
+
+          {/* Later: show only if user manages the event */}
+          <button
+            type="button"
+            className="button button--primary"
+            disabled
+            title="Edit event coming soon"
+          >
+            Edit Event
+          </button>
+        </div>
+      </div>
     </article>
   );
 };

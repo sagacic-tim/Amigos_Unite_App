@@ -1,6 +1,7 @@
 // src/layout/navigation/events-menu-overlay.tsx
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { useNavDropdownPosition } from "@/hooks/use-nav-dropdown-position";
 
 interface EventsMenuOverlayProps {
   open: boolean;
@@ -19,40 +20,15 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
   onOpenCreateEvent,
   anchorRef,
 }) => {
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<{ top: number; left: number } | null>(
-    null
+  const { panelRef, firstItemRef, position } = useNavDropdownPosition(
+    anchorRef,
+    open,
+    onClose,
+    {
+      offset: 14,     // 14px below the anchor
+      panelWidth: 280 // matches your SCSS max-width
+    }
   );
-
-  // Compute fixed position directly under the "Events" anchor
-  useLayoutEffect(() => {
-    if (!open || !anchorRef.current) return;
-
-    const rect = anchorRef.current.getBoundingClientRect();
-    setPosition({
-      top: rect.bottom + 14, // 4px gap under the link
-      left: rect.left,
-    });
-  }, [open, anchorRef]);
-
-  // Click outside -> close
-  useEffect(() => {
-    if (!open) return;
-
-    const handler = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(target) &&
-        !anchorRef.current?.contains(target)
-      ) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open, onClose, anchorRef]);
 
   if (!open || !position) return null;
 
@@ -68,11 +44,17 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
       role="menu"
       aria-label="Events"
     >
-      <div className="nav-menu__section ">
+      <div className="nav-menu__section">
         <div className="nav-menu__label">Events</div>
-        <ul className="nav-menu__list ">
+        <ul className="nav-menu__list">
           <li>
-            <Link to="/events" onClick={onClose} className="nav-menu__item">
+            <Link
+              to="/events"
+              onClick={onClose}
+              className="nav-menu__item"
+              role="menuitem"
+              ref={firstItemRef as React.RefObject<HTMLAnchorElement>}
+            >
               View Events
             </Link>
           </li>
@@ -83,6 +65,7 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
                 to="/events/manage"
                 onClick={onClose}
                 className="nav-menu__item"
+                role="menuitem"
               >
                 Manage My Events
               </Link>
@@ -91,9 +74,17 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
 
           {isLoggedIn && (
             <li>
-              <Link to="/manage-events" onClick={onClose} className="nav-menu__item">
+              <button
+                type="button"
+                className="nav-menu__item nav-menu__item--button"
+                role="menuitem"
+                onClick={() => {
+                  onOpenCreateEvent();
+                  onClose();
+                }}
+              >
                 Create New Event
-              </Link>
+              </button>
             </li>
           )}
         </ul>

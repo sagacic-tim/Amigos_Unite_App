@@ -1,31 +1,35 @@
-
-/* utils */
+/* shared helper */
 .visually-hidden {
-  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-  padding: 0; margin: -1px; overflow: hidden;
   position: absolute !important;
   width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 
-/* container aligns to the rightmost column/cell */
+/* container – can be specialized via modifiers like nav-menu--user */
 .nav-menu {
-  justify-self: end; // works with your CSS Grid header
   position: relative;
+  justify-self: end; // works with your CSS grid header
 }
 
-/* icon button */
+.nav-menu--user {
+  // any user-specific tweaks (if needed)
+}
+
+/* trigger button (icon or text badge) */
 .nav-menu__toggle {
+  display: inline-flex;
   align-items: center;
-  background-color: var(--nav-item-bg-color);
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   border: 0;
-  cursor: pointer;
-  display: inline-flex;
-  justify-content: center;
-  line-height: 1;
   padding: var(--spacing-xs);
-  transition: background-color 0.5s;
-  width: 40px; height: 40px; /* good touch target */
+  cursor: pointer;
+  line-height: 1;
+  background-color: var(--nav-item-bg-color);
+  transition: background-color 0.25s ease;
 }
 
 .nav-menu__toggle:hover {
@@ -37,23 +41,19 @@
   background-color: var(--nav-item-active-bg-color);
 }
 
-/* panel */
+/* panel – *position is now set inline* from the hook */
 .nav-menu__panel {
-  background: var(--secondary-surface-bg-color-1);
-  border-radius: 12px;
-  border: 2px solid var(--primary-border-color);
-  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08);
+  min-width: 280px;
   max-width: 320px;
   padding: 10px;
-  position: fixed;
-  right: 0;                /* right align under icon */
-  top: calc(100% + 8px);   /* slight offset below button */
+  border-radius: 12px;
+  border: 2px solid var(--primary-border-color);
+  background: var(--secondary-surface-bg-color-1);
+  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08);
   z-index: 2000;
 
-
-  /* entry motion; respects reduced motion */
   @media (prefers-reduced-motion: no-preference) {
-    animation: usermenu-fade-in 500ms ease-out both;
+    animation: nav-menu-fade-in 180ms ease-out both;
     transform-origin: 100% 0%;
   }
 }
@@ -69,15 +69,17 @@
   margin: 8px 0;
 }
 
-.nav-menu__section + .nav-menu__section { margin-top: 8px; }
+.nav-menu__section + .nav-menu__section {
+  margin-top: 8px;
+}
 
 .nav-menu__label {
   color: var(--nav-item-text-color);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: .02em;
-  margin-bottom: 6px;
   opacity: .7;
+  margin-bottom: 6px;
 }
 
 .nav-menu__list {
@@ -87,13 +89,20 @@
 }
 
 .nav-menu__item {
-  background: transparent;
-  border-radius: 8px;
-  border: none;
-  color: inherit;
   display: block;
   padding: 8px 10px;
+  border-radius: 8px;
   text-decoration: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.nav-menu__item--button {
+  font: inherit;
+  cursor: pointer;
 }
 
 .nav-menu__item:hover,
@@ -102,16 +111,35 @@
   outline: none;
 }
 
+.nav-menu__select {
+  background: transparent;
+}
+
+.nav-menu-item__select {
+  background: transparent;
+}
+
 .nav-menu__palette {
-/* lets your ThemeSwitcher breathe */
   padding: 6px 4px;
 }
 
-
-/* Optional: keep the panel within viewport on very narrow screens */
+/* Optional: keep panel inside viewport on narrow screens */
 @media (max-width: 420px) {
   .nav-menu__panel {
-    right: 8px;
     min-width: min(280px, 95vw);
   }
+}
+
+/* Example icon coloring for user icon */
+.nav-menu--user .fa-user {
+  color: var(--nav-item-text-color);
+}
+
+.nav-menu--user .fa-user:hover {
+  color: var(--nav-item-hover-text-color);
+}
+
+.nav-menu--user .fa-user:active,
+.nav-menu--user .fa-user:focus {
+  color: var(--nav-item-active-text-color);
 }
