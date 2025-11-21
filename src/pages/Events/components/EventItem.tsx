@@ -15,12 +15,31 @@ const EventItem: React.FC<EventItemProps> = ({ event }) => {
     event_date,
     event_time,
     description,
+    status,
     status_label,
   } = event;
 
+  // Prefer formatted fields from the API; fall back to raw ISO
   const displayDate = formatted_event_date ?? event_date ?? "";
   const displayTime = formatted_event_time ?? event_time ?? "";
   const displayDescription = description || "No description provided.";
+
+  // Fallback label if the API doesn't send status_label for some reason
+  const fallbackStatusLabel = (() => {
+    if (status_label) return status_label;
+    switch (status) {
+      case "planning":
+        return "Planning";
+      case "active":
+        return "Active";
+      case "completed":
+        return "Completed";
+      case "canceled":
+        return "Canceled";
+      default:
+        return status || "Unknown";
+    }
+  })();
 
   return (
     <article className="card card--profile">
@@ -46,13 +65,12 @@ const EventItem: React.FC<EventItemProps> = ({ event }) => {
 
         <p className="card__field">
           <span className="card__field-label">Status:</span>
-          {status_label}
+          {fallbackStatusLabel}
         </p>
 
         <p className="card__message">{displayDescription}</p>
 
         <div className="card__actions">
-          {/* These buttons hook into your future flows */}
           <button
             type="button"
             className="button button--secondary"
@@ -70,7 +88,6 @@ const EventItem: React.FC<EventItemProps> = ({ event }) => {
             View Location
           </button>
 
-          {/* Later: show only if user manages the event */}
           <button
             type="button"
             className="button button--primary"

@@ -21,31 +21,33 @@
 .grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
 
 /* Cards grid mixin
-   - $min-card:   min width of a card track
-   - $max-card:   optional max width for cards (center + avoid super-wide lanes)
-   - $gap:        gap between cards (both axes)
+   - auto-fit columns based on available width
+   - each track prefers >= $min-card, card itself capped at $ideal-card
 */
-@mixin cards-grid($min-card: 380px, $max-card: 480px, $gap: 20px) {
+@mixin cards-grid(
+  $min-card: 340px,
+  $ideal-card: 380px,
+  $gap: 20px
+) {
   display: grid;
   gap: $gap;
-  align-items: stretch; // equal height per row
+  align-items: stretch;
+  justify-content: space-around;
 
-  // Allow a CSS variable override, with SCSS fallback:
+  // ✅ VALID: let the track grow up to 1fr; cap the card itself below.
   grid-template-columns: repeat(
     auto-fit,
-    minmax(var(--min-card, #{$min-card}), 1fr)
+    minmax($min-card, 1fr)
   );
 
-  // Direct .card children (your Amigos page structure)
+  // Direct .card children
   > .card {
     width: 100%;
-    @if $max-card != null {
-      max-width: $max-card;
-      justify-self: center;
-    }
+    max-width: $ideal-card;   // soft cap around 380px
+    justify-self: center;
   }
 
-  // If you ever wrap in a list (<ul class="cards-grid"><li><article class="card">…)
+  // Optional: <ul class="cards-grid"><li><article class="card">…</article></li></ul>
   > li {
     list-style: none;
     margin: 0;
@@ -53,15 +55,21 @@
 
     > .card {
       width: 100%;
-      @if $max-card != null {
-        max-width: $max-card;
-        justify-self: center;
-      }
+      max-width: $ideal-card;
+      justify-self: center;
     }
   }
 }
 
-/* Your default recipe for this project */
+/* Default cards grid */
 .cards-grid {
-  @include cards-grid(380px, 480px, 20px);
+  @include cards-grid(340px, 380px, 20px);
+}
+
+/* Layout-only tweak for very small viewports */
+@media (max-width: 400px) {
+  .cards-grid {
+    grid-template-columns: minmax(0, 1fr); // force a single column
+    justify-content: stretch;
+  }
 }

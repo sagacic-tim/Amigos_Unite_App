@@ -19,13 +19,12 @@ function AuthModalsHost() {
   const navigate = useNavigate();
 
   const [loginOpen, setLoginOpen] = useState(false);
-  const [loginNotice, setLoginNotice] = useState<string | null>(null);
-  const [loginNext, setLoginNext] = useState<string | null>(null);
+  const [loginNotice, setLoginNotice] = useState<string | null>(null); // NEW
+  const [loginNext, setLoginNext] = useState<string | null>(null);     // NEW
 
   const [signupOpen, setSignupOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
-  // Central handler for auth:* events from anywhere in the app
   useEffect(() => {
     const onLogin = (ev: Event) => {
       const e = ev as CustomEvent<{ notice?: string; next?: string }>;
@@ -36,32 +35,14 @@ function AuthModalsHost() {
     const onSignup = () => setSignupOpen(true);
     const onLogout = () => setLogoutOpen(true);
 
-    document.addEventListener(
-      'auth:login',
-      onLogin as EventListener,
-    );
-    document.addEventListener(
-      'auth:signup',
-      onSignup as EventListener,
-    );
-    document.addEventListener(
-      'auth:logout',
-      onLogout as EventListener,
-    );
+    document.addEventListener('auth:login', onLogin as EventListener);
+    document.addEventListener('auth:signup', onSignup as EventListener);
+    document.addEventListener('auth:logout', onLogout as EventListener);
 
     return () => {
-      document.removeEventListener(
-        'auth:login',
-        onLogin as EventListener,
-      );
-      document.removeEventListener(
-        'auth:signup',
-        onSignup as EventListener,
-      );
-      document.removeEventListener(
-        'auth:logout',
-        onLogout as EventListener,
-      );
+      document.removeEventListener('auth:login', onLogin as EventListener);
+      document.removeEventListener('auth:signup', onSignup as EventListener);
+      document.removeEventListener('auth:logout', onLogout as EventListener);
     };
   }, []);
 
@@ -74,27 +55,16 @@ function AuthModalsHost() {
       setLoginNotice(null);
       setLoginNext(null);
     };
-    document.addEventListener(
-      'ui:route-changed',
-      handler as EventListener,
-    );
-    return () =>
-      document.removeEventListener(
-        'ui:route-changed',
-        handler as EventListener,
-      );
+    document.addEventListener('ui:route-changed', handler as EventListener);
+    return () => document.removeEventListener('ui:route-changed', handler as EventListener);
   }, []);
 
   return (
     <>
       <Login
         isOpen={loginOpen}
-        notice={loginNotice ?? undefined}
-        onClose={() => {
-          setLoginOpen(false);
-          setLoginNotice(null);
-          setLoginNext(null);
-        }}
+        notice={loginNotice ?? undefined}               // pass notice to modal
+        onClose={() => { setLoginOpen(false); setLoginNotice(null); setLoginNext(null); }}
         onLoginSuccess={(amigo) => {
           setLoginOpen(false);
           const target = loginNext || '/';
@@ -104,11 +74,7 @@ function AuthModalsHost() {
           navigate(target, { replace: true });
 
           // let the app know auth state changed
-          document.dispatchEvent(
-            new CustomEvent('auth:changed', {
-              detail: { type: 'login', amigo },
-            }),
-          );
+          document.dispatchEvent(new CustomEvent('auth:changed', { detail: { type: 'login', amigo } }));
         }}
       />
 
@@ -117,11 +83,7 @@ function AuthModalsHost() {
         onClose={() => setSignupOpen(false)}
         onSignupSuccess={() => {
           setSignupOpen(false);
-          document.dispatchEvent(
-            new CustomEvent('auth:changed', {
-              detail: { type: 'signup' },
-            }),
-          );
+          document.dispatchEvent(new CustomEvent('auth:changed', { detail: { type: 'signup' } }));
         }}
       />
 
@@ -134,9 +96,7 @@ function AuthModalsHost() {
               onLogoutSuccess={() => {
                 setLogoutOpen(false);
                 document.dispatchEvent(
-                  new CustomEvent('auth:changed', {
-                    detail: { type: 'logout' },
-                  }),
+                  new CustomEvent('auth:changed', { detail: { type: 'logout' } }),
                 );
               }}
             />
@@ -160,47 +120,37 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [banner, setBanner] = useState<string | null>(null);
 
-  // Let listeners know the route changed (closes modals, etc.)
   useEffect(() => {
     document.dispatchEvent(new CustomEvent('ui:route-changed'));
   }, [location.pathname]);
 
-  // Handle ?auth=login&flash=...&next=... pattern
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const auth = params.get('auth'); // 'login' triggers modal
-    const flash = params.get('flash');
-    const next = params.get('next');
+    const auth   = params.get('auth');     // 'login' triggers modal
+    const flash  = params.get('flash');    // message to show in modal
+    const next   = params.get('next');     // where to go after login
 
     if (auth === 'login') {
-      document.dispatchEvent(
-        new CustomEvent('auth:login', {
-          detail: {
-            notice: flash || undefined,
-            next: next || undefined,
-          },
-        }),
-      );
+      // Open the login modal and pass along flash + next
+      document.dispatchEvent(new CustomEvent('auth:login', {
+        detail: { notice: flash || undefined, next: next || undefined }
+      }));
 
-      // Clean URL so it doesn’t fire again
+      // Clean the URL so it doesn’t fire again
       params.delete('auth');
       params.delete('flash');
       params.delete('next');
-      navigate(
-        { pathname: location.pathname, search: params.toString() },
-        { replace: true },
-      );
+      navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
+      // Don’t show the top banner; the notice is inside the modal
       setBanner(null);
       return;
     }
 
+    // Optional: if you still want to support a generic top banner when not opening login
     if (flash) {
       setBanner(flash);
       params.delete('flash');
-      navigate(
-        { pathname: location.pathname, search: params.toString() },
-        { replace: true },
-      );
+      navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
     }
   }, [location.key, location.pathname, location.search, navigate]);
 
@@ -209,25 +159,14 @@ export default function AppLayout() {
       {banner && (
         <div className="banner banner-warning">
           <span>{banner}</span>
-          <button
-            type="button"
-            className="banner__close"
-            onClick={() => setBanner(null)}
-            aria-label="Close"
-          >
-            ×
-          </button>
+          <button type="button" className="banner__close" onClick={() => setBanner(null)} aria-label="Close">×</button>
         </div>
       )}
-
       <SiteHeader />
-
       <main className="app-main">
         <Outlet />
       </main>
-
       <SiteFooter />
-
       <AuthModalsHost />
     </div>
   );

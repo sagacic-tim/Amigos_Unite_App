@@ -20,9 +20,7 @@ const Login: React.FC<LoginProps> = ({
 }) => {
   const [loginAttribute, setLoginAttribute] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    null,
-  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleErrorResponse = (status: number) => {
@@ -49,21 +47,16 @@ const Login: React.FC<LoginProps> = ({
 
     try {
       setLoading(true);
-      const params: LoginParams = {
-        login_attribute: loginAttribute,
-        password,
-      };
+      const params: LoginParams = { login_attribute: loginAttribute, password };
       const amigo = await loginAmigo(params);
       onLoginSuccess(amigo);
-      // Parent (AuthModalsHost) closes the modal; no need to call onClose here.
+      // Parent (AuthModalsHost) already closes the modal; no need to call onClose here.
     } catch (err: any) {
-      if (err.response) {
-        handleErrorResponse(err.response.status);
-      } else {
+      if (err.response) handleErrorResponse(err.response.status);
+      else
         setErrorMessage(
           'An error occurred during login. Please try again later.',
         );
-      }
     } finally {
       setLoading(false);
     }

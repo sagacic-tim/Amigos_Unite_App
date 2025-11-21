@@ -21,6 +21,11 @@ export interface Event {
   status: EventStatus;
   lead_coordinator_id?: number | null;
 
+  // Formatted fields from the serializer (optional)
+  formatted_event_date?: string;  // e.g., "November 14, 2025"
+  formatted_event_time?: string;  // e.g., "3:30 PM"
+  status_label?: string;          // e.g., "Planning", "Active", ...
+
   // Optional expansions (index/show payload convenience)
   event_type?: string | null;
   event_speakers_performers?: string[] | null;
@@ -34,6 +39,7 @@ export interface Event {
   event_location_connectors?: import('./EventLocationConnectorTypes').EventLocationConnector[];
   primary_event_location?: import('./EventLocationTypes').EventLocation | null;
 }
+
 
 export interface EventCreateParams {
   event_name: string;

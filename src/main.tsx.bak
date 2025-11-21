@@ -6,6 +6,7 @@ import AppRouter from '@/routes/routes';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { AuthProvider } from '@/context/AuthContext';
 
+import Login from '@/components/Authentication/Login';
 import { setAuthRequiredHandler } from '@/services/privateApi';
 import { refreshAuthSession } from '@/services/auth';
 import '@/App.scss';
@@ -14,43 +15,37 @@ import '@/App.scss';
 import EventCreateModal from '@/components/modals/EventCreateModal';
 
 function Root() {
+  const [loginOpen, setLoginOpen] = React.useState(false);
+  const [loginNotice, setLoginNotice] = React.useState<string | undefined>();
   const [expiresAt, setExpiresAt] = React.useState<string | undefined>();
   const refreshTimerRef = React.useRef<number | null>(null);
 
-  // When the API interceptor gets a 401 that requires login,
-  // just emit an auth:login event. AuthModalsHost in AppLayout
-  // is responsible for showing the Login modal.
-  React.useEffect(() => {
-    setAuthRequiredHandler((notice?: string) => {
-      document.dispatchEvent(
-        new CustomEvent('auth:login', {
-          detail: {
-            notice:
-              notice ?? 'You need to be logged in to view this page.',
-          },
-        }),
-      );
-    });
+  const openLoginWith = React.useCallback((msg?: string) => {
+    setLoginNotice(msg ?? 'You need to be logged in to view this page.');
+    setLoginOpen(true);
   }, []);
 
-  // Listen for new JWT expiry announcements from auth service
+  React.useEffect(() => {
+    setAuthRequiredHandler((notice?: string) => {
+      openLoginWith(notice ?? 'You need to be logged in to view this page.');
+    });
+  }, [openLoginWith]);
+
   React.useEffect(() => {
     function onExpires(e: Event) {
       const iso = (e as CustomEvent<string>).detail;
       setExpiresAt(iso);
     }
-    window.addEventListener(
-      'auth:expires',
-      onExpires as EventListener,
-    );
-    return () =>
-      window.removeEventListener(
-        'auth:expires',
-        onExpires as EventListener,
-      );
+    window.addEventListener('auth:expires', onExpires as EventListener);
+    return () => window.removeEventListener('auth:expires', onExpires as EventListener);
   }, []);
 
-  // Helper: schedule a proactive refresh ~5 minutes before expiry
+  React.useEffect(() => {
+    const onAuthLogin = () => openLoginWith();
+    document.addEventListener('auth:login', onAuthLogin as EventListener);
+    return () => document.removeEventListener('auth:login', onAuthLogin as EventListener);
+  }, [openLoginWith]);
+
   const schedule = React.useCallback(
     (iso?: string) => {
       if (refreshTimerRef.current) {
@@ -59,36 +54,23 @@ function Root() {
       }
       if (!iso) return;
 
-      const skewMs = 5 * 60 * 1000; // 5 minutes early
-      const dueIn = Math.max(
-        0,
-        new Date(iso).getTime() - Date.now() - skewMs,
-      );
+      const skewMs = 5 * 60 * 1000;
+      const dueIn = Math.max(0, new Date(iso).getTime() - Date.now() - skewMs);
 
       refreshTimerRef.current = window.setTimeout(async () => {
         const ok = await refreshAuthSession();
-
         if (!ok) {
-          // Align with previous behaviour: send user Home
           if (window.location.pathname !== '/') {
             window.history.replaceState(null, '', '/');
           }
-          // And ask for login via the central auth:login flow
-          document.dispatchEvent(
-            new CustomEvent('auth:login', {
-              detail: {
-                notice: 'Your session expired. Please log in again.',
-              },
-            }),
-          );
+          openLoginWith('Your session expired. Please log in again.');
         }
         // On success, refreshAuthSession() will emit a new auth:expires event
       }, dueIn);
     },
-    [],
+    [openLoginWith]
   );
 
-  // When expiresAt changes, (re)schedule proactive refresh
   React.useEffect(() => {
     schedule(expiresAt);
     return () => {
@@ -99,7 +81,6 @@ function Root() {
     };
   }, [expiresAt, schedule]);
 
-  // Reset schedule on user activity when we’re close to expiry
   React.useEffect(() => {
     if (!expiresAt) return;
 
@@ -111,25 +92,24 @@ function Root() {
       }
     };
 
-    const events = [
-      'mousemove',
-      'keydown',
-      'click',
-      'scroll',
-      'visibilitychange',
-    ];
-    events.forEach((ev) =>
-      window.addEventListener(ev, handler, { passive: true }),
-    );
-    return () =>
-      events.forEach((ev) => window.removeEventListener(ev, handler));
+    const events = ['mousemove', 'keydown', 'click', 'scroll', 'visibilitychange'];
+    events.forEach((ev) => window.addEventListener(ev, handler, { passive: true }));
+    return () => events.forEach((ev) => window.removeEventListener(ev, handler));
   }, [expiresAt, schedule]);
 
   return (
     <AuthProvider>
       <ErrorBoundary>
         <AppRouter />
-        {/* Only global event-creation modal lives here now */}
+
+        <Login
+          isOpen={loginOpen}
+          onClose={() => setLoginOpen(false)}
+          onLoginSuccess={() => setLoginOpen(false)}
+          notice={loginNotice}
+        />
+
+        {/* Modal still mounted at root level */}
         <EventCreateModal />
       </ErrorBoundary>
     </AuthProvider>
@@ -139,5 +119,5 @@ function Root() {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Root />
-  </React.StrictMode>,
+  </React.StrictMode>
 );

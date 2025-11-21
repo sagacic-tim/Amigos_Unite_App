@@ -58,21 +58,22 @@ body {
 
 /* Main content region (full-bleed) */
 .app-main {
-  /* Keep if you plan to use container queries; harmless otherwise */
   background-color: var(--primary-surface-bg-color-1);
   container-name: app;
   container-type: inline-size;
+
   display: grid;
+  grid-template-columns: 100%;  // clear and explicit intent
+  grid-auto-flow: row;
+  grid-auto-rows: auto;
+
   justify-content: center;
-  /* Full width: no max width or centering */
+
   inline-size: 100%;
   max-inline-size: none;
   margin: 0 0 30px;
-
-  /* If you want a tiny default gutter inside main, change this var to a token */
   padding-inline: var(--page-gutter-inline);
 }
-
 /* Utility: allow a child section to bleed to the edges even if you set a gutter */
 .app-bleed {
   /* Pull content to the edges by negating the main’s inline padding */
