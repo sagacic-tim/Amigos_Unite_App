@@ -1,5 +1,5 @@
 // src/services/csrf.ts
-import publicApi from '@/services/publicApi';
+import publicApi from '@/services/api/publicApi';
 
 let cachedToken: string | null = null;
 let inflight: Promise<string> | null = null;

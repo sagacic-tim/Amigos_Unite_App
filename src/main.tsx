@@ -6,7 +6,7 @@ import AppRouter from '@/routes/routes';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { AuthProvider } from '@/context/AuthContext';
 
-import { setAuthRequiredHandler } from '@/services/privateApi';
+import { setAuthRequiredHandler } from '@/services/api/privateApi';
 import { refreshAuthSession } from '@/services/auth';
 import '@/App.scss';
 

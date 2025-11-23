@@ -1,7 +1,7 @@
 // src/context/AuthContext.tsx
 import { createContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
-import privateApi from '@/services/privateApi';
+import privateApi from '@/services/api/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
 
 export type AuthState = {
@@ -9,11 +9,12 @@ export type AuthState = {
   loading: boolean;
   error: string | null;
   amigos: Amigo[];
-  currentUser: Amigo | null;
+  currentAmigo: Amigo | null;
   refreshAuth: () => Promise<void>;
-  refreshCurrentUser: () => Promise<void>;
-  setCurrentUser: Dispatch<SetStateAction<Amigo | null>>;
+  refreshCurrentAmigo: () => Promise<void>;
+  setCurrentAmigo: Dispatch<SetStateAction<Amigo | null>>;
 };
+
 
 export const AuthContext = createContext<AuthState | undefined>(undefined);
 
@@ -61,8 +62,8 @@ function normalizeAmigosList(data: any): Amigo[] {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn]   = useState(false);
   const [loading, setLoading]         = useState(true);
-  const [amigos, setAmigos]           = useState<Amigo[]>([]);
-  const [currentUser, setCurrentUser] = useState<Amigo | null>(null);
+  const [amigos, setAmigos]             = useState<Amigo[]>([]);
+  const [currentAmigo, setCurrentAmigo] = useState<Amigo | null>(null);
   const [error, setError]             = useState<string | null>(null);
 
   const loadAmigos = useCallback(async () => {
@@ -75,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+
   const loadMe = useCallback(async (): Promise<boolean> => {
     try {
       const res = await privateApi.get('/api/v1/me', {
@@ -85,20 +87,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.status === 200) {
         const me = normalizeMePayload(res.data);
         if (me?.id) {
-          setCurrentUser(me);
+          setCurrentAmigo(me);
           return true;
         }
       }
 
-      setCurrentUser(null);
+      setCurrentAmigo(null);
       return false;
     } catch {
-      setCurrentUser(null);
+      setCurrentAmigo(null);
       return false;
     }
   }, []);
 
-  const refreshCurrentUser = useCallback(async () => {
+  const refreshCurrentAmigo = useCallback(async () => {
     await loadMe();
   }, [loadMe]);
 
@@ -113,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await loadAmigos();
     } else {
       setIsLoggedIn(false);
-      setCurrentUser(null);
+      setCurrentAmigo(null);
       setAmigos([]);
     }
 
@@ -137,10 +139,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     error,
     amigos,
-    currentUser,
+    currentAmigo,
     refreshAuth,
-    refreshCurrentUser,
-    setCurrentUser,
+    refreshCurrentAmigo,
+    setCurrentAmigo,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

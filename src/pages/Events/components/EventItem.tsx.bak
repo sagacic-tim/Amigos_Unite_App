@@ -1,21 +1,13 @@
 // src/pages/Events/components/EventItem.tsx
 import React from "react";
-import { Link } from "react-router-dom";
 import type { Event } from "@/types/events/EventTypes";
 
 interface EventItemProps {
   event: Event;
-  mode?: "public" | "manage";
-  onDelete?: (event: Event) => void;
 }
 
-const EventItem: React.FC<EventItemProps> = ({
-  event,
-  mode = "public",
-  onDelete,
-}) => {
+const EventItem: React.FC<EventItemProps> = ({ event }) => {
   const {
-    id,
     event_name,
     event_type,
     formatted_event_date,
@@ -27,10 +19,12 @@ const EventItem: React.FC<EventItemProps> = ({
     status_label,
   } = event;
 
+  // Prefer formatted fields from the API; fall back to raw ISO
   const displayDate = formatted_event_date ?? event_date ?? "";
   const displayTime = formatted_event_time ?? event_time ?? "";
   const displayDescription = description || "No description provided.";
 
+  // Fallback label if the API doesn't send status_label for some reason
   const fallbackStatusLabel = (() => {
     if (status_label) return status_label;
     switch (status) {
@@ -76,12 +70,11 @@ const EventItem: React.FC<EventItemProps> = ({
 
         <p className="card__message">{displayDescription}</p>
 
-        {/* Ensure .card__actions has margin-top: auto in SCSS so it pins to the bottom */}
         <div className="card__actions">
           <button
             type="button"
             className="button button--secondary"
-            // TODO: open event details modal
+            // onClick={... open Event details modal later ...}
           >
             View Details
           </button>
@@ -95,24 +88,14 @@ const EventItem: React.FC<EventItemProps> = ({
             View Location
           </button>
 
-          {mode === "manage" && (
-            <>
-              <Link
-                to={`/events/${id}/edit`}
-                className="button button--primary"
-              >
-                Edit Event
-              </Link>
-
-              <button
-                type="button"
-                className="button button--danger"
-                onClick={() => onDelete?.(event)}
-              >
-                Delete Event
-              </button>
-            </>
-          )}
+          <button
+            type="button"
+            className="button button--primary"
+            disabled
+            title="Edit event coming soon"
+          >
+            Edit Event
+          </button>
         </div>
       </div>
     </article>

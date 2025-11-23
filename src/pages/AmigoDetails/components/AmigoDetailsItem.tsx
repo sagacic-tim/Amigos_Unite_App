@@ -24,12 +24,12 @@ const formatString = (key: string): string =>
   key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 const AmigoDetailsItem: React.FC<AmigoDetailsItemProps> = ({ amigoDetails, amigo }) => {
-  const { currentUser } = useAuth();               // ⬅️ read auth state
+  const { currentAmigo } = useAuth();               // ⬅️ read auth state
 
   // If this card is showing the logged-in amigo, prefer currentUser,
   // which you refresh after avatar upload. Otherwise fall back to the prop.
   const effectiveAmigo: Amigo =
-    currentUser && currentUser.id === amigo.id ? { ...amigo, ...currentUser } : amigo;
+    currentAmigo && currentAmigo.id === amigo.id ? { ...amigo, ...currentAmigo } : amigo;
 
   const firstName = effectiveAmigo.first_name || 'Unknown';
   const lastName  = effectiveAmigo.last_name  || 'Unknown';

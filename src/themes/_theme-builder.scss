@@ -96,8 +96,8 @@
     --secondary-border-hover-color:#{ch.mix-str($space, map.get($neutrals, neutral-gray), 86, $brand-color, 14)};
 
     /* ───────── Primary Buttons ───────── */
-    --primary-button-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $brand-color, 95)};
-    --primary-button-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 5, $brand-color, 95)};
+    --primary-button-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 10, $brand-color, 90)};
+    --primary-button-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 0, $brand-color, 100)};
     --primary-button-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 85, $brand-color, 15)};
     --primary-button-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};
     --primary-button-hover-label-color:    #{map.get($neutrals, neutral-white)};
@@ -227,8 +227,8 @@
     --secondary-border-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 86, $brand-color, 14)};
 
     /* ───────── Buttons ───────── */
-    --primary-button-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $brand-color, 95)};
-    --primary-button-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 5, $brand-color, 95)};
+    --primary-button-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 10, $brand-color, 90)};
+    --primary-button-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 0, $brand-color, 100)};
     --primary-button-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 90, $brand-color, 10)};
     --primary-button-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};
     --primary-button-hover-label-color:    #{map.get($neutrals, neutral-white)};

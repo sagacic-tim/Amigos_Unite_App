@@ -89,7 +89,7 @@ export function setTheme(opts: ThemeOptions): void {
 
   const palette: string =
     area === 'public'
-      ? (opts.palette ?? current.palette ?? 'blue')
+      ? (opts.palette ?? current.palette ?? 'blue-tones')
       : 'admin'; // dummy for href builder; not stored for admin
 
   // Persist (admin does not store a palette)

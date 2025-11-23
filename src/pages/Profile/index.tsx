@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import md5 from 'blueimp-md5';
-import privateApi, { triggerAuthRequired } from '@/services/privateApi';
+import privateApi, { triggerAuthRequired } from '@/services/api/privateApi';
 import styles from './Profile.module.scss';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -166,9 +166,9 @@ function composeAddress(loc: Partial<AmigoLocationPayload>): string {
 export default function Profile() {
   const {
     isLoggedIn,
-    currentUser,
+    currentAmigo,
     refreshAuth,
-    refreshCurrentUser, // (still available if you want it separately)
+    refreshCurrentAmigo, // (still available if you want it separately)
   } = useAuth();
   const navigate = useNavigate();
 
@@ -180,7 +180,7 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
-  const amigoId = currentUser?.id;
+  const amigoId = currentAmigo?.id;
 
   const regionOptions = useMemo(() => {
     return {
@@ -192,11 +192,11 @@ export default function Profile() {
   const apiOrigin = import.meta.env.VITE_API_ORIGIN as string;
 
   const initialAvatarSrc = useMemo(() => {
-    if (currentUser?.avatar_url) return `${apiOrigin}${currentUser.avatar_url}`;
-    const email = (currentUser?.email || '').trim().toLowerCase();
+    if (currentAmigo?.avatar_url) return `${apiOrigin}${currentAmigo.avatar_url}`;
+    const email = (currentAmigo?.email || '').trim().toLowerCase();
     if (email) return gravatarIdenticon(email, 80);
     return '/images/default-amigo-avatar.png';
-  }, [apiOrigin, currentUser?.avatar_url, currentUser?.email]);
+  }, [apiOrigin, currentAmigo?.avatar_url, currentAmigo?.email]);
 
   const loadAll = useCallback(async () => {
     if (!amigoId) return;
@@ -212,10 +212,10 @@ export default function Profile() {
       const raw = (a?.data ?? {}) as any;
 
       setAmigoCore({
-        first_name: raw.first_name ?? currentUser?.first_name ?? '',
-        last_name: raw.last_name ?? currentUser?.last_name ?? '',
-        user_name: raw.user_name ?? currentUser?.user_name ?? '',
-        email: raw.email ?? currentUser?.email ?? '',
+        first_name: raw.first_name ?? currentAmigo?.first_name ?? '',
+        last_name: raw.last_name ?? currentAmigo?.last_name ?? '',
+        user_name: raw.user_name ?? currentAmigo?.user_name ?? '',
+        email: raw.email ?? currentAmigo?.email ?? '',
         secondary_email: raw.secondary_email ?? '',
         // These may already be in international format thanks to the backend
         phone_1: raw.phone_1 ?? '',
@@ -224,10 +224,10 @@ export default function Profile() {
     } catch {
       // Fallback: at least populate from currentUser if the show endpoint fails
       setAmigoCore({
-        first_name: currentUser?.first_name ?? '',
-        last_name: currentUser?.last_name ?? '',
-        user_name: currentUser?.user_name ?? '',
-        email: currentUser?.email ?? '',
+        first_name: currentAmigo?.first_name ?? '',
+        last_name: currentAmigo?.last_name ?? '',
+        user_name: currentAmigo?.user_name ?? '',
+        email: currentAmigo?.email ?? '',
         secondary_email: '',
         phone_1: '',
         phone_2: '',
@@ -264,7 +264,7 @@ export default function Profile() {
     }
 
     setLoading(false);
-  }, [amigoId, currentUser]);
+  }, [amigoId, currentAmigo]);
 
   // Auth guard
   useEffect(() => {
@@ -764,7 +764,7 @@ export default function Profile() {
                     style={{ borderRadius: '50%', objectFit: 'cover' }}
                     onError={(e) => {
                       const img = e.currentTarget as HTMLImageElement;
-                      const email = (currentUser?.email || '').trim().toLowerCase();
+                      const email = (currentAmigo?.email || '').trim().toLowerCase();
                       const stage = img.dataset.fallbackStage || '0';
                       if (stage === '0' && email) {
                         img.dataset.fallbackStage = '1';

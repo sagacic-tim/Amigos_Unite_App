@@ -1,6 +1,6 @@
 // src/services/auth.ts
-import publicApi  from '@/services/publicApi';
-import privateApi from '@/services/privateApi';
+import publicApi  from '@/services/api/publicApi';
+import privateApi from '@/services/api/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
 import { ensureCsrfToken, resetCsrfToken } from '@/services/csrf';
 

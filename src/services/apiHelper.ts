@@ -1,7 +1,7 @@
 // src/services/apiHelper.ts
 import type { AxiosInstance } from 'axios';
-import publicApi from './publicApi';
-import privateApi from './privateApi';
+import publicApi from './api/publicApi';
+import privateApi from './api/privateApi';
 
 type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
 

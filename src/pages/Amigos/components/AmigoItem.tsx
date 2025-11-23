@@ -17,18 +17,18 @@ interface AmigoItemProps {
 
 const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentAmigo } = useAuth();
 
   // Is this card the logged-in amigo?
-  const canEdit = !!currentUser && currentUser.id === amigo.id;
+  const canEdit = !!currentAmigo && currentAmigo.id === amigo.id;
 
   // Prefer currentUser when this card represents the logged-in amigo
   const effectiveAmigo = useMemo<Amigo>(() => {
-    if (currentUser && currentUser.id === amigo.id) {
-      return { ...amigo, ...currentUser };
+    if (currentAmigo && currentAmigo.id === amigo.id) {
+      return { ...amigo, ...currentAmigo };
     }
     return amigo;
-  }, [amigo, currentUser]);
+  }, [amigo, currentAmigo]);
 
   // Build avatar from the effective amigo (so new avatar shows up immediately)
   const avatarUrl = useMemo(

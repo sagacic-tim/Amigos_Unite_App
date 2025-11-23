@@ -35,8 +35,10 @@ export function ThemeSwitcher({ area }: Props) {
           value={palette}
           onChange={(e) => setPalette(e.target.value)}
         >
-          <option value="blue">Blue</option>
+          <option value="blue-tones">Blue Tones</option>
           <option value="earth-tones">Earth Tones</option>
+          <option value="forest-tones">Forest Tones</option>
+
         </select>
       )}
 

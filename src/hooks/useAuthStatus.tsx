@@ -9,10 +9,10 @@ type AuthStatus = {
 };
 
 export default function useAuthStatus(): AuthStatus {
-  const { isLoggedIn, currentUser, loading } = useAuth();
+  const { isLoggedIn, currentAmigo, loading } = useAuth();
   return {
     isLoggedIn,
-    amigo: currentUser,
+    amigo: currentAmigo,
     checking: loading,
   };
 }

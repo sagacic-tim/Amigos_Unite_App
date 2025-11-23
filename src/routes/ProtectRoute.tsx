@@ -1,7 +1,7 @@
 // src/routes/ProtectedRoute.tsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
-import { triggerAuthRequired } from '@/services/privateApi';
+import { triggerAuthRequired } from '@/services/api/privateApi';
 
 export default function ProtectedRoute() {
   const { isLoggedIn } = useAuth();

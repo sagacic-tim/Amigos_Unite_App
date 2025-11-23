@@ -1,7 +1,8 @@
 // src/components/modals/EventCreateModal.tsx
 import React, { useEffect, useRef, useState } from "react";
 import useAuthStatus from "@/hooks/useAuthStatus";
-import { EventService, EventLocationService } from "@/services/EventService";
+import { EventService } from "@/services/EventService";
+import { EventLocationService } from "@/services/EventLocationService";
 import type { EventCreateParams, EventStatus } from "@/types/events";
 import type { EventLocation } from "@/types/events/EventLocationTypes";
 
@@ -97,27 +98,29 @@ const EventCreateModal: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const created = await EventService.create({
+      const created = await EventService.createEvent({
         event_name: ev.event_name.trim(),
         event_date: ev.event_date,
-        event_time: ev.event_time.length === 5 ? ev.event_time + ":00" : ev.event_time,
+        event_time:
+          ev.event_time.length === 5 ? ev.event_time + ":00" : ev.event_time,
         status: ev.status ?? "planning",
         event_type: ev.event_type?.trim() || undefined,
-        event_speakers_performers: ev.event_speakers_performers?.filter(Boolean) ?? [],
+        event_speakers_performers:
+          ev.event_speakers_performers?.filter(Boolean) ?? [],
       });
 
       if (addLocation && loc && (loc.business_name || loc.street_name)) {
-        const createdLoc = await EventLocationService.create({
-          business_name: loc.business_name?.trim(),
-          street_number: loc.street_number?.trim(),
-          street_name:   loc.street_name?.trim(),
-          city:          loc.city?.trim(),
-          state_province:loc.state_province?.trim(),
-          postal_code:   loc.postal_code?.trim(),
-          country:       loc.country?.trim(),
+        const createdLoc = await EventLocationService.createLocation({
+          business_name:   loc.business_name?.trim(),
+          street_number:   loc.street_number?.trim(),
+          street_name:     loc.street_name?.trim(),
+          city:            loc.city?.trim(),
+          state_province:  loc.state_province?.trim(),
+          postal_code:     loc.postal_code?.trim(),
+          country:         loc.country?.trim(),
         });
 
-        await EventService.connectLocation(created.id, createdLoc.id, true);
+        await EventLocationService.connectLocation(created.id, createdLoc.id, true);
       }
 
       setOpen(false);

@@ -1,5 +1,5 @@
 // src/services/AmigoService.ts
-import privateApi from '@/services/privateApi';
+import privateApi from '@/services/api/privateApi';
 import type { Amigo } from '@/types/AmigoTypes';
 
 // Helpers mirroring AuthContext’s shape handling

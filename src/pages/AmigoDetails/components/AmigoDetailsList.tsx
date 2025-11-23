@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AmigoDetailsItem from './AmigoDetailsItem';
 import type { AmigoDetails } from '@/types/AmigoDetailsTypes';
 import type { Amigo } from '@/types/AmigoTypes';
-import privateApi from '@/services/privateApi';
+import privateApi from '@/services/api/privateApi';
 import useAuth from '@/hooks/useAuth';
 
 interface AmigoWithDetails {
