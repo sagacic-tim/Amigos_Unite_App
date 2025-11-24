@@ -1,6 +1,25 @@
 
-// src/assets/sass/components/_events.scss
-@use '../layout/grid' as default-grid;
+/* src/pages/Profile/Events.module.scss */
+@use '@/assets/sass/layout/grid' as default-grid;
+
+.page {
+  background-color: var(--primary-surface-bg-color-1);
+  display: grid;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-md);
+  justify-self: center;
+  grid-template-columns: minmax(640px, 0.5fr);
+}
+
+.pageDescription {
+  margin-bottom: 1.0rem;
+}
+
+.header {
+  color: var(--secondary-heading-color);
+  margin-bottom: var(--spacing-md);
+  margin: auto;
+}
 
 .event-item {
   border: 1px solid #ccc;
@@ -12,7 +31,7 @@
   }
 
   p {
-    margin: 5px 0;
+    margin: 20px 0;
   }
 }
 

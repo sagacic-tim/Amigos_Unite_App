@@ -1,5 +1,17 @@
 /* src/assets/sass/components/_forms.scss */
 
+.form {
+  background: var(--secondary-surface-bg-color-1);
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: 0 1px 2px var(--box-shadow-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0; // rely on parent grid gap
+  padding: var(--spacing-md);
+}
+
+/* Main layout wrapper for the actual <form> element */
 .form-grid {
   background: transparent;
   border: none;
@@ -74,12 +86,38 @@
     }
   }
 
+  /* Small explanatory text under inputs */
+  .form-hint {
+    display: block;
+    margin-top: var(--spacing-xxs);
+    font-size: 0.875rem;
+    color: var(--muted-text-color);
+    font-weight: var(--font-weight-regular);
+  }
+
   .checkbox {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
 
-    input[type='checkbox'] {
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: translateY(-1px);
+    }
+
+    span {
+      margin: 0;
+      font-weight: var(--font-weight-regular);
+    }
+  }
+
+  .radio {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+
+    input[type="radio"] {
       width: auto;
       margin: 0;
       transform: translateY(-1px);
@@ -123,16 +161,19 @@
     margin-bottom: var(--spacing-sm);
   }
 
-  .card {
-    padding: var(--spacing-lg);
-    border: 1px solid var(--secondary-border-color);
-    border-radius: var(--border-radius-lg);
-    background: var(--surface-bg-color);
-  }
-
   @media (max-width: 900px) {
     &__fields {
       grid-template-columns: 1fr;
     }
+  }
+}
+
+/* Motion safety applies to all forms, not just forms nested in .form-grid */
+@media (prefers-reduced-motion: reduce) {
+  .form,
+  .form * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

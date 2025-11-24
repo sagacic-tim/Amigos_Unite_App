@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import EventList from "@/pages/Events/components/EventList";
+import styles from "@pages/Events/Events.module.scss"
 
 const EventsPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
@@ -11,7 +12,7 @@ const EventsPage: React.FC = () => {
     <div className="container container--page">
       <section className="sectionPageHeading">
         <h1 className="page-title">Scheduled Events</h1>
-        <p className="page-description">
+        <p className={styles.pageDescription}>
           Browse all scheduled Amigos Unite events, including when they are held
           and a brief description. You do not need an account to view events.
         </p>
