@@ -25,4 +25,6 @@ export interface EventLocation {
   time_zone?: string;
   created_at: string;
   updated_at: string;
+  location_image_url?: string | null;
+  location_image_attribution?: string | null;
 }

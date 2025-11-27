@@ -78,7 +78,7 @@
 
     /* ───────── Headings ───────── */
     --primary-heading-color:   #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 92, $brand-color, 8)};
-    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-gray), 70, $brand-color, 30)};
+    --secondary-heading-color: #{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 70, $brand-color, 30)};
     --heading-hover-color:     #{ch.mix-str($space, map.get($neutrals, neutral-white), 96, $brand-color, 4)};
 
     /* ───────── Cards ───────── */

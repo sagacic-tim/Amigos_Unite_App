@@ -1,11 +1,6 @@
 // src/components/forms/EventForm.tsx
 import React, { useState } from "react";
 import type { EventCreateParams, EventStatus } from "@/types/events/EventTypes";
-import type { PlaceResult, PlacePhoto } from "@/services/PlacesService";
-import {
-  searchPlacesWithPhotos,
-  fetchPlacePhotos,
-} from "@/services/PlacesService";
 
 interface EventFormProps {
   initialValues?: Partial<EventCreateParams>;
@@ -44,7 +39,7 @@ type LocationDraft = {
   postalCode: string;
   owner: string;
   phone: string;
-  capacity: string;
+  capacity: string; // keep as string for now; convert to integer when persisting
   availability: string;
   services: {
     food: boolean;
@@ -54,6 +49,7 @@ type LocationDraft = {
   };
   imageUrl: string;
   placeId?: string | null;
+  photoName?: string | null;      // Google Places photo resource name
   photoAttribution?: string | null;
 };
 
@@ -77,8 +73,6 @@ const defaultLocation: LocationDraft = {
     bigScreen: false,
   },
   imageUrl: "",
-  placeId: null,
-  photoAttribution: null,
 };
 
 const EventForm: React.FC<EventFormProps> = ({
@@ -100,17 +94,28 @@ const EventForm: React.FC<EventFormProps> = ({
 
   // ── Location state (front-end only for now) ───────────────────────────────
   const [location, setLocation] = useState<LocationDraft>(defaultLocation);
-
-  // Google Places search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
-  const [placeResults, setPlaceResults] = useState<PlaceResult[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
-  const [placePhotos, setPlacePhotos] = useState<PlacePhoto[]>([]);
+  const [places, setPlaces] = useState<PlaceResult[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleSearchPhotos = async () => {
+    if (!searchQuery.trim()) return;
+    setSearching(true);
+    setSearchError(null);
+    try {
+      const results = await searchPlacesWithPhotos(searchQuery);
+      setPlaces(results);
+    } catch (err: any) {
+      console.error(err);
+      setSearchError("Could not load images from Google Places.");
+    } finally {
+      setSearching(false);
+    }
+  };
 
   // ───────────────────────────────────────────────────────────────────────────
   // Handlers: Event fields
@@ -172,57 +177,6 @@ const EventForm: React.FC<EventFormProps> = ({
   };
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Google Places: search → select place → load photos
-  // ───────────────────────────────────────────────────────────────────────────
-
-  const handleSearchPlaces = async () => {
-    if (!searchQuery.trim()) return;
-
-    setSearching(true);
-    setSearchError(null);
-
-    try {
-      const results = await searchPlacesWithPhotos(searchQuery);
-      setPlaceResults(results);
-      setSelectedPlace(null);
-      setPlacePhotos([]);
-    } catch (err) {
-      console.error(err);
-      setSearchError("Could not load places from Google.");
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const handleSelectPlace = async (place: PlaceResult) => {
-    setSelectedPlace(place);
-
-    // Basic location fields (you can enrich this later from formatted_address)
-    setLocation((prev) => ({
-      ...prev,
-      name: prev.name || place.name || "",
-      placeId: place.place_id,
-    }));
-
-    try {
-      const photos = await fetchPlacePhotos(place.place_id);
-      setPlacePhotos(photos);
-    } catch (err) {
-      console.error(err);
-      setSearchError("Could not load photos for that location.");
-    }
-  };
-
-  const handleSelectPlaceImage = (photo: PlacePhoto) => {
-    setLocation((prev) => ({
-      ...prev,
-      imageUrl: photo.photo_url || "",
-      placeId: photo.place_id || prev.placeId || null,
-      photoAttribution: photo.photo_attribution || prev.photoAttribution || null,
-    }));
-  };
-
-  // ───────────────────────────────────────────────────────────────────────────
   // Submit: currently only sends the Event payload
   // ───────────────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -243,7 +197,7 @@ const EventForm: React.FC<EventFormProps> = ({
       };
 
       // NOTE: For now, we only submit the Event payload.
-      // Later we will extend this to also submit `location`
+      // In a later step we will extend this to also submit `location`
       // (creating an EventLocation + EventLocationConnector).
       await onSubmit(payload);
     } catch (err: any) {
@@ -573,101 +527,17 @@ const EventForm: React.FC<EventFormProps> = ({
             </div>
           </fieldset>
 
-          {/* Location image: search + gallery + manual override */}
+          {/* Location image (URL + preview for now) */}
           <fieldset>
             <legend>Location image</legend>
-
-            {/* Search input + button */}
-            <label>
-              <span>Search Google Places for a location</span>
-              <div className="places-search">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="e.g., Tierra Mia West Covina"
-                />
-                <button
-                  type="button"
-                  className="button button--secondary"
-                  onClick={handleSearchPlaces}
-                  disabled={searching || !searchQuery.trim()}
-                >
-                  {searching ? "Searching…" : "Search"}
-                </button>
-              </div>
-            </label>
-
-            {searchError && <p className="form-error">{searchError}</p>}
-
-            {/* List of candidate places */}
-            {placeResults.length > 0 && (
-              <ul className="places-results">
-                {placeResults.map((place) => (
-                  <li key={place.place_id}>
-                    <button
-                      type="button"
-                      className={
-                        "places-results__item" +
-                        (selectedPlace?.place_id === place.place_id
-                          ? " places-results__item--selected"
-                          : "")
-                      }
-                      onClick={() => handleSelectPlace(place)}
-                    >
-                      <strong>{place.name}</strong>
-                      <span>{place.formatted_address}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {/* Scrollable gallery of photos for the selected place */}
-            {selectedPlace && placePhotos.length > 0 && (
-              <div className="places-gallery" role="list">
-                {placePhotos.map((photo, idx) => {
-                  const isSelected = location.imageUrl === photo.photo_url;
-
-                  return (
-                    <button
-                      type="button"
-                      key={photo.photo_url || `${photo.place_id}-${idx}`}
-                      role="listitem"
-                      className={
-                        "places-gallery__item" +
-                        (isSelected ? " places-gallery__item--selected" : "")
-                      }
-                      onClick={() => handleSelectPlaceImage(photo)}
-                    >
-                      {photo.photo_url && (
-                        <img
-                          src={photo.photo_url}
-                          alt={selectedPlace.name || "Location photo"}
-                          className="places-gallery__image"
-                        />
-                      )}
-                      {photo.photo_attribution && (
-                        <span
-                          className="places-gallery__attribution"
-                          dangerouslySetInnerHTML={{
-                            __html: photo.photo_attribution,
-                          }}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Manual override / fallback */}
             <p className="form-hint">
-              If needed, you can override the image URL manually:
+              In a later version, this area will show a scrollable gallery of
+              images from Google Maps / Places. For now, you can paste an
+              image URL to visually identify the venue.
             </p>
 
             <label>
-              <span>Image URL (override)</span>
+              <span>Image URL</span>
               <input
                 type="url"
                 value={location.imageUrl}
@@ -678,7 +548,6 @@ const EventForm: React.FC<EventFormProps> = ({
               />
             </label>
 
-            {/* Final preview of whichever image is selected / typed */}
             {location.imageUrl && (
               <div style={{ marginTop: "8px" }}>
                 <span className="form-hint">Preview</span>

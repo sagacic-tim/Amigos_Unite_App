@@ -22,8 +22,9 @@
   max-width: 640px;
 
   &__title {
-    margin: 0 0 var(--spacing-sm);
+    color: var(--primary-heading-color);
     font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--spacing-sm);
   }
 
   &__notice {
@@ -133,6 +134,14 @@
     field-sizing: content;
     min-height: 120px;
     resize: vertical;
+  }
+
+  legend.formsLegend {
+    color: var(--secondary-heading-color);
+    font-size: 1.75rem;
+    font-weight: 900;
+    margin-bottom: 1.0rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
   }
 
   /* Actions row: layout ONLY (buttons come from _buttons.scss) */
