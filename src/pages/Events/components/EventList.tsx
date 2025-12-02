@@ -26,6 +26,7 @@ const EventList: React.FC<EventListProps> = ({ variant = "public" }) => {
         setError(null);
 
         const data = await EventService.fetchEvents();
+        console.log("Raw events from API", data);
         let filtered = data;
 
         if (variant === "manage" && currentAmigo) {

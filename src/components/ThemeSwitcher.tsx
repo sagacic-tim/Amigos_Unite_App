@@ -38,7 +38,8 @@ export function ThemeSwitcher({ area }: Props) {
           <option value="blue-tones">Blue Tones</option>
           <option value="earth-tones">Earth Tones</option>
           <option value="forest-tones">Forest Tones</option>
-
+          <option value="deep-purple-tones">Deep Purple</option>
+          <option value="fire-on-water-tones">Fire-on-the-Water</option>
         </select>
       )}
 

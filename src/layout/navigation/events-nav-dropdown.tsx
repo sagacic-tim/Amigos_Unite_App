@@ -1,4 +1,4 @@
-// src/layout/navigation/events-menu-overlay.tsx
+// src/layout/navigation/events-nav-dropdown.tsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { useNavDropdownPosition } from "@/hooks/use-nav-dropdown-position";
@@ -8,7 +8,6 @@ interface EventsMenuOverlayProps {
   onClose: () => void;
   isLoggedIn: boolean;
   hasManagedEvents: boolean;
-  onOpenCreateEvent: () => void;
   anchorRef: React.RefObject<HTMLAnchorElement>;
 }
 
@@ -17,7 +16,6 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
   onClose,
   isLoggedIn,
   hasManagedEvents,
-  onOpenCreateEvent,
   anchorRef,
 }) => {
   const { panelRef, firstItemRef, position } = useNavDropdownPosition(
@@ -25,8 +23,8 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
     open,
     onClose,
     {
-      offset: 14,     // 14px below the anchor
-      panelWidth: 280 // matches your SCSS max-width
+      offset: 14, // 14px below the anchor
+      panelWidth: 280, // matches your SCSS max-width
     }
   );
 
@@ -74,17 +72,14 @@ const EventsMenuOverlay: React.FC<EventsMenuOverlayProps> = ({
 
           {isLoggedIn && (
             <li>
-              <button
-                type="button"
+              <Link
+                to="/events/new"
+                onClick={onClose}
                 className="nav-menu__item nav-menu__item--button"
                 role="menuitem"
-                onClick={() => {
-                  onOpenCreateEvent();
-                  onClose();
-                }}
               >
                 Create New Event
-              </button>
+              </Link>
             </li>
           )}
         </ul>

@@ -1,99 +1,357 @@
-// src/services/EventService.ts
-import axios from "axios";
 import privateApi from "@/services/api/privateApi";
+import publicApi from "@/services/api/publicApi";
 import type {
   Event,
   EventCreateParams,
-  EventAmigoConnector,
-  EventLocation,
-  EventLocationConnector,
-} from "@/types/events";
+  EventStatus,
+} from "@/types/events/EventTypes";
+import type { EventLocation } from "@/types/events/EventLocationTypes";
 
-const API = "/api/v1";
+const API_PREFIX = "/api/v1";
 
-export const EventService = {
-  // ─────────────────────────────────────────────
-  // Events
-  // ─────────────────────────────────────────────
-  async fetchEvents(params?: { status?: string; upcoming_only?: boolean }) {
-    const { data } = await axios.get<Event[]>(`${API}/events`, { params });
-    return data;
-  },
+// ─────────────────────────────────────────────────────────────────────────────
+// JSON:API types for Events / EventLocations
+// ─────────────────────────────────────────────────────────────────────────────
 
-  async fetchEvent(id: number) {
-    const { data } = await axios.get<Event>(`${API}/events/${id}`);
-    return data;
-  },
-
-  async createEvent(payload: EventCreateParams) {
-    const { data } = await privateApi.post(`${API}/events`, {
-      event: payload,
-    });
-    // If your API wraps as { event: ... }, prefer that; otherwise this is fine:
-    return (data as any).event ?? data;
-  },
-
-  async updateEvent(
-    id: number,
-    attrs: Partial<EventCreateParams> & { new_lead_coordinator_id?: number }
-  ) {
-    const { data } = await privateApi.put(`${API}/events/${id}`, {
-      event: attrs,
-      new_lead_coordinator_id: attrs["new_lead_coordinator_id"],
-    });
-    return (data as any).event ?? data;
-  },
-
-  async deleteEvent(id: number) {
-    await privateApi.delete(`${API}/events/${id}`);
-  },
-
-  // ─────────────────────────────────────────────
-  // Event–Amigo connectors
-  // ─────────────────────────────────────────────
-  async fetchEventConnectors(eventId: number) {
-    const { data } = await privateApi.get<EventAmigoConnector[]>(
-      `${API}/events/${eventId}/event_amigo_connectors`
-    );
-    return data;
-  },
-
-  async registerSelf(eventId: number) {
-    const { data } = await privateApi.post<EventAmigoConnector>(
-      `${API}/events/${eventId}/event_amigo_connectors`,
-      {}
-    );
-    return data;
-  },
-
-  async changeRole(
-    eventId: number,
-    connectorId: number,
-    newRole: "participant" | "assistant_coordinator" | "lead_coordinator"
-  ) {
-const { data } = await privateApi.put<EventAmigoConnector>(
-      `${API}/events/${eventId}/event_amigo_connectors/${connectorId}`,
-      { event_amigo_connector: { role: newRole } }
-    );
-    return data;
-  },
-
-  async leave(eventId: number, connectorId: number) {
-    await privateApi.delete(
-      `${API}/events/${eventId}/event_amigo_connectors/${connectorId}`
-    );
-  },
-
-  // Global lists for debugging/admin:
-  async fetchAllEventAmigoConnectors(): Promise<EventAmigoConnector[]> {
-    const res = await privateApi.get("/event_amigo_connectors");
-    return res.data.event_amigo_connectors ?? res.data.data ?? res.data;
-  },
-
-  async fetchAllEventLocationConnectors(): Promise<EventLocationConnector[]> {
-    const res = await privateApi.get("/event_location_connectors");
-    return res.data.event_location_connectors ?? res.data.data ?? res.data;
-  },
+type JsonApiResourceIdentifier = {
+  id: string;
+  type: string;
 };
 
-export { EventLocationService } from "@/services/EventLocationService";
+interface JsonApiEventAttributes {
+  "event-name": string;
+  "event-date": string;
+  "event-time": string;
+  status: EventStatus;
+
+  "event-type"?: string | null;
+  "event-speakers-performers"?: string[] | null;
+  description?: string | null;
+  "status-label"?: string;
+
+  "lead-coordinator-id"?: number | null;
+
+  "formatted-event-date"?: string;
+  "formatted-event-time"?: string;
+
+  "created-at"?: string;
+  "updated-at"?: string;
+}
+
+interface JsonApiEventRelationships {
+  "lead-coordinator"?: {
+    data: JsonApiResourceIdentifier | null;
+  };
+  "primary-event-location"?: {
+    data: JsonApiResourceIdentifier | null;
+  };
+}
+
+interface JsonApiEventResource {
+  id: string;
+  type: "events";
+  attributes: JsonApiEventAttributes;
+  relationships?: JsonApiEventRelationships;
+}
+
+interface JsonApiEventLocationAttributes {
+  "business-name": string;
+  "location-type"?: string | null;
+  "business-phone"?: string | null;
+
+  address?: string | null;
+  floor?: string | null;
+  "street-number"?: string | null;
+  "street-name"?: string | null;
+  "room-no"?: string | null;
+  "apartment-suite-number"?: string | null;
+
+  "city-sublocality"?: string | null;
+  city?: string | null;
+  "state-province-subdivision"?: string | null;
+  "state-province"?: string | null;
+  "state-province-short"?: string | null;
+  country?: string | null;
+  "country-short"?: string | null;
+  "postal-code"?: string | null;
+  "postal-code-suffix"?: string | null;
+  "post-box"?: string | null;
+
+  latitude?: number | null;
+  longitude?: number | null;
+  "time-zone"?: string | null;
+
+  "owner-name"?: string | null;
+  "owner-phone"?: string | null;
+  capacity?: number | null;
+  "capacity-seated"?: number | null;
+  "availability-notes"?: string | null;
+  "has-food"?: boolean;
+  "has-drink"?: boolean;
+  "has-internet"?: boolean;
+  "has-big-screen"?: boolean;
+  "place-id"?: string | null;
+  services?: string[] | null;
+
+  "location-image-url"?: string | null;
+  "location-image-attribution"?: string | null;
+
+  "created-at": string;
+  "updated-at": string;
+}
+
+interface JsonApiEventLocationResource {
+  id: string;
+  type: "event-locations";
+  attributes: JsonApiEventLocationAttributes;
+}
+
+interface JsonApiIndexResponse {
+  data: JsonApiEventResource[];
+}
+
+interface JsonApiShowResponse {
+  data: JsonApiEventResource;
+  included?: (JsonApiEventLocationResource | any)[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Normalizers
+// ─────────────────────────────────────────────────────────────────────────────
+
+function normalizeEventLocation(
+  resource: JsonApiEventLocationResource
+): EventLocation {
+  const a = resource.attributes;
+
+  return {
+    id: Number(resource.id),
+
+    location_type: a["location-type"] ?? null,
+    business_name: a["business-name"],
+    business_phone: a["business-phone"] ?? null,
+
+    address: a.address ?? null,
+    floor: a.floor ?? null,
+    street_number: a["street-number"] ?? null,
+    street_name: a["street-name"] ?? null,
+    room_no: a["room-no"] ?? null,
+    apartment_suite_number: a["apartment-suite-number"] ?? null,
+
+    city_sublocality: a["city-sublocality"] ?? null,
+    city: a.city ?? null,
+    state_province_subdivision: a["state-province-subdivision"] ?? null,
+    state_province: a["state-province"] ?? null,
+    state_province_short: a["state-province-short"] ?? null,
+    country: a.country ?? null,
+    country_short: a["country-short"] ?? null,
+    postal_code: a["postal-code"] ?? null,
+    postal_code_suffix: a["postal-code-suffix"] ?? null,
+    post_box: a["post-box"] ?? null,
+
+    latitude: a.latitude ?? null,
+    longitude: a.longitude ?? null,
+    time_zone: a["time-zone"] ?? null,
+
+    owner_name: a["owner-name"] ?? null,
+    owner_phone: a["owner-phone"] ?? null,
+    capacity: a.capacity ?? null,
+    capacity_seated: a["capacity-seated"] ?? null,
+    availability_notes: a["availability-notes"] ?? null,
+    has_food: a["has-food"],
+    has_drink: a["has-drink"],
+    has_internet: a["has-internet"],
+    has_big_screen: a["has-big-screen"],
+    place_id: a["place-id"] ?? null,
+    services: a.services ?? undefined,
+
+    location_image_url: a["location-image-url"] ?? null,
+    location_image_attribution: a["location-image-attribution"] ?? null,
+
+    created_at: a["created-at"],
+    updated_at: a["updated-at"],
+  };
+}
+
+function normalizeEvent(
+  resource: JsonApiEventResource,
+  included?: JsonApiEventLocationResource[]
+): Event {
+  const a = resource.attributes;
+  const relationships = resource.relationships ?? {};
+
+  // Hydrate primary_event_location from relationships + included
+  let primaryLocation: EventLocation | null = null;
+
+  const primaryRel =
+    relationships["primary-event-location"]
+      ?.data as JsonApiResourceIdentifier | null | undefined;
+
+  if (primaryRel && primaryRel.type === "event-locations" && included) {
+    const locRes = included.find(
+      (r: JsonApiEventLocationResource) =>
+        r.type === "event-locations" && r.id === primaryRel.id
+    );
+    if (locRes) {
+      primaryLocation = normalizeEventLocation(locRes);
+    }
+  }
+
+  return {
+    id: Number(resource.id),
+    event_name: a["event-name"],
+    event_date: a["event-date"],
+    event_time: a["formatted-event-time"] ?? a["event-time"],
+    status: a.status,
+    lead_coordinator_id: a["lead-coordinator-id"] ?? null,
+
+    formatted_event_date: a["formatted-event-date"] ?? a["event-date"],
+    formatted_event_time: a["formatted-event-time"],
+    status_label: a["status-label"],
+
+    event_type: a["event-type"] ?? null,
+    event_speakers_performers: a["event-speakers-performers"] ?? [],
+    description: a.description ?? null,
+
+    created_at: a["created-at"],
+    updated_at: a["updated-at"],
+
+    // These can be hydrated later if you include them in the payload
+    lead_coordinator: null,
+    event_amigo_connectors: [],
+    event_location_connectors: [],
+    primary_event_location: primaryLocation,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Service API
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const EventService = {
+  // Index (events only – no includes)
+  async fetchEvents(): Promise<Event[]> {
+    const res = await publicApi.get<JsonApiIndexResponse>(
+      `${API_PREFIX}/events`
+    );
+    const resources = Array.isArray(res.data.data) ? res.data.data : [];
+    return resources.map((r) => normalizeEvent(r));
+  },
+
+  // Show (includes primary_event_location)
+  async fetchEvent(id: number): Promise<Event> {
+    const res = await publicApi.get<JsonApiShowResponse>(
+      `${API_PREFIX}/events/${id}`
+    );
+    const included = (res.data.included || []).filter(
+      (r: any): r is JsonApiEventLocationResource =>
+        r && r.type === "event-locations"
+    );
+    return normalizeEvent(res.data.data, included);
+  },
+
+  // Create (expects { event: EventCreateParams } and returns JSON:API event)
+  async createEvent(params: EventCreateParams): Promise<Event> {
+    const res = await privateApi.post<JsonApiShowResponse>(
+      `${API_PREFIX}/events`,
+      {
+      event: params,
+    });
+    const included = (res.data.included || []).filter(
+      (r: any): r is JsonApiEventLocationResource =>
+        r && r.type === "event-locations"
+    );
+    return normalizeEvent(res.data.data, included);
+  },
+
+  // Update
+  async updateEvent(id: number, params: EventCreateParams): Promise<Event> {
+    const res = await privateApi.put<JsonApiShowResponse>(
+      `${API_PREFIX}/events/${id}`, {
+      event: params,
+    });
+    const included = (res.data.included || []).filter(
+      (r: any): r is JsonApiEventLocationResource =>
+        r && r.type === "event-locations"
+    );
+    return normalizeEvent(res.data.data, included);
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Legacy / auxiliary methods expected by existing components
+  // (signatures kept wide so they compile cleanly even if callers vary)
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Register the current amigo for an event.
+   *
+   * NOTE: Endpoint path is a best guess; adjust to match your actual routes.
+   * This returns `Promise<any>` so existing callers type check even if they
+   * expect Event / EventAmigoConnector, etc.
+   */
+  async registerSelf(eventId: number, options?: any): Promise<any> {
+    // Example: POST /events/:id/register_self
+    const res = await privateApi.post(`${API_PREFIX}/events/${eventId}/register_self`, {
+      ...(options || {}),
+    });
+    return res.data;
+  },
+
+  /**
+   * Leave / unregister from an event.
+   *
+   * NOTE: Adjust the path and verb to match your routes.
+   */
+  async leave(eventId: number): Promise<any> {
+    // Example: DELETE /events/:id/leave
+    const res = await privateApi.delete(`${API_PREFIX}/events/${eventId}/leave`);
+    return res.data;
+  },
+
+  /**
+   * Fetch all EventAmigoConnector records (for admin / debugging views).
+   *
+   * NOTE: Shape is `any[]` until we wire this to your actual connector types.
+   */
+  async fetchAllEventAmigoConnectors(): Promise<any[]> {
+    const res = await privateApi.get("${API_PREFIX}/event_amigo_connectors");
+    const payload: any = res.data;
+
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+
+    if (payload && Array.isArray(payload.data)) {
+      return payload.data;
+    }
+
+    // Fallback – unexpected shape
+    return [];
+  },
+
+  /**
+   * Fetch all EventLocationConnector records.
+   */
+  async fetchAllEventLocationConnectors(): Promise<any[]> {
+    const res = await privateApi.get("${API_PREFIX}/event_location_connectors");
+    const payload: any = res.data;
+
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+
+    if (payload && Array.isArray(payload.data)) {
+      return payload.data;
+    }
+
+    // Fallback – unexpected shape
+    return [];
+  },
+
+  /**
+   * Delete an event.
+   */
+  async deleteEvent(id: number): Promise<void> {
+    await privateApi.delete(`${API_PREFIX}/events/${id}`);
+  },
+};

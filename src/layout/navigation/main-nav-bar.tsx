@@ -1,6 +1,7 @@
 // src/layout/navigation/main-nav-bar.tsx
 import React, { useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useManagedEventsFlag } from "@/hooks/useManagedEventsFlag";
 
 export type NavItem = { to: string; label: string };
 

@@ -1,7 +1,22 @@
+// src/types/events/EventTypes.ts
+import type { EventLocationCreatePayload } from "./EventLocationTypes";
 
-export type EventRole = 'participant' | 'assistant_coordinator' | 'lead_coordinator';
-export type EventMembershipStatus = 'pending' | 'confirmed' | 'declined';
-export type EventStatus = 'planning' | 'active' | 'completed' | 'canceled';
+// ─────────────────────────────────────────────────────────────────────────────
+// Core event-related enums / aliases
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type EventRole =
+  | "participant"
+  | "assistant_coordinator"
+  | "lead_coordinator";
+
+export type EventMembershipStatus = "pending" | "confirmed" | "declined";
+
+export type EventStatus = "planning" | "active" | "completed" | "canceled";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Minimal Amigo info attached to events
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface AmigoMinimal {
   id: number;
@@ -13,18 +28,22 @@ export interface AmigoMinimal {
   admin?: boolean;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Event as returned from the API
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface Event {
   id: number;
   event_name: string;
-  event_date: string;  // ISO date e.g. "2025-11-13"
-  event_time: string;  // "HH:MM:SS"
+  event_date: string; // ISO date e.g. "2025-11-13"
+  event_time: string; // "HH:MM:SS"
   status: EventStatus;
   lead_coordinator_id?: number | null;
 
   // Formatted fields from the serializer (optional)
-  formatted_event_date?: string;  // e.g., "November 14, 2025"
-  formatted_event_time?: string;  // e.g., "3:30 PM"
-  status_label?: string;          // e.g., "Planning", "Active", ...
+  formatted_event_date?: string; // e.g., "November 14, 2025"
+  formatted_event_time?: string; // e.g., "3:30 PM"
+  status_label?: string; // e.g., "Planning", "Active", ...
 
   // Optional expansions (index/show payload convenience)
   event_type?: string | null;
@@ -35,18 +54,24 @@ export interface Event {
   lead_coordinator?: AmigoMinimal | null;
 
   // Optional related aggregates
-  event_amigo_connectors?: import('./EventAmigoConnectorTypes').EventAmigoConnector[];
-  event_location_connectors?: import('./EventLocationConnectorTypes').EventLocationConnector[];
-  primary_event_location?: import('./EventLocationTypes').EventLocation | null;
+  event_amigo_connectors?: import("./EventAmigoConnectorTypes").EventAmigoConnector[];
+  event_location_connectors?: import("./EventLocationConnectorTypes").EventLocationConnector[];
+  primary_event_location?: import("./EventLocationTypes").EventLocation | null;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Shape used when creating/updating an event from the frontend
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface EventCreateParams {
   event_name: string;
-  event_date: string;  // "YYYY-MM-DD"
-  event_time: string;  // "HH:MM" or "HH:MM:SS"
+  event_date: string; // "YYYY-MM-DD"
+  event_time: string; // "HH:MM" or "HH:MM:SS"
   status?: EventStatus;
   event_type?: string;
   event_speakers_performers?: string[];
   description?: string;
+
+  // NEW: nested event location payload for primary location
+  location?: EventLocationCreatePayload | null;
 }

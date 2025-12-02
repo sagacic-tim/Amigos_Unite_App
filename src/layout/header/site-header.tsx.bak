@@ -18,6 +18,7 @@ export interface SiteHeaderProps {
   onLogin?: () => void;
   onSignup?: () => void;
   onLogout?: () => void;
+  onOpenCreateEvent?: () => void;
   themeArea?: "public" | "admin";
   profilePath?: string;
 }
@@ -28,11 +29,12 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
   nav = [
     { to: "/", label: "Home" },
     { to: "/amigos", label: "Amigos" },
-    { to: "#events", label: "Events" }, // ensure Events is present by default
+    { to: "#events", label: "Events" }, // ← ensure Events is present by default
   ],
   onLogin,
   onSignup,
   onLogout,
+  onOpenCreateEvent,
   themeArea = "public",
   profilePath = "/user-profile",
 }) => {
@@ -44,6 +46,13 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
 
   const toggleEvents = () => setEventsOpen((v) => !v);
   const closeEvents = () => setEventsOpen(false);
+
+  // Default create-event handler: keep CustomEvent behaviour
+  const openCreateEvent =
+    onOpenCreateEvent ??
+    (() => {
+      document.dispatchEvent(new CustomEvent("events:create"));
+    });
 
   return (
     <header className="site-header site-header--sticky" id="top">
@@ -65,7 +74,7 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
           eventsAnchorRef={eventsAnchorRef}
         />
 
-        {/* User menu (login/signup/logout) */}
+        {/* Your existing UserMenu kept intact */}
         <UserMenu
           isLoggedIn={isLoggedIn}
           onLogin={
@@ -85,12 +94,13 @@ const SiteHeader: React.FC<SiteHeaderProps> = ({
         />
       </div>
 
-      {/* Floating Events overlay positioned under the Events nav item */}
+      {/* Floating Events overlay that appears over the nav bar, no backdrop */}
       <EventsMenuOverlay
         open={eventsOpen}
         onClose={closeEvents}
         isLoggedIn={isLoggedIn}
         hasManagedEvents={hasManagedEvents}
+        onOpenCreateEvent={openCreateEvent}
         anchorRef={eventsAnchorRef}
       />
     </header>

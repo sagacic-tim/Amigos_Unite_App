@@ -1,6 +1,7 @@
 // src/components/forms/EventForm.tsx
 import React, { useState } from "react";
 import type { EventCreateParams, EventStatus } from "@/types/events/EventTypes";
+import type { EventLocationCreatePayload } from "@/types/events/EventLocationTypes";
 import type { PlaceResult, PlacePhoto } from "@/services/PlacesService";
 import {
   searchPlacesWithPhotos,
@@ -16,18 +17,78 @@ interface EventFormProps {
 const DEFAULT_STATUS: EventStatus = "planning";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Location section types (front-end only for now)
+// Location section types (front-end only)
+//
+// NOTE: Keep this list conceptually in sync with EventLocation::VENUE_KEYWORDS
+// on the backend (same categories, FE uses Title Case labels).
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LOCATION_TYPES = [
-  "Cafe",
+  // Core food / beverage
   "Restaurant",
-  "House",
+  "Cafe",
+  "Coffee Shop",
+  "Tea House",
+  "Bar",
+  "Pub",
+  "Club",
+
+  // Dedicated event venues
+  "Banquet Hall",
   "Meeting Hall",
-  "Church",
+  "Event Venue",
+  "Conference Center",
+  "Convention Center",
+
+  // Community / civic
+  "Community Center",
+  "Civic Center",
+  "Cultural Center",
+  "Recreation Center",
+  "Leisure Center",
+
+  // Performance / cultural venues
+  "Theater",
   "Auditorium",
-  "School Campus",
+  "Amphitheater",
+  "Concert Hall",
+
+  // Hospitality
+  "Hotel",
+  "Motel",
+  "Inn",
+  "Resort",
+  "Lodge",
+
+  // Religious venues
+  "Church",
+  "Cathedral",
+  "Temple",
+  "Mosque",
+  "Synagogue",
+  "Abbey",
+  "Basilica",
+  "Parish",
+  "Gurudwara",
+
+  // Education / institutional
+  "School",
+  "College",
+  "University",
+  "Library",
+  "Training Center",
+  "Learning Center",
+  "Student Union",
+
+  // Outdoor
+  "Park",
+  "Campground",
+  "Picnic Ground",
+
+  // Misc / legacy options
+  "House",
   "Office",
+
   "Other",
 ] as const;
 
@@ -55,6 +116,7 @@ type LocationDraft = {
   imageUrl: string;
   placeId?: string | null;
   photoAttribution?: string | null;
+  photoReference?: string | null;
 };
 
 const defaultLocation: LocationDraft = {
@@ -79,7 +141,78 @@ const defaultLocation: LocationDraft = {
   imageUrl: "",
   placeId: null,
   photoAttribution: null,
+  photoReference: null,
 };
+
+function buildLocationPayload(
+  loc: LocationDraft
+): EventLocationCreatePayload | null {
+  const hasCore =
+    (loc.name && loc.name.trim().length > 0) ||
+    (loc.streetName && loc.streetName.trim().length > 0) ||
+    (loc.city && loc.city.trim().length > 0) ||
+    !!loc.placeId;
+
+  if (!hasCore) return null;
+
+  return {
+    business_name: loc.name.trim(),
+    location_type: loc.type || undefined,
+    street_number: loc.streetNumber || undefined,
+    street_name: loc.streetName || undefined,
+    city: loc.city || undefined,
+    state_province: loc.stateProvince || undefined,
+    country: loc.country || undefined,
+    postal_code: loc.postalCode || undefined,
+    owner_name: loc.owner || undefined,
+    owner_phone: loc.phone || undefined,
+    capacity: loc.capacity ? Number(loc.capacity) : undefined,
+    availability_notes: loc.availability || undefined,
+    has_food: loc.services.food || undefined,
+    has_drink: loc.services.drink || undefined,
+    has_internet: loc.services.internet || undefined,
+    has_big_screen: loc.services.bigScreen || undefined,
+    place_id: loc.placeId ?? undefined,
+    location_image_attribution: loc.photoAttribution ?? undefined,
+    image_url: loc.imageUrl || undefined,
+    photo_reference: loc.photoReference ?? undefined,
+  };
+}
+
+// NEW: build a LocationDraft from a preexisting EventLocationCreatePayload
+// (used for pre-populating the edit form)
+function buildLocationDraftFromPayload(
+  payload: EventLocationCreatePayload
+): LocationDraft {
+  return {
+    ...defaultLocation,
+    name: payload.business_name ?? "",
+    type: (payload.location_type as LocationType) || "",
+    streetNumber: payload.street_number ?? "",
+    streetName: payload.street_name ?? "",
+    city: payload.city ?? "",
+    stateProvince: payload.state_province ?? "",
+    country: payload.country ?? "",
+    postalCode: payload.postal_code ?? "",
+    owner: payload.owner_name ?? "",
+    phone: payload.owner_phone ?? "",
+    capacity:
+      typeof payload.capacity === "number"
+        ? String(payload.capacity)
+        : "",
+    availability: payload.availability_notes ?? "",
+    services: {
+      food: !!payload.has_food,
+      drink: !!payload.has_drink,
+      internet: !!payload.has_internet,
+      bigScreen: !!payload.has_big_screen,
+    },
+    imageUrl: payload.image_url ?? "",
+    placeId: payload.place_id ?? null,
+    photoAttribution: payload.location_image_attribution ?? null,
+    photoReference: payload.photo_reference ?? null,
+  };
+}
 
 const EventForm: React.FC<EventFormProps> = ({
   initialValues,
@@ -96,16 +229,24 @@ const EventForm: React.FC<EventFormProps> = ({
     event_speakers_performers:
       initialValues?.event_speakers_performers ?? [],
     description: initialValues?.description ?? "",
+    // `location` is optional and injected at submit-time from LocationDraft
   });
 
-  // ── Location state (front-end only for now) ───────────────────────────────
-  const [location, setLocation] = useState<LocationDraft>(defaultLocation);
+  // ── Location state (front-end only) ───────────────────────────────────────
+  const [location, setLocation] = useState<LocationDraft>(() => {
+    if (initialValues?.location) {
+      return buildLocationDraftFromPayload(initialValues.location);
+    }
+    return defaultLocation;
+  });
 
   // Google Places search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [placeResults, setPlaceResults] = useState<PlaceResult[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(
+    null
+  );
   const [placePhotos, setPlacePhotos] = useState<PlacePhoto[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
 
@@ -218,13 +359,17 @@ const EventForm: React.FC<EventFormProps> = ({
       ...prev,
       imageUrl: photo.photo_url || "",
       placeId: photo.place_id || prev.placeId || null,
-      photoAttribution: photo.photo_attribution || prev.photoAttribution || null,
+      photoAttribution:
+        photo.photo_attribution || prev.photoAttribution || null,
+      photoReference:
+        photo.photo_reference ?? prev.photoReference ?? null,
     }));
   };
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Submit: currently only sends the Event payload
+  // Submit: send Event payload including optional `location` block
   // ───────────────────────────────────────────────────────────────────────────
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
@@ -237,14 +382,14 @@ const EventForm: React.FC<EventFormProps> = ({
         normalizedTime = `${normalizedTime}:00`;
       }
 
+      const locationPayload = buildLocationPayload(location);
+
       const payload: EventCreateParams = {
         ...values,
         event_time: normalizedTime,
+        ...(locationPayload ? { location: locationPayload } : {}),
       };
 
-      // NOTE: For now, we only submit the Event payload.
-      // Later we will extend this to also submit `location`
-      // (creating an EventLocation + EventLocationConnector).
       await onSubmit(payload);
     } catch (err: any) {
       console.error(err);
@@ -636,14 +781,18 @@ const EventForm: React.FC<EventFormProps> = ({
                       role="listitem"
                       className={
                         "places-gallery__item" +
-                        (isSelected ? " places-gallery__item--selected" : "")
+                        (isSelected
+                          ? " places-gallery__item--selected"
+                          : "")
                       }
                       onClick={() => handleSelectPlaceImage(photo)}
                     >
                       {photo.photo_url && (
                         <img
                           src={photo.photo_url}
-                          alt={selectedPlace.name || "Location photo"}
+                          alt={
+                            selectedPlace.name || "Location photo"
+                          }
                           className="places-gallery__image"
                         />
                       )}

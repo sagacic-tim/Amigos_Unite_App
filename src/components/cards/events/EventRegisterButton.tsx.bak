@@ -45,7 +45,7 @@ const EventRegisterButton: React.FC<Props> = ({ event, myConnector, onChange, di
     if (!myConnector) return;
     setBusy(true);
     try {
-      await EventService.leave(event.id);
+      await EventService.leave(event.id, myConnector.id);
       onChange?.(null);
     } finally {
       setBusy(false);
