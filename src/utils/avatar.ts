@@ -1,6 +1,6 @@
 // src/utils/avatar.ts
 import md5 from 'crypto-js/md5';
-import type { Amigo } from '@/types/AmigoTypes';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 import { resolveApiUrl } from '@/utils/resolveApiUrl';
 
 export const DEFAULT_AVATAR = '/images/default-amigo-avatar.png';

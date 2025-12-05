@@ -1,10 +1,11 @@
-
-// src/components/modals/events/EventCreateModal.tsx
+// src/components/modals/EventCreateModal.tsx
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import useAuthStatus from "@/hooks/useAuthStatus";
-import { EventService, EventLocationService } from "@/services/EventService";
-import type { Event, EventCreateParams, EventStatus, EventLocation } from "@/types/events";
+import { EventService } from "@/services/EventService";
+import { EventLocationService } from "@/services/EventLocationService";
+import type { EventCreateParams, EventStatus } from "@/types/events";
+import type { EventLocation } from "@/types/events/EventLocationTypes";
+
 /** Minimal user inputs; backend/Geocoder derives the rest. */
 type LocationDraft = Partial<
   Pick<
@@ -37,14 +38,11 @@ const EventCreateModal: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Step toggles
   const [addLocation, setAddLocation] = useState(false);
 
-  // Form state
   const [ev, setEv] = useState<EventCreateParams>(defaultEvent);
   const [loc, setLoc] = useState<LocationDraft>({});
   const firstFieldRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
 
   // Open on "events:create"
   useEffect(() => {
@@ -64,7 +62,6 @@ const EventCreateModal: React.FC = () => {
 
   useEffect(() => {
     if (open) {
-      // reset each time it opens
       setEv(defaultEvent);
       setLoc({});
       setAddLocation(false);
@@ -80,7 +77,7 @@ const EventCreateModal: React.FC = () => {
 
   const onChange = <K extends keyof EventCreateParams>(k: K, v: EventCreateParams[K]) => {
     setEv(prev => ({ ...prev, [k]: v }));
-  }
+  };
 
   const onLocChange = (k: keyof LocationDraft, v: string) => {
     setLoc(prev => ({ ...prev, [k]: v }));
@@ -91,7 +88,6 @@ const EventCreateModal: React.FC = () => {
     setError(null);
 
     if (!isLoggedIn) {
-      // Require login first
       document.dispatchEvent(new CustomEvent("auth:login"));
       return;
     }
@@ -102,34 +98,36 @@ const EventCreateModal: React.FC = () => {
 
     setSubmitting(true);
     try {
-      // 1) Create Event
-      const created = await EventService.create({
+      const created = await EventService.createEvent({
         event_name: ev.event_name.trim(),
         event_date: ev.event_date,
-        event_time: ev.event_time.length === 5 ? ev.event_time + ":00" : ev.event_time, // normalize HH:MM → HH:MM:00
+        event_time:
+          ev.event_time.length === 5 ? ev.event_time + ":00" : ev.event_time,
         status: ev.status ?? "planning",
         event_type: ev.event_type?.trim() || undefined,
-        event_speakers_performers: ev.event_speakers_performers?.filter(Boolean) ?? [],
+        event_speakers_performers:
+          ev.event_speakers_performers?.filter(Boolean) ?? [],
       });
 
-      // 2) Optional: create & connect location
       if (addLocation && loc && (loc.business_name || loc.street_name)) {
-        const createdLoc = await EventLocationService.create({
-          business_name: loc.business_name?.trim(),
-          street_number: loc.street_number?.trim(),
-          street_name:   loc.street_name?.trim(),
-          city:          loc.city?.trim(),
-          state_province:loc.state_province?.trim(),
-          postal_code:   loc.postal_code?.trim(),
-          country:       loc.country?.trim(),
+        const createdLoc = await EventLocationService.createLocation({
+          business_name:   loc.business_name?.trim(),
+          street_number:   loc.street_number?.trim(),
+          street_name:     loc.street_name?.trim(),
+          city:            loc.city?.trim(),
+          state_province:  loc.state_province?.trim(),
+          postal_code:     loc.postal_code?.trim(),
+          country:         loc.country?.trim(),
         });
 
-        await EventService.connectLocation(created.id, createdLoc.id, true);
+        await EventLocationService.connectLocation(created.id, createdLoc.id, true);
       }
 
-      // 3) Success → close + navigate to manage page
       setOpen(false);
-      navigate(`/events/${created.id}/manage`);
+
+      // Instead of useNavigate (which requires Router context),
+      // do a simple redirect:
+      window.location.href = `/events/${created.id}/manage`;
     } catch (err: any) {
       const msg =
         err?.response?.data?.error ||
@@ -217,7 +215,6 @@ const EventCreateModal: React.FC = () => {
             />
           </div>
 
-          {/* Optional: speakers/performers as comma-separated; backend will normalize */}
           <div className="form-row">
             <label htmlFor="ev-speakers">Speakers/Performers (optional)</label>
             <input
@@ -324,7 +321,9 @@ const EventCreateModal: React.FC = () => {
           )}
 
           <footer className="modal__footer">
-            <button type="button" className="btn" onClick={close} disabled={submitting}>Cancel</button>
+            <button type="button" className="btn" onClick={close} disabled={submitting}>
+              Cancel
+            </button>
             <button type="submit" className="btn btn--primary" disabled={submitting}>
               {submitting ? "Creating…" : "Create Event"}
             </button>

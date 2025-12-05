@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Amigo } from '@/types/AmigoTypes';
-import { AmigoLocation } from '@/types/AmigoLocationTypes';
+import { Amigo } from '@/types/amigos/AmigoTypes';
+import { AmigoLocation } from '@/types/amigos/AmigoLocationTypes';
 import AmigoLocationItem from './AmigoLocationItem';
 import { fetchAmigoLocations } from '@/services/AmigoService';
 

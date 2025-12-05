@@ -1,70 +1,60 @@
 // src/pages/AmigoLocations/components/AmigoLocationItem.tsx
-import React from "react";
-import type { AmigoLocation } from "@/types/amigos/AmigoLocationTypes";
-import type { Amigo } from "@/types/amigos/AmigoTypes";
+import React from 'react';
+import type { AmigoLocation } from '@/types/amigos/AmigoLocationTypes';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 
 interface AmigoLocationItemProps {
   location: AmigoLocation | null;
   amigo: Amigo;
-  /** Optional heading id so wrapper card/modal can reference it */
-  headingId?: string;
 }
 
 // Pretty-print keys: "postal_code" → "Postal Code"
 const formatString = (key: string): string =>
-  key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-const AmigoLocationItem: React.FC<AmigoLocationItemProps> = ({
-  location,
-  amigo,
-  headingId,
-}) => {
-  const firstName = amigo.first_name || "Unknown";
-  const lastName  = amigo.last_name  || "Unknown";
-  const computedHeadingId =
-    headingId ?? `amigo-location-heading-${amigo.id}`;
+const AmigoLocationItem: React.FC<AmigoLocationItemProps> = ({ location, amigo }) => {
+  const firstName = amigo.first_name || 'Unknown';
+  const lastName  = amigo.last_name  || 'Unknown';
+  const headingId = 'amigo-location-heading';
 
-  // No location → message block
+  // No location → message card
   if (!location) {
     return (
-      <>
-        <h3 className="card__title" id={computedHeadingId}>
+      <article className="card card--details" aria-labelledby={headingId}>
+        <h2 className="card__title" id={headingId}>
           Address(es) for {firstName} {lastName}
-        </h3>
+        </h2>
         <ul className="card__fields">
           <li className="card__field">
-            <span className="card__field-label">Amigo Id:</span>
-            {amigo.id}
+            <span className="card__field-label">Amigo Id:</span>{amigo.id}
           </li>
           <li className="card__field prose">
             Message: No Address Information Found.
           </li>
         </ul>
-      </>
+      </article>
     );
   }
 
   // Filter to simple, displayable fields
-  const locationFields = Object.entries(location).filter(
-    ([key, value]) =>
-      value !== null &&
-      value !== undefined &&
-      key !== "id" &&
-      key !== "amigo" &&
-      key !== "amigo_id" &&
-      typeof value !== "object",
+  const locationFields = Object.entries(location).filter(([key, value]) =>
+    value !== null &&
+    value !== undefined &&
+    key !== 'id' &&
+    key !== 'amigo' &&
+    key !== 'amigo_id' &&
+    typeof value !== 'object'
   );
 
   return (
-    <>
-      <h3 className="card__title" id={computedHeadingId}>
+    <article className="card card--details" aria-labelledby={headingId}>
+      <h3 className="card__title" id={headingId}>
         Address for {firstName} {lastName}
       </h3>
 
       <ul className="card__fields">
         <li className="card__field">
-          <span className="card__field-label">Amigo Id:</span>
-          {amigo.id}
+          <span className="card__field-label">Amigo Id:</span>{amigo.id}
         </li>
 
         {locationFields.length > 0 ? (
@@ -80,7 +70,7 @@ const AmigoLocationItem: React.FC<AmigoLocationItemProps> = ({
           </li>
         )}
       </ul>
-    </>
+    </article>
   );
 };
 

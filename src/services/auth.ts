@@ -1,7 +1,7 @@
 // src/services/auth.ts
 import publicApi  from '@/services/api/publicApi';
 import privateApi from '@/services/api/privateApi';
-import type { Amigo } from '@/types/AmigoTypes';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 import { ensureCsrfToken, resetCsrfToken } from '@/services/csrf';
 
 export interface LoginParams {

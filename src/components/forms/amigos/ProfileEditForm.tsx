@@ -1,8 +1,8 @@
-// src/components/forms/ProfileForm.tsx
+// src/components/forms/amigos/ProfileForm.tsx
 import { useEffect, useMemo, useState, useCallback } from "react";
 import md5 from "blueimp-md5";
 import privateApi from "@/services/api/privateApi";
-import type { Amigo } from "@/types/AmigoTypes";
+import type { Amigo } from "@/types/amigos/AmigoTypes";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types (lifted from the original Profile page)

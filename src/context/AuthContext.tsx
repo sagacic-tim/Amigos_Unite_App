@@ -2,7 +2,7 @@
 import { createContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 import privateApi from '@/services/api/privateApi';
-import type { Amigo } from '@/types/AmigoTypes';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 
 export type AuthState = {
   isLoggedIn: boolean;

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../../pages/Authentication/Authentication.module.scss';
 import { loginAmigo, LoginParams } from '../../services/auth';
-import { Amigo } from '../../types/AmigoTypes';
+import { Amigo } from '../../types/amigos/AmigoTypes';
 import AuthFormShell from './AuthFormShell';
 
 interface LoginProps {

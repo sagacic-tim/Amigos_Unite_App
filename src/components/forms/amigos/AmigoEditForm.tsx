@@ -1,7 +1,7 @@
 
 // src/pages/Amigos/components/AmigoEditForm.tsx
 import { useState } from 'react';
-import type { Amigo } from '@/types/AmigoTypes';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 import { updateAmigo } from '@/services/AmigoService';
 
 export default function AmigoEditForm({

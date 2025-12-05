@@ -1,5 +1,5 @@
 // src/pages/Amigos/components/AmigoItem.tsx
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import UniversalModal from "@/components/modals/UniversalModal";
@@ -20,10 +20,8 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
   const navigate = useNavigate();
   const { currentAmigo } = useAuth();
 
-  // Is this card the logged-in amigo?
   const canEdit = !!currentAmigo && currentAmigo.id === amigo.id;
 
-  // Prefer currentAmigo when showing the logged-in amigo
   const effectiveAmigo = useMemo<Amigo>(() => {
     if (currentAmigo && currentAmigo.id === amigo.id) {
       return { ...amigo, ...currentAmigo };
@@ -206,15 +204,10 @@ const AmigoItem: React.FC<AmigoItemProps> = ({ amigo }) => {
                 key={location.id}
                 location={location}
                 amigo={effectiveAmigo}
-                headingId={locationHeadingId}
               />
             ))
           ) : (
-            <AmigoLocationItem
-              location={null}
-              amigo={effectiveAmigo}
-              headingId={locationHeadingId}
-            />
+            <AmigoLocationItem location={null} amigo={effectiveAmigo} />
           )}
         </UniversalCard>
       </UniversalModal>

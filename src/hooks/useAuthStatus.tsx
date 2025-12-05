@@ -1,6 +1,6 @@
 // src/hooks/useAuthStatus.ts
 import useAuth from '@/hooks/useAuth';
-import type { Amigo } from '@/types/AmigoTypes';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 
 type AuthStatus = {
   isLoggedIn: boolean;

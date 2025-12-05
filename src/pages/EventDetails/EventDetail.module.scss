@@ -1,0 +1,20 @@
+
+/* src/pages/EventDetails/EventDetail.module.scss */
+.eventDetailsCard {
+  color: inherit;
+  
+  /* scope any event-specific tweaks here */
+}
+
+.metaLine {
+  margin-bottom: var(--spacing-sm);
+  color: var(--secondary-text-color);
+}
+
+.metaItem {
+  margin-right: var(--spacing-xs);
+}
+
+.subheading {
+  margin: var(--spacing-md) 0 var(--spacing-xs);
+}

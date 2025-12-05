@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
 import { triggerAuthRequired } from "@/services/api/privateApi";
-import ProfileForm from "@/components/forms/ProfileForm";
+import ProfileForm from "@/components/forms/amigos/ProfileEditForm";
 import styles from "./Profile.module.scss";
 
 export default function Profile() {

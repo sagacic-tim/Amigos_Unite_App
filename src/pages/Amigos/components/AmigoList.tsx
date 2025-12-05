@@ -1,7 +1,7 @@
 // src/pages/Amigos/components/AmigoList.tsx
 import React, { useEffect, useState } from 'react';
 import AmigoItem from './AmigoItem';
-import { Amigo } from '@/types/AmigoTypes';
+import { Amigo } from '@/types/amigos/AmigoTypes';
 import { fetchAmigos } from '@/services/AmigoService';
 import useAuthStatus from '@/hooks/useAuthStatus';
 
