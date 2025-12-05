@@ -10,8 +10,6 @@ interface EventDetailsItemProps {
    * If omitted, this will dispatch a CustomEvent("events:view-location", { detail: { eventId } }).
    */
   onViewLocationClick?: (eventId: number) => void;
-  /** Optional heading id so the wrapper card/modal can reference it for aria-labelledby */
-  headingId?: string;
 }
 
 function formatStatus(status: EventModel["status"], label?: string): string {
@@ -23,7 +21,6 @@ function formatStatus(status: EventModel["status"], label?: string): string {
 const EventDetailsItem: React.FC<EventDetailsItemProps> = ({
   event,
   onViewLocationClick,
-  headingId,
 }) => {
   const {
     id,
@@ -39,14 +36,12 @@ const EventDetailsItem: React.FC<EventDetailsItemProps> = ({
     formatted_event_time,
   } = event;
 
-  const computedHeadingId = headingId ?? `event-details-heading-${id}`;
+  const headingId = `event-details-heading-${id}`;
 
   const whenDate = formatted_event_date ?? event_date;
   const whenTime =
     formatted_event_time ??
-    (event_time && event_time.length >= 5
-      ? event_time.slice(0, 5)
-      : event_time);
+    (event_time && event_time.length >= 5 ? event_time.slice(0, 5) : event_time);
 
   const speakers =
     event_speakers_performers?.filter(Boolean).join(", ") ?? "";
@@ -68,8 +63,11 @@ const EventDetailsItem: React.FC<EventDetailsItemProps> = ({
   };
 
   return (
-    <div className={styles.eventDetailsCard}>
-      <h3 className="card__title" id={computedHeadingId}>
+    <article
+      className={`card card--details ${styles.eventDetailsCard}`}
+      aria-labelledby={headingId}
+    >
+      <h3 className="card__title" id={headingId}>
         {event_name}
       </h3>
 
@@ -119,7 +117,7 @@ const EventDetailsItem: React.FC<EventDetailsItemProps> = ({
         </>
       )}
 
-      {/* Actions (e.g., jump to location) */}
+      {/* Actions pinned to bottom via .card__actions */}
       <div className="card__actions">
         <button
           type="button"
@@ -129,7 +127,7 @@ const EventDetailsItem: React.FC<EventDetailsItemProps> = ({
           View Location
         </button>
       </div>
-    </div>
+    </article>
   );
 };
 
