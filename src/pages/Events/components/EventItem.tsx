@@ -1,22 +1,54 @@
 // src/pages/Events/components/EventItem.tsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import type { Event } from "@/types/events/EventTypes";
+import type { Event, EventLocation } from "@/types/events";
+import { EventService } from "@/services/EventService";
 import UniversalModal from "@/components/modals/UniversalModal";
 import UniversalCard from "@/components/cards/UniversalCard";
 import EventDetailsItem from "@/pages/EventDetails/components/EventDetailsItem";
+import EventLocationItem from "@/pages/EventLocations/components/EventLocationItem";
+import { formatDateToMMDDYYYY, formatTimeToHHMMAmPm } from "@/utils/dateFormat";
+import useAuthStatus from "@/hooks/useAuthStatus";
 
-interface EventItemProps {
+export interface EventItemProps {
   event: Event;
   mode?: "public" | "manage";
   onDelete?: (event: Event) => void;
 }
+
+type EventWithLocation = Event & {
+  primary_event_location?: EventLocation | null;
+};
 
 const EventItem: React.FC<EventItemProps> = ({
   event,
   mode = "public",
   onDelete,
 }) => {
+  const { isLoggedIn, amigo } = useAuthStatus();
+
+  // Is the logged-in amigo the lead coordinator for this event?
+  const isLeadCoordinator =
+    !!amigo && event.lead_coordinator_id === amigo.id;
+
+  // Only allow registration in public mode, when logged in, and not the lead coordinator
+  const canRegister = mode === "public" && isLoggedIn && !isLeadCoordinator;
+
+  // Base event from the index (no location hydrated)
+  const baseEvent = event as EventWithLocation;
+
+  // Hydrated event (from /events/:id show) – includes primary_event_location
+  const [fullEvent, setFullEvent] = useState<EventWithLocation | null>(null);
+
+  // Modal state
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+
+  // NEW: registration UX state
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+
+  const effectiveEvent: EventWithLocation = fullEvent ?? baseEvent;
   const {
     id,
     event_name,
@@ -28,21 +60,16 @@ const EventItem: React.FC<EventItemProps> = ({
     description,
     status,
     status_label,
-    // This is already used in EditEventPage, so it should exist on Event
     primary_event_location,
-  } = event as Event & {
-    primary_event_location?: any | null; // type is EventLocation in your types
-  };
-
-  // Modal state
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  } = effectiveEvent;
 
   const detailsHeadingId = `event-details-heading-${id}`;
   const locationHeadingId = `event-location-heading-${id}`;
 
-  const displayDate = formatted_event_date ?? event_date ?? "";
-  const displayTime = formatted_event_time ?? event_time ?? "";
+  const rawDate = formatted_event_date ?? event_date ?? "";
+  const rawTime = formatted_event_time ?? event_time ?? "";
+  const displayDate = rawDate ? formatDateToMMDDYYYY(rawDate) : "";
+  const displayTime = rawTime ? formatTimeToHHMMAmPm(rawTime) : "";
   const displayDescription = description || "No description provided.";
 
   const fallbackStatusLabel = (() => {
@@ -61,12 +88,31 @@ const EventItem: React.FC<EventItemProps> = ({
     }
   })();
 
-  const hasPrimaryLocation = !!primary_event_location;
+  const hasLocation = !!primary_event_location;
 
-  const handleOpenDetailsModal = () => setIsDetailsOpen(true);
+  /**
+   * Ensure we have a fully hydrated event from /events/:id (with primary_event_location).
+   * This is called before opening either modal.
+   */
+  const ensureFullEventLoaded = () => {
+    if (fullEvent) return;
+
+    EventService.fetchEvent(id)
+      .then((loaded) => {
+        setFullEvent(loaded as EventWithLocation);
+      })
+      .catch((err) => {
+        console.error("Failed to load full event for modal:", err);
+      });
+  };
+
+  const handleOpenDetailsModal = () => {
+    ensureFullEventLoaded();
+    setIsDetailsOpen(true);
+  };
 
   const handleOpenLocationModal = () => {
-    if (!hasPrimaryLocation) return;
+    ensureFullEventLoaded();
     setIsLocationOpen(true);
   };
 
@@ -75,17 +121,32 @@ const EventItem: React.FC<EventItemProps> = ({
     setIsLocationOpen(false);
   };
 
-  // Used when the user clicks "View Location" **inside** the details modal
   const handleViewLocationFromDetails = () => {
+    ensureFullEventLoaded();
     setIsDetailsOpen(false);
-    if (hasPrimaryLocation) {
-      setIsLocationOpen(true);
+    setIsLocationOpen(true);
+  };
+
+  // NEW: registration handler
+  const handleRegisterForEvent = async () => {
+    if (!canRegister || !amigo || isRegistering) return;
+
+    setIsRegistering(true);
+
+    try {
+      await EventService.registerForEvent(id, amigo.id);
+      setIsRegistered(true);
+    } catch (err) {
+      console.error("Error registering for event:", err);
+      // Optionally surface this via toast / UI state
+    } finally {
+      setIsRegistering(false);
     }
   };
 
   return (
     <>
-      {/* Summary card in the Events grid */}
+      {/* Summary event card in the Events grid */}
       <article className="card card--profile">
         <div className="card__body">
           <h3 className="card__title">{event_name}</h3>
@@ -112,51 +173,68 @@ const EventItem: React.FC<EventItemProps> = ({
             {fallbackStatusLabel}
           </p>
 
-          <p className="card__message">{displayDescription}</p>
+          <p className="card__message prose">{displayDescription}</p>
+        </div>
 
-          {/* Ensure .card__actions has margin-top: auto in SCSS so it pins to the bottom */}
-          <div className="card__actions">
+
+        {/* Actions */}
+        <div className="card__actions">
+          <button
+            type="button"
+            className="button button--secondary view__details--button"
+            onClick={handleOpenDetailsModal}
+          >
+            View Details
+          </button>
+
+          <button
+            type="button"
+            className="button button--secondary view__location--button"
+            onClick={handleOpenLocationModal}
+            disabled={false}
+            title={
+              hasLocation
+                ? undefined
+                : "If this event has a location, it will load in the modal."
+            }
+          >
+            View Location
+          </button>
+
+          {mode === "manage" && (
+            <>
+              <Link
+                to={`/events/${id}/edit`}
+                className="button button--primary edit__event--button"
+              >
+                Edit Event
+              </Link>
+
+              <button
+                type="button"
+                className="button button--danger delete__event--button"
+                onClick={() => onDelete?.(event)}
+              >
+                Delete Event
+              </button>
+            </>
+          )}
+
+          {/* Bottom row: registration (only for logged-in Amigos who are NOT lead coordinators) */}
+          {canRegister && (
             <button
               type="button"
-              className="button button--secondary"
-              onClick={handleOpenDetailsModal}
+              className="button button--primary register__button"
+              onClick={handleRegisterForEvent}
+              disabled={isRegistering || isRegistered}
             >
-              View Details
+              {isRegistered
+                ? "Registered"
+                : isRegistering
+                ? "Registering…"
+                : "Register For This Event"}
             </button>
-
-            <button
-              type="button"
-              className="button button--secondary"
-              onClick={handleOpenLocationModal}
-              disabled={!hasPrimaryLocation}
-              title={
-                hasPrimaryLocation
-                  ? undefined
-                  : "Location details coming soon"
-              }
-            >
-              View Location
-            </button>
-
-            {mode === "manage" && (
-              <>
-                <Link
-                  to={`/events/${id}/edit`}
-                  className="button button--primary"
-                >
-                  Edit Event
-                </Link>
-
-                <button
-                  type="button"
-                  className="button button--danger"
-                  onClick={() => onDelete?.(event)}
-                >
-                  Delete Event
-                </button>
-              </>
-            )}
-          </div>
+          )}
         </div>
       </article>
 
@@ -168,77 +246,28 @@ const EventItem: React.FC<EventItemProps> = ({
       >
         <UniversalCard titleId={detailsHeadingId}>
           <EventDetailsItem
-            event={event}
+            event={effectiveEvent}
             headingId={detailsHeadingId}
-            onViewLocationClick={() => {
-              // Close details → open location, if available
-              handleViewLocationFromDetails();
-            }}
+            onViewLocationClick={handleViewLocationFromDetails}
           />
         </UniversalCard>
       </UniversalModal>
 
-      {/* Location modal (uses primary_event_location if present) */}
+      {/* Location modal (reuses EventLocationItem) */}
       <UniversalModal
         isOpen={isLocationOpen}
         onClose={handleCloseModals}
         titleId={locationHeadingId}
       >
         <UniversalCard titleId={locationHeadingId}>
-          {hasPrimaryLocation ? (
-            <>
-              <h3 className="card__title" id={locationHeadingId}>
-                {primary_event_location.business_name ||
-                  "Primary Event Location"}
-              </h3>
-
-              <ul className="card__fields">
-                <li className="card__field">
-                  <span className="card__field-label">Address:</span>
-                  <span>{primary_event_location.address ?? "—"}</span>
-                </li>
-
-                {primary_event_location.city && (
-                  <li className="card__field">
-                    <span className="card__field-label">City:</span>
-                    <span>{primary_event_location.city}</span>
-                  </li>
-                )}
-
-                {primary_event_location.state_province && (
-                  <li className="card__field">
-                    <span className="card__field-label">State/Province:</span>
-                    <span>{primary_event_location.state_province}</span>
-                  </li>
-                )}
-
-                {primary_event_location.country && (
-                  <li className="card__field">
-                    <span className="card__field-label">Country:</span>
-                    <span>{primary_event_location.country}</span>
-                  </li>
-                )}
-
-                {primary_event_location.postal_code && (
-                  <li className="card__field">
-                    <span className="card__field-label">Postal Code:</span>
-                    <span>{primary_event_location.postal_code}</span>
-                  </li>
-                )}
-
-                {primary_event_location.availability_notes && (
-                  <li className="card__field prose">
-                    <span className="card__field-label">
-                      Availability Notes:
-                    </span>
-                    <span>{primary_event_location.availability_notes}</span>
-                  </li>
-                )}
-              </ul>
-            </>
+          {primary_event_location ? (
+            <EventLocationItem
+              eventLocation={primary_event_location}
+              headingId={locationHeadingId}
+            />
           ) : (
             <p className="card__message">
-              No primary location has been set for this event yet.
+              No location has been set for this event yet.
             </p>
           )}
         </UniversalCard>

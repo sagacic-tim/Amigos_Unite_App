@@ -4,7 +4,7 @@
   width: 100%;
   max-inline-size: var(--section-max-width, none);
   margin-inline: auto; /* center horizontally by default */
-  padding-inline: var(--section-inline-padding, 0);
+  padding-inline: var(--spacing-sm);
 
   /* section rhythm */
   margin-block: var(--spacing-lg);

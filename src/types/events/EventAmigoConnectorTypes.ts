@@ -2,8 +2,23 @@
 import type {
   EventRole,
   EventMembershipStatus,
-  AmigoMinimal,
 } from "./EventTypes";
+
+export interface EventConnectorAmigo {
+  id: number;
+  user_name: string;
+
+  first_name?: string | null;
+  last_name?: string | null;
+
+  email?: string | null;
+  secondary_email?: string | null;
+
+  phone_1?: string | null;
+  phone_2?: string | null;
+
+  avatar_url?: string | null;
+}
 
 export interface EventAmigoConnector {
   id:       number;
@@ -12,7 +27,7 @@ export interface EventAmigoConnector {
   role:     EventRole;
   status:   EventMembershipStatus;
 
-  amigo?: AmigoMinimal; // optional expansion from API
+  amigo?: EventConnectorAmigo;
   created_at?: string;
   updated_at?: string;
 }

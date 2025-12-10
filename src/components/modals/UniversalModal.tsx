@@ -1,4 +1,3 @@
-
 // src/components/modals/UniversalModal.tsx
 import React, { useEffect } from "react";
 import "../../assets/sass/components/_modals.scss";
@@ -17,17 +16,21 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   children,
   titleId,
 }) => {
-  if (!isOpen) return null;
-
-  // Close on Escape
+  // Close on Escape – hook is ALWAYS called,
+  // but only attaches a listener while the modal is open.
   useEffect(() => {
+    if (!isOpen) return;
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [isOpen, onClose]);
+
+  // Now that hooks have run, we can safely bail out when closed.
+  if (!isOpen) return null;
 
   return (
     <div

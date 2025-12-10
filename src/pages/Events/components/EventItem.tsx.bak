@@ -1,19 +1,40 @@
 // src/pages/Events/components/EventItem.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import type { Event } from "@/types/events/EventTypes";
+import type { Event, EventLocation } from "@/types/events";
+import { EventService } from "@/services/EventService";
+import UniversalModal from "@/components/modals/UniversalModal";
+import UniversalCard from "@/components/cards/UniversalCard";
+import EventDetailsItem from "@/pages/EventDetails/components/EventDetailsItem";
+import EventLocationItem from "@/pages/EventLocations/components/EventLocationItem";
+import {formatDateToMMDDYYYY,formatTimeToHHMMAmPm,} from "@/utils/dateFormat";
 
-interface EventItemProps {
+export interface EventItemProps {
   event: Event;
   mode?: "public" | "manage";
   onDelete?: (event: Event) => void;
 }
+
+type EventWithLocation = Event & {
+  primary_event_location?: EventLocation | null;
+};
 
 const EventItem: React.FC<EventItemProps> = ({
   event,
   mode = "public",
   onDelete,
 }) => {
+  // Base event from the index (no location hydrated)
+  const baseEvent = event as EventWithLocation;
+
+  // Hydrated event (from /events/:id show) – includes primary_event_location
+  const [fullEvent, setFullEvent] = useState<EventWithLocation | null>(null);
+
+  // Modal state
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+
+  const effectiveEvent: EventWithLocation = fullEvent ?? baseEvent;
   const {
     id,
     event_name,
@@ -25,10 +46,16 @@ const EventItem: React.FC<EventItemProps> = ({
     description,
     status,
     status_label,
-  } = event;
+    primary_event_location,
+  } = effectiveEvent;
 
-  const displayDate = formatted_event_date ?? event_date ?? "";
-  const displayTime = formatted_event_time ?? event_time ?? "";
+  const detailsHeadingId = `event-details-heading-${id}`;
+  const locationHeadingId = `event-location-heading-${id}`;
+
+  const rawDate = formatted_event_date ?? event_date ?? "";
+  const rawTime = formatted_event_time ?? event_time ?? "";
+  const displayDate = rawDate ? formatDateToMMDDYYYY(rawDate) : "";
+  const displayTime = rawTime ? formatTimeToHHMMAmPm(rawTime) : "";
   const displayDescription = description || "No description provided.";
 
   const fallbackStatusLabel = (() => {
@@ -47,75 +74,161 @@ const EventItem: React.FC<EventItemProps> = ({
     }
   })();
 
+  const hasLocation = !!primary_event_location;
+
+  /**
+   * Ensure we have a fully hydrated event from /events/:id (with primary_event_location).
+   * This is called before opening either modal.
+   */
+  const ensureFullEventLoaded = () => {
+    if (fullEvent) return;
+
+    EventService.fetchEvent(id)
+      .then((loaded) => {
+        setFullEvent(loaded as EventWithLocation);
+      })
+      .catch((err) => {
+        console.error("Failed to load full event for modal:", err);
+      });
+  };
+
+  const handleOpenDetailsModal = () => {
+    ensureFullEventLoaded();
+    setIsDetailsOpen(true);
+  };
+
+  const handleOpenLocationModal = () => {
+    ensureFullEventLoaded();
+    setIsLocationOpen(true);
+  };
+
+  const handleCloseModals = () => {
+    setIsDetailsOpen(false);
+    setIsLocationOpen(false);
+  };
+
+  const handleViewLocationFromDetails = () => {
+    ensureFullEventLoaded();
+    setIsDetailsOpen(false);
+    setIsLocationOpen(true);
+  };
+
   return (
-    <article className="card card--profile">
-      <div className="card__body">
-        <h3 className="card__title">{event_name}</h3>
+    <>
+      {/* Summary event card in the Events grid */}
+      <article className="card card--profile">
+        <div className="card__body">
+          <h3 className="card__title">{event_name}</h3>
 
-        <p className="card__subtitle">
-          {displayDate && displayTime
-            ? `Scheduled for ${displayDate} at ${displayTime}`
-            : displayDate
-            ? `Scheduled for ${displayDate}`
-            : displayTime
-            ? `Scheduled at ${displayTime}`
-            : "Schedule not yet set"}
-        </p>
-
-        {event_type && (
-          <p className="card__field">
-            <span className="card__field-label">Type:</span>
-            {event_type}
+          <p className="card__subtitle">
+            {displayDate && displayTime
+              ? `Scheduled for ${displayDate} at ${displayTime}`
+              : displayDate
+              ? `Scheduled for ${displayDate}`
+              : displayTime
+              ? `Scheduled at ${displayTime}`
+              : "Schedule not yet set"}
           </p>
-        )}
 
-        <p className="card__field">
-          <span className="card__field-label">Status:</span>
-          {fallbackStatusLabel}
-        </p>
-
-        <p className="card__message">{displayDescription}</p>
-
-        {/* Ensure .card__actions has margin-top: auto in SCSS so it pins to the bottom */}
-        <div className="card__actions">
-          <button
-            type="button"
-            className="button button--secondary"
-            // TODO: open event details modal
-          >
-            View Details
-          </button>
-
-          <button
-            type="button"
-            className="button button--secondary"
-            disabled
-            title="Location details coming soon"
-          >
-            View Location
-          </button>
-
-          {mode === "manage" && (
-            <>
-              <Link
-                to={`/events/${id}/edit`}
-                className="button button--primary"
-              >
-                Edit Event
-              </Link>
-
-              <button
-                type="button"
-                className="button button--danger"
-                onClick={() => onDelete?.(event)}
-              >
-                Delete Event
-              </button>
-            </>
+          {event_type && (
+            <p className="card__field">
+              <span className="card__field-label">Type:</span>
+              {event_type}
+            </p>
           )}
-        </div>
-      </div>
-    </article>
+
+          <p className="card__field">
+            <span className="card__field-label">Status:</span>
+            {fallbackStatusLabel}
+          </p>
+
+          <p className="card__message prose">{displayDescription}</p>
+
+          </div>
+
+          {/* Ensure .card__actions has margin-top: auto in SCSS so it pins to the bottom */}
+          <div className="card__actions">
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={handleOpenDetailsModal}
+            >
+              View Details
+            </button>
+
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={handleOpenLocationModal}
+              // You can keep this enabled and show a message in the modal
+              // or disable it if you *only* want it clickable when we already
+              // know there is a location.
+              disabled={false}
+              title={
+                hasLocation
+                  ? undefined
+                  : "If this event has a location, it will load in the modal."
+              }
+            >
+              View Location
+            </button>
+
+            {mode === "manage" && (
+              <>
+                <Link
+                  to={`/events/${id}/edit`}
+                  className="button button--primary"
+                >
+                  Edit Event
+                </Link>
+
+                <button
+                  type="button"
+                  className="button button--danger"
+                  onClick={() => onDelete?.(event)}
+                >
+                  Delete Event
+                </button>
+              </>
+            )}
+          </div>
+      </article>
+
+      {/* Details modal */}
+      <UniversalModal
+        isOpen={isDetailsOpen}
+        onClose={handleCloseModals}
+        titleId={detailsHeadingId}
+      >
+        <UniversalCard titleId={detailsHeadingId}>
+          <EventDetailsItem
+            event={effectiveEvent}
+            headingId={detailsHeadingId}
+            onViewLocationClick={handleViewLocationFromDetails}
+          />
+        </UniversalCard>
+      </UniversalModal>
+
+      {/* Location modal (reuses EventLocationItem) */}
+      <UniversalModal
+        isOpen={isLocationOpen}
+        onClose={handleCloseModals}
+        titleId={locationHeadingId}
+      >
+        <UniversalCard titleId={locationHeadingId}>
+          {primary_event_location ? (
+            <EventLocationItem
+              eventLocation={primary_event_location}
+              headingId={locationHeadingId}
+            />
+          ) : (
+            <p className="card__message">
+              No location has been set for this event yet.
+            </p>
+          )}
+        </UniversalCard>
+      </UniversalModal>
+    </>
   );
 };
 

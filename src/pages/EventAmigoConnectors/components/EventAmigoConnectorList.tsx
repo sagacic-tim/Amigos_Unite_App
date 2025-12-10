@@ -1,14 +1,14 @@
 // src/pages/EventAmigoConnectors/components/EventAmigoConnectorList.tsx
-import React, { useEffect, useState } from 'react';
-import EventAmigoConnectorItem from './EventAmigoConnectorItem';
-import type { EventAmigoConnector } from '@/types/events';
-import { EventService } from '@/services/EventService';
-import '@/assets/sass/components/_eventAmigoConnectors.scss';
+import React, { useEffect, useState } from "react";
+import EventAmigoConnectorItem from "./EventAmigoConnectorItem";
+import type { EventAmigoConnector } from "@/types/events";
+import { EventService } from "@/services/EventService";
+import "@/assets/sass/components/_eventAmigoConnectors.scss";
 
 const EventAmigoConnectorList: React.FC = () => {
   const [connectors, setConnectors] = useState<EventAmigoConnector[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -20,7 +20,8 @@ const EventAmigoConnectorList: React.FC = () => {
         if (mounted) setConnectors(data);
       } catch (err) {
         console.error(err);
-        if (mounted) setError('Error fetching event–amigo connectors.');
+        if (mounted)
+          setError("Error fetching event–amigo connectors.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -32,8 +33,9 @@ const EventAmigoConnectorList: React.FC = () => {
   }, []);
 
   if (loading) return <p>Loading event–amigo connectors…</p>;
-  if (error)   return <p>{error}</p>;
-  if (!connectors.length) return <p>No event–amigo connectors found.</p>;
+  if (error) return <p>{error}</p>;
+  if (!connectors.length)
+    return <p>No event–amigo connectors found.</p>;
 
   return (
     <div className="event-amigo-connector-list">

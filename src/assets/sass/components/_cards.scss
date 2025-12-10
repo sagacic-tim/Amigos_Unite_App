@@ -29,6 +29,7 @@
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
+  margin-bottom: var(--spacing-sm);
 }
 
 .card__title  {
@@ -53,9 +54,10 @@
     auto-fit,
     minmax(min(100%, 10rem), 1fr)
   ); /* ~160px cap */
-  gap: var(--spacing-sm) var(--spacing-xxs);
+  gap: var(--spacing-sm) var(--spacing-sm);
   justify-content: start;
   align-content: start;
+  margin-block-start: var(--spacing-sm);
 
   /* 👇 This is the key line */
   margin-top: auto;
@@ -70,6 +72,27 @@
   & :where(a, button, [role="button"]):focus-visible {
     outline: 2px solid var(--focus-ring-color, Highlight);
     outline-offset: 2px;
+  }
+  /* Event card action layout:
+     - Top row: View Details, View Location
+     - Bottom row: Edit/Delete (manage mode) + Register
+  */
+  .view__details--button,
+  .view__location--button {
+    grid-row: 1;
+  }
+
+  .edit__event--button,
+  .delete__event--button,
+  .register__button {
+    grid-row: 2;
+  }
+
+  /* Optional: on narrow screens, make the Register button full-width */
+  @media (max-width: 600px) {
+    .register__button {
+      grid-column: 1 / -1;
+    }
   }
 }
 
@@ -124,9 +147,16 @@
   max-width: 440px;
 }
 
-.card__field-label { font-weight: 600; margin-right: .5rem; }
+.card__field-label {
+  font-weight: 600;
+  margin-right: .5rem;
+}
 
-.card__message { color: var(--secondary-text-color); margin: 0; }
+.card__message {
+  color: var(--secondary-text-color);
+  margin: 0;
+  max-width: 460px;
+}
 
 /* Optional: motion safety if you later add transitions */
 

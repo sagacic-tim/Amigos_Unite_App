@@ -34,7 +34,7 @@
 .button--primary {
   background-color: var(--primary-button-bg-color);
   color: var(--primary-button-label-color);
-  max-width: 160px;
+  max-width: 180px;
   min-width: 0;
 
   &:hover:not(:disabled) {
@@ -53,8 +53,7 @@
   border-style: solid;
   border-width: var(--border-width);
   color: var(--secondary-button-label-color);
-  margin-right: 6px;
-  max-width: 160px;
+  max-width: 180px;
   min-width: 0;
 
   &:hover:not(:disabled) {
@@ -66,7 +65,7 @@
 .button--cancel {
   background-color: var(--cancel-button-bg-color);
   color: var(--cancel-button-label-color);
-  max-width: 100px;
+  max-width: 160px;
 
   &:hover:not(:disabled) {
     background-color: var(--cancel-button-hover-bg-color);
@@ -75,6 +74,36 @@
   &:disabled {
     background-color: var(--cancel-button-disabled-bg-color);
     color: var(--cancel-button-disabled-label-color);
+  }
+}
+
+.button--warning {
+  background-color: var(--warning-button-bg-color);
+  color: var(--warning-button-label-color);
+  max-width: 160px;
+
+  &:hover:not(:disabled) {
+    background-color: var(--warning-button-hover-bg-color);
+    color: var(--warning-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--warning-button-disabled-bg-color);
+    color: var(--warning-button-disabled-label-color);
+  }
+}
+
+.button--danger {
+  background-color: var(--danger-button-bg-color);
+  color: var(--danger-button-label-color);
+  max-width: 160px;
+
+  &:hover:not(:disabled) {
+    background-color: var(--danger-button-hover-bg-color);
+    color: var(--danger-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--danger-button-disabled-bg-color);
+    color: var(--danger-button-disabled-label-color);
   }
 }
 

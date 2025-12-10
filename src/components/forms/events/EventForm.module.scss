@@ -1,0 +1,13 @@
+.places-button {
+  background-color: var(--secondary-button-bg-color);
+  border-color: var(--secondary-border-color);
+  border-style: solid;
+  border-width: var(--border-width);
+  color: var(--secondary-button-label-color);
+  margin-right: 6px;
+  width: 100%;
+  &:hover:not(:disabled) {
+    background-color: var(--secondary-button-hover-bg-color);
+    color: var(--secondary-button-hover-label-color);
+  }
+}

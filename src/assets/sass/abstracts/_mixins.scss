@@ -22,19 +22,16 @@
 /* Resets link defaults safely */
 @mixin link-reset() {
   text-decoration: none;
-  color: inherit;
   cursor: pointer;
   transition: color 0.3s;
 }
 
 /* Applies your link color system via CSS variables */
 @mixin link-colors(
-  $color: var(--link-color),
   $hover: var(--link-hover-color),
   $active: var(--link-active-color),
-  $underline: true
+  $underline: false
 ) {
-  color: $color;
 
   @if $underline {
     text-decoration: underline;

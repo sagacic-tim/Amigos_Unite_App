@@ -19,7 +19,9 @@
   text-wrap: pretty;       /* ignored where unsupported */
 
   overflow-wrap: break-word;
-  /* word-spacing: normal;  ← or keep your 0.02rem if you prefer the look */
+  word-spacing: -1px;
+  letter-spacing: -0.5px;
+  text-justify: inter-character;
 }
 
 /* Prefer inter-character where supported (Firefox) */
@@ -27,8 +29,6 @@
   .prose,
   .prose :where(p, li, dd, figcaption, caption):lang(en) {
     text-justify: inter-character;
-    letter-spacing: normal; /* let justification do the spacing */
-    word-spacing: normal;   /* (optional) avoid double-inflating gaps */
   }
 }
 

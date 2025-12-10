@@ -1,30 +1,61 @@
 // src/pages/EventLocations/components/EventLocationItem.tsx
-import React from 'react';
-import type { EventLocation } from '@/types/events';
-import '@/assets/sass/components/_eventLocations.scss';
+import React from "react";
+import type { EventLocation } from "@/types/events";
 
 interface EventLocationItemProps {
   eventLocation: EventLocation;
+  /** Optional heading id so the wrapper card/modal can reference it */
+  headingId?: string;
 }
 
-const EventLocationItem: React.FC<EventLocationItemProps> = ({ eventLocation }) => {
+const EventLocationItem: React.FC<EventLocationItemProps> = ({
+  eventLocation,
+  headingId,
+}) => {
+  const {
+    id,
+    business_name,
+    business_phone,
+    address,
+    // Image fields
+    location_image_url,
+  } = eventLocation;
+
+  const computedHeadingId = headingId ?? `event-location-heading-${id}`;
+
   return (
-    <div className="event-location-item">
-      <h2>{eventLocation.business_name}</h2>
-      <p>Phone: {eventLocation.business_phone}</p>
-      <p>Address: {eventLocation.address}</p>
-      <p>Floor: {eventLocation.floor}</p>
-      <p>Room No: {eventLocation.room_no}</p>
-      <p>Suite: {eventLocation.apartment_suite_number}</p>
-      <p>Sublocality: {eventLocation.city_sublocality}</p>
-      <p>City: {eventLocation.city}</p>
-      <p>State: {eventLocation.state_province}</p>
-      <p>Country: {eventLocation.country}</p>
-      <p>Postal Code: {eventLocation.postal_code}</p>
-      <p>Latitude: {eventLocation.latitude}</p>
-      <p>Longitude: {eventLocation.longitude}</p>
-      <p>Time Zone: {eventLocation.time_zone}</p>
-    </div>
+    <>
+      {/* Title */}
+      <h3 className="card__title" id={computedHeadingId}>
+        {business_name || "Event Location"}
+      </h3>
+
+      {/* Full address at the top of the card */}
+      <p className="card__subtitle">
+        {address || "No address available."}
+      </p>
+      {/* image block at the bottom of the card if eists */}
+      {location_image_url && (
+        <figure className="card__media">
+          <img
+            src={location_image_url}
+            className="card__image"
+            alt={
+              business_name
+                ? `Photo of ${business_name}`
+                : "Event location photo"
+            }
+          />
+        </figure>
+      )}
+      {/* Phone number at the bottom of the card below the image if eists */}
+      {business_phone && (
+        <p className="card__field">
+          <span className="card__field-label">Phone:</span>
+          <span>{business_phone}</span>
+        </p>
+      )}
+    </>
   );
 };
 

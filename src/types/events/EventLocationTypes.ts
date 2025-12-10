@@ -33,7 +33,6 @@ export interface EventLocation {
 
   // Venue / services fields
   owner_name?: string | null;
-  owner_phone?: string | null;
   capacity?: number | null;
   capacity_seated?: number | null;
   availability_notes?: string | null;
@@ -56,6 +55,7 @@ export interface EventLocation {
 // as part of the EventCreateParams.location block.
 export interface EventLocationCreatePayload {
   business_name: string;
+  business_phone?: string;
   location_type?: string;
   street_number?: string;
   street_name?: string;

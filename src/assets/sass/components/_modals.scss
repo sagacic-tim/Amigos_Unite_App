@@ -30,8 +30,8 @@
   /* CONTENT-DRIVEN SIZE */
   /* shrink-to-fit, but never exceed available viewport after overlay padding */
   inline-size: max-content;                                /* content width */
-  max-inline-size: calc(100vw - 40px);                     /* account for 20px L/R overlay padding */
-  max-block-size: calc(100dvh - 60px);                     /* account for 30px T/B overlay padding */
+  max-inline-size: calc(100vw - 20px);                     /* account for 20px L/R overlay padding */
+  max-block-size: calc(100dvh - 30px);                     /* account for 30px T/B overlay padding */
 
   /* no internal clipping (body will scroll if needed) */
   overflow: hidden;

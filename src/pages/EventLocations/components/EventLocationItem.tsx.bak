@@ -1,0 +1,145 @@
+// src/pages/EventLocations/components/EventLocationItem.tsx
+import React from "react";
+import type { EventLocation } from "@/types/events";
+
+interface EventLocationItemProps {
+  eventLocation: EventLocation;
+  /** Optional heading id so the wrapper card/modal can reference it */
+  headingId?: string;
+}
+
+const EventLocationItem: React.FC<EventLocationItemProps> = ({
+  eventLocation,
+  headingId,
+}) => {
+  const {
+    id,
+    business_name,
+    business_phone,
+    address,
+    floor,
+    room_no,
+    apartment_suite_number,
+    city_sublocality,
+    city,
+    state_province,
+    country,
+    postal_code,
+    latitude,
+    longitude,
+    time_zone,
+    // Image fields
+    location_image_url,
+    location_image_attribution,
+  } = eventLocation;
+
+  const computedHeadingId = headingId ?? `event-location-heading-${id}`;
+
+  const fields: { key: string; label: string; value: React.ReactNode }[] = [];
+
+  if (business_phone) {
+    fields.push({
+      key: "business_phone",
+      label: "Phone",
+      value: business_phone,
+    });
+  }
+  if (address) {
+    fields.push({ key: "address", label: "Address", value: address });
+  }
+  if (floor) {
+    fields.push({ key: "floor", label: "Floor", value: floor });
+  }
+  if (room_no) {
+    fields.push({ key: "room_no", label: "Room No", value: room_no });
+  }
+  if (apartment_suite_number) {
+    fields.push({
+      key: "apartment_suite_number",
+      label: "Suite",
+      value: apartment_suite_number,
+    });
+  }
+  if (city_sublocality) {
+    fields.push({
+      key: "city_sublocality",
+      label: "Sublocality",
+      value: city_sublocality,
+    });
+  }
+  if (city) {
+    fields.push({ key: "city", label: "City", value: city });
+  }
+  if (state_province) {
+    fields.push({
+      key: "state_province",
+      label: "State / Province",
+      value: state_province,
+    });
+  }
+  if (country) {
+    fields.push({ key: "country", label: "Country", value: country });
+  }
+  if (postal_code) {
+    fields.push({
+      key: "postal_code",
+      label: "Postal Code",
+      value: postal_code,
+    });
+  }
+  if (latitude != null) {
+    fields.push({ key: "latitude", label: "Latitude", value: latitude });
+  }
+  if (longitude != null) {
+    fields.push({ key: "longitude", label: "Longitude", value: longitude });
+  }
+  if (time_zone) {
+    fields.push({ key: "time_zone", label: "Time Zone", value: time_zone });
+  }
+
+  return (
+    <>
+      <h3 className="card__title" id={computedHeadingId}>
+        {business_name || "Event Location"}
+      </h3>
+
+      <ul className="card__fields">
+        {fields.length > 0 ? (
+          fields.map((field) => (
+            <li key={field.key} className="card__field prose">
+              <span className="card__field-label">{field.label}:</span>
+              <span>{field.value}</span>
+            </li>
+          ))
+        ) : (
+          <li className="card__field prose">
+            <span className="card__field-label">Message:</span>
+            <span>No location details available.</span>
+          </li>
+        )}
+      </ul>
+
+      {/* Optional image block at the bottom of the card */}
+      {location_image_url && (
+        <figure className="card__media">
+          <img
+            src={location_image_url}
+            className="card__image"
+            alt={
+              business_name
+                ? `Photo of ${business_name}`
+                : "Event location photo"
+            }
+          />
+          {location_image_attribution && (
+            <figcaption className="card__image-caption">
+              {location_image_attribution}
+            </figcaption>
+          )}
+        </figure>
+      )}
+    </>
+  );
+};
+
+export default EventLocationItem;

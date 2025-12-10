@@ -1,3 +1,4 @@
+// src/services/EventService.ts //
 import privateApi from "@/services/api/privateApi";
 import publicApi from "@/services/api/publicApi";
 import type {
@@ -6,6 +7,7 @@ import type {
   EventStatus,
 } from "@/types/events/EventTypes";
 import type { EventLocation } from "@/types/events/EventLocationTypes";
+import type { EventAmigoConnector } from "@/types/events";
 
 const API_PREFIX = "/api/v1";
 
@@ -82,7 +84,6 @@ interface JsonApiEventLocationAttributes {
   "time-zone"?: string | null;
 
   "owner-name"?: string | null;
-  "owner-phone"?: string | null;
   capacity?: number | null;
   "capacity-seated"?: number | null;
   "availability-notes"?: string | null;
@@ -154,7 +155,6 @@ function normalizeEventLocation(
     time_zone: a["time-zone"] ?? null,
 
     owner_name: a["owner-name"] ?? null,
-    owner_phone: a["owner-phone"] ?? null,
     capacity: a.capacity ?? null,
     capacity_seated: a["capacity-seated"] ?? null,
     availability_notes: a["availability-notes"] ?? null,
@@ -277,75 +277,87 @@ export const EventService = {
     return normalizeEvent(res.data.data, included);
   },
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Legacy / auxiliary methods expected by existing components
-  // (signatures kept wide so they compile cleanly even if callers vary)
-  // ───────────────────────────────────────────────────────────────────────────
+  /**
+   * Register the given amigo as a participant on an event.
+   * Hits: POST /api/v1/events/:event_id/event_amigo_connectors
+   */
+  async registerForEvent(
+    eventId: number,
+    amigoId: number
+  ): Promise<EventAmigoConnector> {
+    const res = await privateApi.post(
+      `${API_PREFIX}/events/${eventId}/event_amigo_connectors`,
+      {
+        event_amigo_connector: {
+          amigo_id: amigoId,
+          role: "participant",
+        },
+      }
+    );
+    return res.data;
+  },
 
   /**
-   * Register the current amigo for an event.
-   *
-   * NOTE: Endpoint path is a best guess; adjust to match your actual routes.
-   * This returns `Promise<any>` so existing callers type check even if they
-   * expect Event / EventAmigoConnector, etc.
+   * Register the current amigo for an event via the /events/:id/register_self
+   * endpoint (if you keep this route). This is more “semantic”, whereas
+   * registerForEvent works directly with the connectors endpoint.
+   * legacy; no matching route defined yet.
    */
   async registerSelf(eventId: number, options?: any): Promise<any> {
-    // Example: POST /events/:id/register_self
-    const res = await privateApi.post(`${API_PREFIX}/events/${eventId}/register_self`, {
-      ...(options || {}),
-    });
+    const res = await privateApi.post(
+      `${API_PREFIX}/events/${eventId}/register_self`,
+      {
+        ...(options || {}),
+      }
+    );
     return res.data;
   },
 
+  async fetchEventAmigoConnectors(eventId: number): Promise<EventAmigoConnector[]> {
+    const res = await privateApi.get(
+      `${API_PREFIX}/events/${eventId}/event_amigo_connectors`
+    );
+    const payload: any = res.data;
+
+    if (Array.isArray(payload)) return payload;
+    if (payload && Array.isArray(payload.data)) return payload.data;
+    return [];
+  },
+
   /**
-   * Leave / unregister from an event.
-   *
-   * NOTE: Adjust the path and verb to match your routes.
+   * Global/debug listing of ALL EventAmigoConnectors.
+   * Hits: GET /api/v1/event_amigo_connectors
+   * (You will need a matching top-level route in Rails.)
    */
+  async fetchAllEventAmigoConnectors(): Promise<EventAmigoConnector[]> {
+    const res = await privateApi.get(
+      `${API_PREFIX}/event_amigo_connectors`,
+    );
+    const payload: any = res.data;
+
+    if (Array.isArray(payload)) return payload;
+    if (payload && Array.isArray(payload.data)) return payload.data;
+    return [];
+  },
+
+
+  async fetchAllEventLocationConnectors(): Promise<any[]> {
+    const res = await privateApi.get(
+      `${API_PREFIX}/event_location_connectors`
+    );
+    const payload: any = res.data;
+
+    if (Array.isArray(payload)) return payload;
+    if (payload && Array.isArray(payload.data)) return payload.data;
+    return [];
+  },
+
   async leave(eventId: number): Promise<any> {
     // Example: DELETE /events/:id/leave
-    const res = await privateApi.delete(`${API_PREFIX}/events/${eventId}/leave`);
+    const res = await privateApi.delete(
+      `${API_PREFIX}/events/${eventId}/leave`
+    );
     return res.data;
-  },
-
-  /**
-   * Fetch all EventAmigoConnector records (for admin / debugging views).
-   *
-   * NOTE: Shape is `any[]` until we wire this to your actual connector types.
-   */
-  async fetchAllEventAmigoConnectors(): Promise<any[]> {
-    const res = await privateApi.get("${API_PREFIX}/event_amigo_connectors");
-    const payload: any = res.data;
-
-    if (Array.isArray(payload)) {
-      return payload;
-    }
-
-    if (payload && Array.isArray(payload.data)) {
-      return payload.data;
-    }
-
-    // Fallback – unexpected shape
-    return [];
-  },
-
-  /**
-   * Fetch all EventLocationConnector records.
-   */
-  async fetchAllEventLocationConnectors(): Promise<any[]> {
-    const res = await privateApi.get("${API_PREFIX}/event_location_connectors");
-    const payload: any = res.data;
-
-    if (Array.isArray(payload)) {
-      return payload;
-    }
-
-    if (payload && Array.isArray(payload.data)) {
-      return payload.data;
-    }
-
-    // Fallback – unexpected shape
-    return [];
   },
 
   /**

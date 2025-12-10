@@ -1,7 +1,7 @@
 // src/pages/Events/CreateEventPage.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import EventForm from "@/components/forms/EventForm";
+import EventForm from "@/components/forms/events/EventForm";
 import { EventService } from "@/services/EventService";
 import type { EventCreateParams } from "@/types/events/EventTypes";
 import styles from "@/pages/Events/Events.module.scss";
