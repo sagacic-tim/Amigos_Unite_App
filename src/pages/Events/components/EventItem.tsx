@@ -1,7 +1,7 @@
 // src/pages/Events/components/EventItem.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import type { Event, EventLocation } from "@/types/events";
+import type { Event, EventLocation, EventAmigoConnector } from "@/types/events";
 import { EventService } from "@/services/EventService";
 import UniversalModal from "@/components/modals/UniversalModal";
 import UniversalCard from "@/components/cards/UniversalCard";
@@ -20,19 +20,18 @@ type EventWithLocation = Event & {
   primary_event_location?: EventLocation | null;
 };
 
+type EventRole =
+  | "lead_coordinator"
+  | "assistant_coordinator"
+  | "participant"
+  | null;
+
 const EventItem: React.FC<EventItemProps> = ({
   event,
   mode = "public",
   onDelete,
 }) => {
   const { isLoggedIn, amigo } = useAuthStatus();
-
-  // Is the logged-in amigo the lead coordinator for this event?
-  const isLeadCoordinator =
-    !!amigo && event.lead_coordinator_id === amigo.id;
-
-  // Only allow registration in public mode, when logged in, and not the lead coordinator
-  const canRegister = mode === "public" && isLoggedIn && !isLeadCoordinator;
 
   // Base event from the index (no location hydrated)
   const baseEvent = event as EventWithLocation;
@@ -44,9 +43,16 @@ const EventItem: React.FC<EventItemProps> = ({
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
 
-  // NEW: registration UX state
+  // Registration / status state
   const [isRegistering, setIsRegistering] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [eventRole, setEventRole] = useState<EventRole>(null);
+
+  // Derived: is this amigo associated with this event in any role?
+  const isRegistered = !!eventRole;
+
+  // NEW: are they a coordinator on this event?
+  const isCoordinatorRole =
+    eventRole === "lead_coordinator" || eventRole === "assistant_coordinator";
 
   const effectiveEvent: EventWithLocation = fullEvent ?? baseEvent;
   const {
@@ -91,6 +97,88 @@ const EventItem: React.FC<EventItemProps> = ({
   const hasLocation = !!primary_event_location;
 
   /**
+   * Determine the current amigo's role on this event (if any), using:
+   * - event.event_amigo_connectors if already present, or
+   * - a call to EventService.fetchEventAmigoConnectors(event.id) otherwise,
+   * plus the event.lead_coordinator_id as a fallback for lead coordinator.
+   */
+  useEffect(() => {
+    if (!amigo || !isLoggedIn) {
+      setEventRole(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const pickRoleFromConnectors = (
+      connectors: EventAmigoConnector[]
+    ): EventRole => {
+      const mine = connectors.filter((c) => c.amigo_id === amigo.id);
+      if (mine.length === 0) return null;
+
+      if (mine.some((c) => c.role === "lead_coordinator")) {
+        return "lead_coordinator";
+      }
+      if (mine.some((c) => c.role === "assistant_coordinator")) {
+        return "assistant_coordinator";
+      }
+      if (mine.some((c) => c.role === "participant")) {
+        return "participant";
+      }
+      return null;
+    };
+
+    const applyRole = (connectors: EventAmigoConnector[]) => {
+      let role = pickRoleFromConnectors(connectors);
+
+      // Fallback: if the event has lead_coordinator_id pointing at this amigo,
+      // treat them as lead even if no connector came back with that role.
+      if (!role && event.lead_coordinator_id === amigo.id) {
+        role = "lead_coordinator";
+      }
+
+      if (!cancelled) {
+        setEventRole(role);
+      }
+    };
+
+    // 1) If connectors are already embedded on the event, use them.
+    if (
+      Array.isArray(event.event_amigo_connectors) &&
+      event.event_amigo_connectors.length > 0
+    ) {
+      applyRole(event.event_amigo_connectors as EventAmigoConnector[]);
+      return;
+    }
+
+    // 2) Otherwise fetch connectors for this event.
+    EventService.fetchEventAmigoConnectors(event.id)
+      .then((connectors) => {
+        if (!cancelled) {
+          applyRole(connectors as EventAmigoConnector[]);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error(
+            `Error checking registration status for event ${event.id}:`,
+            err
+          );
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    amigo?.id,
+    isLoggedIn,
+    event.id,
+    event.event_amigo_connectors,
+    event.lead_coordinator_id,
+  ]);
+
+  /**
    * Ensure we have a fully hydrated event from /events/:id (with primary_event_location).
    * This is called before opening either modal.
    */
@@ -127,22 +215,46 @@ const EventItem: React.FC<EventItemProps> = ({
     setIsLocationOpen(true);
   };
 
-  // NEW: registration handler
+  /**
+   * Registration handler:
+   * - Only in "public" mode
+   * - Only when logged in
+   * - Only if the amigo does not already have any role on this event
+   */
   const handleRegisterForEvent = async () => {
-    if (!canRegister || !amigo || isRegistering) return;
+    if (mode !== "public" || !amigo || !isLoggedIn || isRegistering || eventRole) {
+      return;
+    }
 
     setIsRegistering(true);
 
     try {
-      await EventService.registerForEvent(id, amigo.id);
-      setIsRegistered(true);
+      const connector = await EventService.registerForEvent(id, amigo.id);
+      setEventRole(connector.role as EventRole); // expected "participant" currently
     } catch (err) {
       console.error("Error registering for event:", err);
-      // Optionally surface this via toast / UI state
     } finally {
       setIsRegistering(false);
     }
   };
+
+  // Only show the registration/status button on public listings when logged in.
+  const showRegisterButton = mode === "public" && isLoggedIn;
+
+  const buttonLabel = (() => {
+    if (eventRole === "lead_coordinator") return "Lead Coordinator";
+    if (eventRole === "assistant_coordinator") return "Assistant Coordinator";
+    if (eventRole === "participant") return "Already Registered";
+    if (isRegistering) return "Registering…";
+    return "Register For This Event";
+  })();
+
+  // NEW: choose spotlight vs primary styles based on coordinator role.
+  const registerButtonClassName = [
+    "button",
+    isCoordinatorRole ? "button--spotlight" : "button--primary",
+    "register__button",
+  ].join(" ");
 
   return (
     <>
@@ -175,7 +287,6 @@ const EventItem: React.FC<EventItemProps> = ({
 
           <p className="card__message prose">{displayDescription}</p>
         </div>
-
 
         {/* Actions */}
         <div className="card__actions">
@@ -220,19 +331,16 @@ const EventItem: React.FC<EventItemProps> = ({
             </>
           )}
 
-          {/* Bottom row: registration (only for logged-in Amigos who are NOT lead coordinators) */}
-          {canRegister && (
+          {/* Registration / status button (public listing only) */}
+          {showRegisterButton && (
             <button
               type="button"
-              className="button button--primary register__button"
+              className={registerButtonClassName}
               onClick={handleRegisterForEvent}
+              // Once they have any role, this becomes a status label only.
               disabled={isRegistering || isRegistered}
             >
-              {isRegistered
-                ? "Registered"
-                : isRegistering
-                ? "Registering…"
-                : "Register For This Event"}
+              {buttonLabel}
             </button>
           )}
         </div>

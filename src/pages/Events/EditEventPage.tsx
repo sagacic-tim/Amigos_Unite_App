@@ -17,7 +17,8 @@ import styles from "@/pages/Events/Events.module.scss";
 type ManagementParticipant = {
   amigoId: number;
   displayName: string;
-  currentRole?: string;
+  currentRole?: string; // "participant" | "assistant_coordinator" | other
+  connectorId: number;
 };
 
 // Map a full EventLocation (from API) to the slimmer EventLocationCreatePayload
@@ -111,16 +112,15 @@ const EditEventPage: React.FC = () => {
 
     (async () => {
       try {
-        const connectors = await EventService.fetchEventAmigoConnectors(
-          Number(eventId),
-        );
+        const connectors: EventAmigoConnector[] =
+          await EventService.fetchEventAmigoConnectors(Number(eventId));
 
         if (!mounted) return;
 
         const participants: ManagementParticipant[] = [];
         const assistantIds: number[] = [];
 
-        (connectors as EventAmigoConnector[]).forEach((conn) => {
+        connectors.forEach((conn) => {
           // Only treat these as “attendees” for management purposes
           if (
             conn.role !== "participant" &&
@@ -141,6 +141,7 @@ const EditEventPage: React.FC = () => {
             amigoId: conn.amigo_id,
             displayName,
             currentRole: conn.role,
+            connectorId: conn.id,
           });
 
           if (conn.role === "assistant_coordinator") {
@@ -152,8 +153,7 @@ const EditEventPage: React.FC = () => {
         setInitialAssistantCoordinatorIds(assistantIds);
       } catch (err) {
         console.error("Error loading event participants:", err);
-        // We deliberately do not set `error` here so that lack of participants
-        // does not prevent editing the event itself.
+        // Leave event edit usable even if this fails
       }
     })();
 
@@ -162,11 +162,78 @@ const EditEventPage: React.FC = () => {
     };
   }, [eventId]);
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // Submit handlers
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Save event core + location only
   const handleSubmit = async (values: EventCreateParams) => {
     if (!eventId) return;
     await EventService.updateEvent(Number(eventId), values);
+    // Do not navigate yet; we want to run management updates too (if any)
+  };
+
+  // Persist assistant_coordinator changes
+  const handleSubmitManagement = async (
+    assistantCoordinatorIds: number[],
+  ) => {
+    if (!eventId) return;
+
+    // Compute which connectors need a role change
+    const changes: {
+      connectorId: number;
+      newRole: "participant" | "assistant_coordinator";
+    }[] = [];
+
+    managementParticipants.forEach((p) => {
+      const shouldBeAssistant =
+        assistantCoordinatorIds.includes(p.amigoId);
+      const currentlyAssistant =
+        p.currentRole === "assistant_coordinator";
+
+      // No change for this participant
+      if (shouldBeAssistant === currentlyAssistant) return;
+
+      const newRole: "assistant_coordinator" | "participant" =
+        shouldBeAssistant ? "assistant_coordinator" : "participant";
+
+      changes.push({
+        connectorId: p.connectorId,
+        newRole,
+      });
+    });
+
+    if (!changes.length) {
+      // No role changes; just navigate away
+      navigate("/events/manage", { replace: true });
+      return;
+    }
+
+    try {
+      await Promise.all(
+        changes.map((change) =>
+          EventService.updateEventAmigoConnectorRole(
+            Number(eventId),
+            change.connectorId,
+            change.newRole,
+          ),
+        ),
+      );
+    } catch (err) {
+      console.error(
+        "Error updating assistant coordinator roles:",
+        err,
+      );
+      // You could surface a UI error here if desired.
+    }
+
+    // After roles are updated (or attempted), go back to Manage Events
     navigate("/events/manage", { replace: true });
   };
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Render
+  // ───────────────────────────────────────────────────────────────────────────
 
   // Shared outer structure with CreateEventPage
   return (
@@ -210,12 +277,13 @@ const EditEventPage: React.FC = () => {
               submitLabel="Save Changes"
               onSubmit={handleSubmit}
               includeManagementStep={true}
-              // NEW: wire participants into the Manage Event step
+              // Wire participants into the Manage Event step
               managementParticipants={managementParticipants}
               initialAssistantCoordinatorIds={
                 initialAssistantCoordinatorIds
               }
-              // onSubmitManagement can later promote/demote roles via the API
+              // Persist promotions/demotions after event save
+              onSubmitManagement={handleSubmitManagement}
             />
           </>
         )}

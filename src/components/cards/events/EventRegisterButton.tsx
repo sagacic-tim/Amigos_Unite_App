@@ -15,26 +15,42 @@ type Props = {
   disabled?: boolean;
 };
 
-const EventRegisterButton: React.FC<Props> = ({ event, myConnector, onChange, disabled }) => {
-  const { isLoggedIn } = useAuthStatus();
+const EventRegisterButton: React.FC<Props> = ({
+  event,
+  myConnector,
+  onChange,
+  disabled,
+}) => {
+  const { isLoggedIn, amigo, checking } = useAuthStatus();
   const [busy, setBusy] = useState(false);
   const location = useLocation();
 
-  const eventClosed = event.status === "completed" || event.status === "canceled";
-  const isDisabled = disabled || busy || eventClosed;
+  const eventClosed =
+    event.status === "completed" || event.status === "canceled";
+
+  const isDisabled = !!disabled || busy || eventClosed || checking;
 
   const openLoginModalWithReturn = () => {
     try {
       // Persist a return path so the login flow can redirect back
       sessionStorage.setItem("returnTo", location.pathname + location.search);
-    } catch { /* no-op if storage blocked */ }
+    } catch {
+      // no-op if storage is blocked
+    }
     document.dispatchEvent(new CustomEvent("auth:login"));
   };
 
   const register = async () => {
+    // If we somehow got here without an amigo object, treat as not logged in
+    if (!amigo) {
+      openLoginModalWithReturn();
+      return;
+    }
+
     setBusy(true);
     try {
-      const conn = await EventService.registerSelf(event.id);
+      // POST /api/v1/events/:event_id/event_amigo_connectors
+      const conn = await EventService.registerForEvent(event.id, amigo.id);
       onChange?.(conn);
     } finally {
       setBusy(false);
@@ -43,14 +59,20 @@ const EventRegisterButton: React.FC<Props> = ({ event, myConnector, onChange, di
 
   const leave = async () => {
     if (!myConnector) return;
+
     setBusy(true);
     try {
+      // DELETE /api/v1/events/:id/leave (your existing endpoint)
       await EventService.leave(event.id);
       onChange?.(null);
     } finally {
       setBusy(false);
     }
   };
+
+  // ─────────────────────────────────────
+  // Render branches
+  // ─────────────────────────────────────
 
   if (!isLoggedIn) {
     return (
@@ -61,11 +83,12 @@ const EventRegisterButton: React.FC<Props> = ({ event, myConnector, onChange, di
         className="btn btn--primary"
         aria-disabled={isDisabled}
       >
-        Login to Register
+        {checking ? "Checking…" : "Login to Register"}
       </button>
     );
   }
 
+  // Not yet registered for this event (from the caller's perspective)
   if (!myConnector) {
     return (
       <button
@@ -80,7 +103,7 @@ const EventRegisterButton: React.FC<Props> = ({ event, myConnector, onChange, di
     );
   }
 
-  // Already registered; allow leaving (you can render status elsewhere)
+  // Already registered; allow leaving
   return (
     <button
       type="button"

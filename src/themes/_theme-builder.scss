@@ -35,7 +35,8 @@
   $error:   base-red,
   $info:    base-cobalt-blue,
   $alert:   base-red-orange,
-  $cancel:  base-red-orange
+  $cancel:  base-red-orange,
+  $spotlight: base-neon-green
 ) {
   $brand-color:   ch.from-palette($palette, $brand);
   $accent-color:  ch.from-palette($palette, $accent);
@@ -46,6 +47,7 @@
   $info-color:    ch.from-palette($palette, $info);
   $alert-color:   ch.from-palette($palette, $alert);
   $cancel-color:  ch.from-palette($palette, $cancel);
+  $spotlight-color: ch.from-palette($palette, $spotlight);
 
 
   :root {
@@ -100,12 +102,14 @@
     --secondary-border-hover-color:#{ch.mix-str($space, map.get($neutrals, neutral-gray), 86, $brand-color, 14)};
 
     /* ───────── Primary Buttons ───────── */
-    --primary-button-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 20, $success-color, 80)};
-    --primary-button-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 15, $success-color, 85)};
-    --primary-button-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 85, $success-color, 15)};
-    --primary-button-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $success-color, 2)};
+    --primary-button-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 10, $brand-color, 90)};
+    --primary-button-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 0, $brand-color, 100)};
+    --primary-button-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 90, $brand-color, 10)};
+    --primary-button-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};
     --primary-button-hover-label-color:    #{map.get($neutrals, neutral-white)};
-    --primary-button-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 88, $brand-color, 12)};
+    --primary-button-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 80, $brand-color, 20)};
+
+
 
     /* ───────── Secondary Button ───────── */
     --secondary-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-med-dark-gray), 75, $brand-color, 25)};
@@ -138,6 +142,14 @@
     --danger-button-label-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $info-color, 5)};
     --danger-button-hover-label-color:  #{map.get($neutrals, neutral-white)};
     --danger-button-disabled-label-color:#{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 90, $info-color, 10)};
+
+    /* ───────── Spotlight Buttons ───────── */
+    --button-spotlight-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 20, $spotlight-color, 80)};
+    --button-spotlight-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 15, $spotlight-color, 85)};
+    --button-spotlight-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $spotlight-color, 95)};
+    --button-spotlight--label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $spotlight-color, 2)};
+    --button-spotlight-hover-label-color:    #{map.get($neutrals, neutral-white)};
+    --button-spotlight-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-black), 98, $spotlight-color, 2)};
 
 
     /* ───────── Links ───────── */
@@ -187,7 +199,8 @@
   $error:   base-red,
   $info:    base-cobalt-blue,
   $alert:   base-red-orange,
-  $cancel:  base-red-orange
+  $cancel:  base-red-orange,
+  $spotlight: base-neon-green
 ) {
   $brand-color:   ch.from-palette($palette, $brand);
   $accent-color:  ch.from-palette($palette, $accent);
@@ -198,6 +211,8 @@
   $info-color:    ch.from-palette($palette, $info);
   $alert-color:   ch.from-palette($palette, $alert);
   $cancel-color:   ch.from-palette($palette, $cancel);
+  $spotlight-color:   ch.from-palette($palette, $spotlight);
+
 
 
   :root {
@@ -255,7 +270,7 @@
     --primary-button-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-med-light-gray), 90, $brand-color, 10)};
     --primary-button-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $brand-color, 2)};
     --primary-button-hover-label-color:    #{map.get($neutrals, neutral-white)};
-    --primary-button-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-gray), 80, $brand-color, 20)};
+    --primary-button-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-dark-gray), 80, $brand-color, 20)};
 
     --secondary-button-bg-color:           #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 85, $brand-color, 15)};
     --secondary-button-hover-bg-color:     #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 90, $brand-color, 10)};
@@ -287,6 +302,15 @@
     --danger-button-label-color:        #{ch.mix-str($space, map.get($neutrals, neutral-off-white), 95, $info-color, 5)};
     --danger-button-hover-label-color:  #{map.get($neutrals, neutral-white)};
     --danger-button-disabled-label-color:#{ch.mix-str($space, map.get($neutrals, neutral-light-gray), 90, $info-color, 10)};
+
+    /* ───────── Spotlight Buttons ───────── */
+    --button-spotlight-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 20, $spotlight-color, 80)};
+    --button-spotlight-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 15, $spotlight-color, 85)};
+    --button-spotlight-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $spotlight-color, 95)};
+    --button-spotlight--label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $spotlight-color, 2)};
+    --button-spotlight-hover-label-color:    #{map.get($neutrals, neutral-white)};
+    --button-spotlight-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-black), 98, $spotlight-color, 2)};
+
 
     /* ───────── Links ───────── */
     --link-color:        #{ch.mix-str($space, $brand-color, 88, map.get($neutrals, neutral-gray), 12)};

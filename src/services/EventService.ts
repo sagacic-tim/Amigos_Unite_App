@@ -250,6 +250,14 @@ export const EventService = {
     return normalizeEvent(res.data.data, included);
   },
 
+  async fetchMyEvents(): Promise<Event[]> {
+    const res = await privateApi.get<JsonApiIndexResponse>(
+      `${API_PREFIX}/events/my_events`
+    );
+    const resources = Array.isArray(res.data.data) ? res.data.data : [];
+    return resources.map((r) => normalizeEvent(r));
+  },
+
   // Create (expects { event: EventCreateParams } and returns JSON:API event)
   async createEvent(params: EventCreateParams): Promise<Event> {
     const res = await privateApi.post<JsonApiShowResponse>(
@@ -327,11 +335,11 @@ export const EventService = {
   /**
    * Global/debug listing of ALL EventAmigoConnectors.
    * Hits: GET /api/v1/event_amigo_connectors
-   * (You will need a matching top-level route in Rails.)
+   * (You need a matching top-level route in Rails for this to work.)
    */
   async fetchAllEventAmigoConnectors(): Promise<EventAmigoConnector[]> {
     const res = await privateApi.get(
-      `${API_PREFIX}/event_amigo_connectors`,
+      `${API_PREFIX}/event_amigo_connectors`
     );
     const payload: any = res.data;
 
@@ -339,7 +347,6 @@ export const EventService = {
     if (payload && Array.isArray(payload.data)) return payload.data;
     return [];
   },
-
 
   async fetchAllEventLocationConnectors(): Promise<any[]> {
     const res = await privateApi.get(
@@ -351,6 +358,27 @@ export const EventService = {
     if (payload && Array.isArray(payload.data)) return payload.data;
     return [];
   },
+
+  /**
+   * Global/debug listing of ALL EventAmigoConnectors.
+   * Hits: GET /api/v1/event_amigo_connectors
+   * (You will need a matching top-level route in Rails.)
+   */
+
+  async updateEventAmigoConnectorRole(
+    eventId: number,
+    connectorId: number,
+    role: "participant" | "assistant_coordinator" | "lead_coordinator"
+  ): Promise<EventAmigoConnector> {
+    const res = await privateApi.patch(
+      `${API_PREFIX}/events/${eventId}/event_amigo_connectors/${connectorId}`,
+      {
+        event_amigo_connector: { role },
+      }
+    );
+    return res.data;
+  },
+
 
   async leave(eventId: number): Promise<any> {
     // Example: DELETE /events/:id/leave

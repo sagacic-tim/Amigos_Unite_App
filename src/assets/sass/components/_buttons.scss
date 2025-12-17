@@ -95,7 +95,7 @@
 .button--danger {
   background-color: var(--danger-button-bg-color);
   color: var(--danger-button-label-color);
-  max-width: 160px;
+  max-width: 180px;
 
   &:hover:not(:disabled) {
     background-color: var(--danger-button-hover-bg-color);
@@ -106,6 +106,22 @@
     color: var(--danger-button-disabled-label-color);
   }
 }
+
+.button--spotlight {
+  background-color: var(--button-spotlight-bg-color);
+  color: var(--button-spotlight--label-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--button-spotlight-hover-bg-color);
+    color: var(--button-spotlight-hover-label-color);
+  }
+
+  &:disabled {
+    background-color: var(--button-spotlight-disabled-bg-color);
+    color: var(--button-spotlight-disabled-label-color);
+  }
+}
+
 
 .button--outline {
   background: transparent;

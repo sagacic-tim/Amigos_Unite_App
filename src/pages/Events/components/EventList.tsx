@@ -25,32 +25,19 @@ const EventList: React.FC<EventListProps> = ({ variant = "public" }) => {
         setLoading(true);
         setError(null);
 
-        const data = await EventService.fetchEvents();
+        // For "manage" view, ask the API for only the events the current amigo can manage.
+        // For public view (or when not logged in), fall back to the public events index.
+        const data =
+          variant === "manage" && currentAmigo
+            ? await EventService.fetchMyEvents()
+            : await EventService.fetchEvents();
+
         console.log("Raw events from API", data);
-        let filtered = data;
 
-        if (variant === "manage" && currentAmigo) {
-          const myId = currentAmigo.id;
-
-          filtered = data.filter((ev) => {
-            if (ev.lead_coordinator_id === myId) return true;
-            if (ev.lead_coordinator && ev.lead_coordinator.id === myId) {
-              return true;
-            }
-
-            if (ev.event_amigo_connectors?.length) {
-              return ev.event_amigo_connectors.some((conn) => {
-                if (conn.amigo_id !== myId) return false;
-                return (
-                  conn.role === "lead_coordinator" ||
-                  conn.role === "assistant_coordinator"
-                );
-              });
-            }
-
-            return false;
-          });
-        }
+        // At this point, data is already appropriately scoped:
+        // - "manage" → only manageable events (handled by the backend)
+        // - "public" → all public events
+        const filtered = data;
 
         if (mounted) setEvents(filtered);
       } catch (err) {
