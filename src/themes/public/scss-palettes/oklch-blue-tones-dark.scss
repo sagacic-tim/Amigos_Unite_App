@@ -1,0 +1,17 @@
+/* src/themes/public/scss-palettes/oklch-blue-tones-dark.scss */
+
+@use '../../../assets/sass/abstracts/variables' as tokens;
+@use '../../_theme-builder' as tb;
+
+@include tb.emit-theme-dark(
+  tokens.$oklch-site-palette,
+  tokens.$oklch-neutrals,
+  $brand:   base-blue,
+  $accent:  base-orange,
+  $success: base-shamrock-green,
+  $warning: base-yellow-orange,
+  $error:   base-red,
+  $info:    base-cobalt-blue,
+  $alert:   base-red-orange,
+  $space:   oklch
+);

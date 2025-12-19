@@ -1,22 +1,21 @@
-// src/App.scss
+/* src/App.scss */
 
-// Abstract files
-@import "./assets/sass/abstracts/all";
+/* 1) abstracts / tokens */
+@use './assets/sass/abstracts' as tokens;
 
-// Base files
-@import "./assets/sass/base/all";
+/* 2) reset (emits CSS) */
+@use './assets/sass/base/reset.emit';
 
-// Components
-@import "./assets/sass/components/all";
+/* 3) base: ensure these emit :root + base + type */
+@use './assets/sass/base/root';
+@use './assets/sass/base/base';
+@use './assets/sass/base/typography';
 
-// Layout
-@import "./assets/sass/layout/all";
+/* 4) layout primitives */
+@use './assets/sass/layout' as * ;
 
-// Pages
-@import "./assets/sass/pages/all";
+/* 5) navigation primitives */
+@use './assets/sass/navigation';
 
-// Theme
-// @import "./assets/sass/theme/all";
-
-// Vendor Files
-// @import "./assets/sass/vendor/all";
+/* 6) components & utilities */
+@use './assets/sass/components' as *;

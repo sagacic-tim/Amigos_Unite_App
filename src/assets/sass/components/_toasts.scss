@@ -1,0 +1,190 @@
+
+/* src/assets/sass/components/_toasts.scss */
+
+/* -------------------------------------------------
+   Container(s): fixed stacks in common corners
+   ------------------------------------------------- */
+.toast-container {
+  /* knobs you can override per instance */
+  --toast-gap: var(--spacing-sm);
+  --toast-z: var(--z-overlay);
+
+  position: fixed;
+  inset-block-start: auto;
+  inset-block-end: var(--spacing-md);
+  inset-inline-start: auto;
+  inset-inline-end: var(--spacing-md);
+  display: grid;
+  gap: var(--toast-gap);
+  z-index: var(--toast-z);
+  pointer-events: none; /* let toasts receive events, not the container */
+}
+
+/* Position variants */
+.toast-container--top-left     { inset-block-start: var(--spacing-md);  inset-inline-start: var(--spacing-md);  inset-block-end: auto; inset-inline-end: auto; }
+.toast-container--top-right    { inset-block-start: var(--spacing-md);  inset-inline-end:  var(--spacing-md);  inset-block-end: auto; inset-inline-start: auto; }
+.toast-container--bottom-left  { inset-block-end:  var(--spacing-md);   inset-inline-start: var(--spacing-md); inset-block-start: auto; inset-inline-end: auto; }
+.toast-container--bottom-right { inset-block-end:  var(--spacing-md);   inset-inline-end:  var(--spacing-md); inset-block-start: auto; inset-inline-start: auto; }
+
+/* -------------------------------------------------
+   Toast: base + slots
+   ------------------------------------------------- */
+.toast {
+  /* component knobs (override inline or on container) */
+  --toast-width: min(420px, 90vw);
+  --toast-padding: var(--spacing-sm);
+  --toast-radius: var(--border-radius-base);
+  --toast-shadow: var(--shadow-sm);
+  --toast-bg: var(--secondary-surface-bg-color-1);
+  --toast-fg: var(--primary-text-color);
+  --toast-border: var(--primary-border-color);
+  --toast-accent: var(--accent-color);
+  --toast-duration: 4.5s;   /* used for progress bar/auto-dismiss animation */
+
+  inline-size: var(--toast-width);
+  color: var(--toast-fg);
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-border);
+  border-radius: var(--toast-radius);
+  box-shadow: var(--toast-shadow);
+  overflow: hidden;
+  pointer-events: auto; /* re-enable inside */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--spacing-sm);
+  padding: var(--toast-padding);
+}
+
+/* Accent stripe (left) */
+.toast::before {
+  content: '';
+  inline-size: 4px;
+  block-size: 100%;
+  background: var(--toast-accent);
+  border-start-start-radius: var(--toast-radius);
+  border-end-start-radius: var(--toast-radius);
+  align-self: stretch;
+  justify-self: start;
+}
+
+/* Slots */
+.toast__icon   { align-self: start; inline-size: 1.25rem; block-size: 1.25rem; margin-inline: var(--spacing-xs); }
+.toast__body   { min-inline-size: 0; display: grid; gap: var(--spacing-xxs); }
+.toast__title  { margin: 0; font-weight: var(--font-weight-semibold); }
+.toast__text   { margin: 0; color: var(--secondary-text-color); }
+.toast__close  {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--border-radius-sm);
+  display: grid;
+  place-items: center;
+  color: inherit;
+  cursor: pointer;
+}
+.toast__close:hover {
+  background: color-mix(in oklab, var(--toast-bg), var(--neutral-white) 12%);
+}
+.toast__close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* Optional action row (buttons/links) */
+.toast__actions {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  gap: var(--spacing-xs);
+  margin-block-start: var(--spacing-xxs);
+}
+
+/* -------------------------------------------------
+   Variants by purpose
+   ------------------------------------------------- */
+.toast--info {
+  --toast-accent: var(--link-color);
+  /* slightly tinted bg for emphasis */
+  --toast-bg: var(--primary-surface-bg-color-1);
+}
+.toast--success {
+  --toast-accent: var(--success-color);
+  --toast-bg: var(--secondary-surface-color-1);
+}
+.toast--warning {
+  --toast-accent: var(--color-warning);
+  --toast-bg: var(--secondary-surface-bg-color-1);
+}
+.toast--error {
+  --toast-accent: var(--color-error);
+  --toast-bg: var(--primary-surface-bg-color-1)
+}
+
+/* Inverse/dark accent (optional) */
+.toast--inverse {
+  --toast-bg: var(--color-header);
+  --toast-fg: var(--neutral-white);
+  --toast-border: var(--primary-border-color) 
+}
+
+/* Compact density */
+.toast--compact { --toast-padding: var(--spacing-xs); }
+
+/* -------------------------------------------------
+   Motion: enter/exit + progress
+   ------------------------------------------------- */
+
+/* Keyframes */
+@keyframes toast-in-right {
+  from { transform: translateX(12px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes toast-in-left {
+  from { transform: translateX(-12px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+@keyframes toast-out {
+  to { transform: translateY(6px); opacity: 0; }
+}
+@keyframes toast-progress {
+  from { inline-size: 100%; }
+  to   { inline-size: 0%; }
+}
+
+/* Direction-aware enter animation (based on container position) */
+.toast-container--top-right  .toast,
+.toast-container--bottom-right .toast { animation: toast-in-right 180ms var(--transition-ease); }
+.toast-container--top-left   .toast,
+.toast-container--bottom-left  .toast { animation: toast-in-left  180ms var(--transition-ease); }
+
+/* Exit state (apply when removing; JS toggles .is-leaving) */
+.toast.is-leaving { animation: toast-out 160ms var(--transition-ease) forwards; }
+
+/* Progress bar (auto-dismiss indicator) */
+.toast__progress {
+  grid-column: 1 / -1;
+  block-size: 3px;
+  inline-size: 100%;
+  background: color-mix(in oklab, var(--toast-accent), transparent 70%);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+.toast__progress::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  block-size: 100%;
+  inline-size: 100%;
+  background: var(--toast-accent);
+  animation: toast-progress var(--toast-duration) linear forwards;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.is-leaving { animation: none !important; }
+  .toast__progress::after { animation-duration: 0.01ms; }
+}

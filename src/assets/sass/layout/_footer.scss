@@ -1,0 +1,143 @@
+/* Empty */
+/* src/assets/sass/layout/_footer.scss */
+
+/* ---------------------------------------
+   Site Footer (page shell)
+   --------------------------------------- */
+.site-footer {
+  /* Footer-scoped knobs (default to your design tokens) */
+  --footer-bg: var(--secondary-surface-bg-color-1);
+  --footer-fg: var(--secondary-text-color);
+  --footer-border-color: var(--secondary-border-color);
+  --footer-link-color: var(--link-color);
+  --footer-link-hover-color: var(--link-color-hover);
+
+  background: var(--footer-bg);
+  color: var(--footer-fg);
+  border-top: 1px solid var(--footer-border-color);
+  padding-block: var(--spacing-lg);
+  position: relative;
+
+  &__nav {
+    font-size: var(--font-size-lg);
+
+    &__item {
+      margin-right: 6px;
+      text-decoration: none !important;
+      outline: none;
+    }
+  }
+
+  &__copy {
+    font-size: var(--font-size-lg);
+  }
+}
+
+/* Constrain inner content to your container width */
+.site-footer__inner {
+  max-inline-size: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--spacing-md);
+
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: 1fr; /* mobile-first */
+}
+
+/* Increase columns as space allows */
+@media (min-width: 768px) {    /* md */
+  .site-footer__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {   /* lg */
+  .site-footer__inner { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Generic section block */
+.site-footer__section {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+/* Section headings */
+.site-footer__heading {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--secondary-heading-color);
+}
+
+/* Lists inside sections */
+.footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+/* Social icons (optional) */
+.footer-social {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  gap: var(--spacing-sm);
+}
+.footer-social a {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--border-radius-sm);
+  background: color-mix(in oklab, var(--footer-bg), var(--neutral-white) 6%);
+}
+.footer-social a:hover {
+  background: color-mix(in oklab, var(--footer-bg), var(--neutral-white) 12%);
+}
+
+/* Bottom bar: legal/meta row */
+.site-footer__bottom {
+  margin: var(--spacing-lg) var(--spacing-md) 0;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--footer-border-color);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+}
+
+/* Back-to-top (optional) */
+.footer-back-to-top {
+  text-decoration: none;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+}
+.footer-back-to-top:hover {
+  background: color-mix(in oklab, var(--footer-bg), var(--neutral-white) 10%);
+}
+
+/* ---------------------------------------
+   Variants
+   --------------------------------------- */
+
+/* More compact footer */
+.site-footer--compact {
+  padding-block: var(--spacing-md);
+  .site-footer__bottom { margin-top: var(--spacing-md); }
+}
+
+/* Inverse/dark variant using your header/brand tokens */
+.site-footer--inverse {
+  --footer-bg: var(--color-header);
+  --footer-fg: var(--neutral-white);
+  --footer-border-color: color-mix(in oklab, var(--color-header), black 20%);
+  --footer-link: var(--neutral-white);
+  --footer-link-hover: var(--link-color-hover-light);
+}
+
+/* Remove the divider if the design calls for a seamless edge */
+.site-footer--no-divider { border-top: 0; }

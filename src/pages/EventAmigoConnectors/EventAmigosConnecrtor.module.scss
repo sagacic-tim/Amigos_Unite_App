@@ -1,0 +1,21 @@
+
+// src/assets/sass/components/_eventAmigoConnectors.scss
+@use '../layout/grid' as default-grid;
+
+.event-amigo-connector-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+
+  .amigo-details {
+    margin-top: 10px;
+    img {
+      max-width: 100px;
+      border-radius: 50%;
+    }
+  }
+}
+
+.event-amigo-connector-list {
+  @include default-grid.grid-layout(); // Using the grid layout mixin
+}

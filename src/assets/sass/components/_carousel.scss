@@ -1,0 +1,49 @@
+/* Empty */
+@use '../abstracts' as tokens;
+
+.carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-md);
+  background: var(--primary-surface-bg-color-1);
+
+  &__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    transition: transform var(--transition-duration) var(--transition-ease);
+    will-change: transform;
+  }
+
+  &__slide { inline-size: 100%; block-size: 100%; }
+
+  &__nav {
+    position: absolute; inset: 0 0 0 0; pointer-events: none;
+
+    .carousel__btn {
+      pointer-events: all;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: var(--lightbox-bg-color);
+      border: 1px solid var(--color-divider);
+      border-radius: var(--border-radius-base);
+      padding: .4rem .6rem;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+    }
+    .is-prev { left: .5rem; }
+    .is-next { right: .5rem; }
+  }
+
+  &__dots {
+    display: flex; gap: .4rem; justify-content: center;
+    position: absolute; inset-inline: 0; bottom: .5rem;
+
+    button {
+      inline-size: .5rem; block-size: .5rem; border-radius: 50%;
+      border: 1px solid var(--color-divider);
+      background-image: var(--color-button-gradient-background);
+      &.is-active { background-image: var(--color-button-gradient-background-active); }
+    }
+  }
+}

@@ -1,37 +1,157 @@
 // src/assets/sass/components/_buttons.scss
-button {
-  border-radius: 8px;
+@use '../abstracts' as tokens;
+
+/* Block */
+.button {
+  align-items: center;
+  border-radius: var(--border-radius-md);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  align-content: center;
-  background-color: #1a1a1a;
   cursor: pointer;
-  display: flex;
-  font-family: inherit;
-  font-weight: 500;
-  height: 2.50rem;
+  display: inline-flex;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  font: inherit;
   justify-content: center;
-  justify-self: center;
-  line-height: 1.25rem;
-  padding: 0.5rem;
-  transition: border-color 0.35s, color 0.55s, background-color 0.45s;
-  width: 200px;
-}
+  line-height: 1.25;
+  margin: 0;
+  padding: var(--spacing-xs) var(--spacing-md);
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
-button:hover {
-  border-color: #646cff;
-  color: #fff;
-  background-color: #2f2f2f;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  button {
-    background-color: #d9d9d9;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .6;
   }
+
+  /* keyboard focus */
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color, #5b9dd9);
+    outline-offset: 2px;
+  }
+}
+
+/* Modifiers */
+.button--primary {
+  background-color: var(--primary-button-bg-color);
+  color: var(--primary-button-label-color);
+  max-width: 180px;
+  min-width: 0;
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-button-hover-bg-color);
+    color: var(--primary-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--primary-button-disabled-bg-color);
+    color: var(--primary-button-disabled-label-color);
+  }
+}
+
+.button--secondary {
+  background-color: var(--secondary-button-bg-color);
+  border-color: var(--secondary-border-color);
+  border-style: solid;
+  border-width: var(--border-width);
+  color: var(--secondary-button-label-color);
+  max-width: 180px;
+  min-width: 0;
+
+  &:hover:not(:disabled) {
+    background-color: var(--secondary-button-hover-bg-color);
+    color: var(--secondary-button-hover-label-color);
+  }
+}
+
+.button--cancel {
+  background-color: var(--cancel-button-bg-color);
+  color: var(--cancel-button-label-color);
+  max-width: 160px;
+
+  &:hover:not(:disabled) {
+    background-color: var(--cancel-button-hover-bg-color);
+    color: var(--cancel-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--cancel-button-disabled-bg-color);
+    color: var(--cancel-button-disabled-label-color);
+  }
+}
+
+.button--warning {
+  background-color: var(--warning-button-bg-color);
+  color: var(--warning-button-label-color);
+  max-width: 160px;
+
+  &:hover:not(:disabled) {
+    background-color: var(--warning-button-hover-bg-color);
+    color: var(--warning-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--warning-button-disabled-bg-color);
+    color: var(--warning-button-disabled-label-color);
+  }
+}
+
+.button--danger {
+  background-color: var(--danger-button-bg-color);
+  color: var(--danger-button-label-color);
+  max-width: 180px;
+
+  &:hover:not(:disabled) {
+    background-color: var(--danger-button-hover-bg-color);
+    color: var(--danger-button-hover-label-color);
+  }
+  &:disabled {
+    background-color: var(--danger-button-disabled-bg-color);
+    color: var(--danger-button-disabled-label-color);
+  }
+}
+
+.button--spotlight {
+  background-color: var(--button-spotlight-bg-color);
+  color: var(--button-spotlight--label-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--button-spotlight-hover-bg-color);
+    color: var(--button-spotlight-hover-label-color);
+  }
+
+  &:disabled {
+    background-color: var(--button-spotlight-disabled-bg-color);
+    color: var(--button-spotlight-disabled-label-color);
+  }
+}
+
+
+.button--outline {
+  background: transparent;
+  color: var(--primary-text-color);
+  border-color: currentColor;
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-surface-bg-color);
+  }
+}
+
+.button--link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--link-color);
+  text-decoration: underline;
+
+  &:hover:not(:disabled) {
+    color: var(--link-hover-color);
+  }
+}
+
+/* Size modifiers */
+.button--sm {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xxs) var(--spacing-sm);
+}
+
+.button--lg {
+  font-size: var(--font-size-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
 }

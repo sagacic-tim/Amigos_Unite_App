@@ -1,0 +1,33 @@
+/* src/assets/sass/navigation/_breadcrumbs.scss */
+
+.breadcrumbs {
+  font-size: var(--font-size-sm);
+  color: var(--secondary-text-color);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.breadcrumbs__item {
+  display: flex;
+  align-items: center;
+
+  &::after {
+    content: '/';
+    margin-inline: var(--spacing-xs);
+    color: var(--color-divider);
+  }
+
+  &:last-child::after {
+    content: '';
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--link-color);
+
+    &:hover {
+      color: var(--link-hover-color);
+    }
+  }
+}

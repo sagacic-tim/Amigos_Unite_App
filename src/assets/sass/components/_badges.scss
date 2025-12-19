@@ -1,0 +1,18 @@
+@use '../abstracts' as tokens;
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  border: 1px solid var(--primary-border-color);
+  color: var(--primary-text-color);
+  background: var(--primary-surface-color);
+}
+
+.badge.-success { border-color: var(--success-color); }
+.badge.-warning { border-color: var(--warning-color); }
+.badge.-error   { border-color: var(--error-color); }
+.badge.-info    { border-color: var(--info-color); }
+.badge.-alert   { border-color: var(--alert-color); }

@@ -1,0 +1,26 @@
+/* src/assets/sass/navigation/_main-nav.scss */
+
+/* Navigation: Main Nav (Primary Site Navigation) */
+.main-nav {
+  display: flex;
+  gap: var(--spacing-md);
+
+  a {
+    background-color: var(--nav-item-bg-color);
+    text-decoration: none;
+    padding: var(--spacing-xxs) var(--spacing-xs);
+    color: var(--nav-item-text-color);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--border-radius-sm);
+    transition: color 0.5s, background-color 0.5s;
+
+    &:hover {
+      background: var(--nav-item-hover-bg-color);
+      color: var(--nav-item-hover-text-color);
+    }
+    &.is-active {
+      background: var(--nav-item-active-bg-color);
+      color: var(--nav-item-active-text-color);
+    }
+  }
+}

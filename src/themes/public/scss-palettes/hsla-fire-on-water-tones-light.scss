@@ -1,0 +1,17 @@
+/* src/themes/public/scss-palettes/hsla-blue-tones-light.scss */
+
+@use '../../../assets/sass/abstracts/variables' as tokens;
+@use '../../_theme-builder' as tb;
+
+@include tb.emit-theme-light(
+  tokens.$hsla-site-palette,
+  tokens.$hsla-neutrals,
+  $brand:   base-red,
+  $accent:  base-turquoise-blue,
+  $success: base-shamrock-green,
+  $warning: base-yellow-orange,
+  $error:   base-red,
+  $info:    base-cobalt-blue,
+  $alert:   base-red-orange,
+  $space:   hsl
+);

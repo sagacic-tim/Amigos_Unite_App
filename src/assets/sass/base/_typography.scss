@@ -1,24 +1,118 @@
 // src/assets/sass/base/_typography.scss
+@use '../abstracts/mixins' as mixins;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+
+/* Base prose */
+.prose,
+.prose :where(p, li, dd, figcaption, caption) {
+  font-kerning: normal;
+  font-feature-settings: "kern","liga";
+  font-size-adjust: 0.545;
+
+  /* hyphenation + breaking */
+  hyphens: auto;
+  -webkit-hyphens: auto; /* Safari */
+  /* -ms-hyphens: auto;   ← only if you care about legacy Edge/IE */
+
+  text-align: justify;     /* required for text-justify to do anything */
+  text-align-last: left;
+  text-wrap: pretty;       /* ignored where unsupported */
+
+  overflow-wrap: break-word;
+  word-spacing: -1px;
+  letter-spacing: -0.5px;
+  text-justify: inter-character;
 }
 
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-@media (prefers-color-scheme: light) {
-  a:hover {
-    color: #747bff;
+/* Prefer inter-character where supported (Firefox) */
+@supports (text-justify: inter-character) {
+  .prose,
+  .prose :where(p, li, dd, figcaption, caption):lang(en) {
+    text-justify: inter-character;
   }
 }
-  
-/* Additional typography styles here */
+
+/* Base text spacing */
+p {
+  color: var(--primary-text-color);
+  font-size: var(--font-size-base);
+  margin-block: var(--spacing-sm) 0;
+}
+
+
+/* Per-heading from CSS variables (unitless line-height = proportional) */
+@each $tag in h1, h2, h3, h4, h5, h6 {
+  #{$tag} {
+    font-size: var(--font-size-#{$tag});
+    font-weight: var(--font-weight-#{$tag});
+    letter-spacing: var(--letter-spacing-#{$tag}, var(--letter-spacing-base));
+    line-height: var(--line-height-#{$tag});
+    margin: 0 0 var(--spacing-sm); // optional rhythm
+  }
+}
+
+/* Global link styles */
+a[href] {
+  @include mixins.link-reset();
+  @include mixins.link-colors();
+}
+
+/* Lists */
+ul, ol {
+  margin: 0 0 var(--spacing-sm);
+  padding-inline-start: 1.25rem;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+/* Blockquote */
+blockquote {
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-inline-start: 4px solid var(--primary-border-color);
+  background: var(--secondary-container-bg-color-1);
+  color: var(--primary-text-color);
+}
+
+/* Code styles */
+code, kbd, samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+  background: var(--secondary-container-bg-color-1);
+  padding: 0.1em 0.3em;
+  border-radius: var(--border-radius-sm);
+}
+
+pre {
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-sm);
+  background: var(--primary-surface-bg-1);
+  border: 1px solid var(--secondary-border-color);
+  border-radius: var(--border-radius-md);
+  overflow-x: auto;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+/* Inline text helpers */
+small { font-size: 0.875em; }
+strong { font-weight: var(--font-weight-semibold); }
+em { font-style: italic; }
+
+/* Selection color */
+::selection {
+  background: var(--primary-surface-color-1);
+}
+
+/* Horizontal rule */
+hr {
+  border: 0;
+  border-top: 1px solid var(--primary-border-color);
+  margin: var(--spacing-md) 0;
+}

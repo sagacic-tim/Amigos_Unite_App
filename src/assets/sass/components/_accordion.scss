@@ -1,0 +1,29 @@
+
+@use '../abstracts' as tokens;
+
+.accordion {
+  border: 1px solid var(--primary-border-color);
+  border-radius: var(--border-radius);
+  background: var(--primary-surface-bg-color);
+  overflow: hidden;
+}
+
+.accordion__item + .accordion__item {
+  border-top: 1px solid var(--secondary-border-color);
+}
+
+.accordion__header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .75rem 1rem;
+  background: var(--secondary-surface-color);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
+
+.accordion__icon { transition: transform var(--transition-duration) var(--transition-ease); }
+.accordion__item.is-open .accordion__icon { transform: rotate(90deg); }
+
+.accordion__panel {
+  display: grid;
+  padding: .75rem 1rem;
+}

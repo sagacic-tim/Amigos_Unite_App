@@ -1,43 +1,22 @@
 // src/assets/sass/base/_base.scss
-:root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
-  
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
-  
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+// Purpose: Apply project tokens to the now-normalized DOM.
 
-  .root-container {
-    margin: 1rem;
-  }
-  
-  body {
-    min-height: 100vh;
-    min-width: 320px;
-    padding: 1.0rem !important;
-    place-items: center;
-  }
+html {
+  /* 100% = the UA default (usually 16px) → respects user/OS settings */
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%; /* iOS zoom quirks */
+  text-size-adjust: 100%;
+}
 
-  .page-container {
-    align-content: space-around;
-    display: grid;
-    grid-gap: 0.75rem;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    justify-content: start;
-  }
-  
-  @media (prefers-color-scheme: light) {
-    :root {
-      color: #213547;
-      background-color: #ffffff;
-    }
-  }
-  
+body {
+  font-size: 1rem;              /* 1rem now maps to the html size */
+  line-height: var(--line-height-base, 1.5);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-regular);
+  color: var(--primary-text-color);
+  background-color: var(--primary-container-bg-color-1);
+  min-height: 100vh;
+  min-width: 320px;
+  margin: 0;
+  padding: 0;
+}

@@ -1,0 +1,167 @@
+
+/* src/assets/sass/media/_image-container.scss */
+
+/* Responsive image wrapper
+   - Works with <img> or <picture><img/></picture>
+   - Uses aspect-ratio where supported with a padding-top fallback
+   - Fully token-driven via runtime CSS variables
+*/
+.image-container {
+  /* Component knobs (override per instance as needed) */
+  --image-radius: var(--border-radius-base);
+  --image-border: var(--color-divider);
+  --image-shadow: var(--shadow-sm);
+  --image-bg: var(--color-surface);
+
+  /* Ratio knobs (modern path) */
+  --ratio: auto;            /* e.g., 16 / 9, 4 / 3, or 'auto' to use intrinsic ratio */
+
+  /* Fallback ratio percentage (legacy path) */
+  --ratio-pct: 0%;          /* e.g., 56.25% for 16:9 */
+
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  background: var(--image-bg);
+  border: 1px solid var(--image-border);
+  border-radius: var(--image-radius);
+  box-shadow: var(--image-shadow);
+  overflow: hidden;
+}
+
+/* Modern aspect-ratio support */
+@supports (aspect-ratio: 1 / 1) {
+  .image-container {
+    /* If you want to force a box, set --ratio to something other than 'auto' */
+    aspect-ratio: var(--ratio);
+    min-block-size: 120px;  /* prevents ultra-thin boxes */
+  }
+
+  .image-container > img,
+  .image-container > picture > img {
+    inline-size: 100%;
+    block-size: 100%;
+    display: block;
+    border: 0;
+    object-fit: cover;      /* default; see fit variants below */
+  }
+}
+
+/* Fallback for browsers without aspect-ratio */
+@supports not (aspect-ratio: 1 / 1) {
+  .image-container::before {
+    content: "";
+    display: block;
+    block-size: 0;
+    padding-block-start: var(--ratio-pct);
+  }
+
+  .image-container > img,
+  .image-container > picture > img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    display: block;
+    object-fit: cover;
+  }
+}
+
+/* Caption pattern (optional) */
+.image-container__caption {
+  display: block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+  background: color-mix(in oklab, var(--color-surface), var(--neutral-white) 6%);
+  border-top: 1px solid var(--color-divider);
+}
+
+/* Overlay slot (badges, icon buttons, etc.) */
+.image-container__overlay {
+  position: absolute;
+  inset: var(--spacing-xs);
+  display: grid;
+  align-content: start;
+  justify-content: end;
+  gap: var(--spacing-xxs);
+  pointer-events: none; /* let explicit overlay children re-enable */
+}
+
+/* -----------------------------------------
+   Fit & density variants
+   ----------------------------------------- */
+.image-container--fit-cover   img { object-fit: cover; }
+.image-container--fit-contain img { object-fit: contain; background: var(--image-bg); }
+.image-container--fit-fill    img { object-fit: fill; }
+.image-container--fit-scale   img { object-fit: scale-down; }
+
+/* Predefined ratio helpers (both modern and fallback) */
+.image-container--1x1  { --ratio: 1 / 1;   --ratio-pct: 100%; }
+.image-container--4x3  { --ratio: 4 / 3;   --ratio-pct: 75%; }
+.image-container--3x2  { --ratio: 3 / 2;   --ratio-pct: 66.6667%; }
+.image-container--16x9 { --ratio: 16 / 9;  --ratio-pct: 56.25%; }
+.image-container--21x9 { --ratio: 21 / 9;  --ratio-pct: 42.8572%; }
+
+/* Elevation & radius tweaks */
+.image-container--flat   { --image-shadow: none; }
+.image-container--raised { --image-shadow: var(--shadow-md); }
+.image-container--round  { --image-radius: var(--border-radius-lg); }
+
+/* Clickable/zoom affordance */
+.image-container--interactive {
+  cursor: zoom-in;
+  transition:
+    transform var(--transition-duration) var(--transition-ease),
+    box-shadow var(--transition-duration) var(--transition-ease),
+    background var(--transition-duration) var(--transition-ease);
+}
+.image-container--interactive:hover {
+  box-shadow: var(--shadow-md);
+  background: color-mix(in oklab, var(--image-bg), var(--neutral-white) 6%);
+}
+.image-container--interactive:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color), var(--image-shadow);
+}
+
+/* -----------------------------------------
+   Lazy-loading shimmer (optional)
+   Add .is-loading on wrapper until the image loads,
+   then swap to .is-loaded in your JS/image onload handler.
+   ----------------------------------------- */
+@keyframes image-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.image-container.is-loading {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--image-bg), var(--neutral-white) 10%) 0%,
+    color-mix(in oklab, var(--image-bg), var(--neutral-white) 25%) 20%,
+    color-mix(in oklab, var(--image-bg), var(--neutral-white) 10%) 40%
+  );
+  background-size: 200% 100%;
+  animation: image-shimmer 1.2s var(--transition-ease) infinite;
+}
+.image-container.is-loading img {
+  opacity: 0;
+}
+
+/* Blur-up (optional): start blurred, fade+sharpen when loaded */
+.image-container img {
+  transition: opacity 240ms var(--transition-ease), filter 240ms var(--transition-ease);
+  filter: blur(6px);
+  opacity: 0.01;
+}
+.image-container.is-loaded img {
+  filter: blur(0);
+  opacity: 1;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .image-container,
+  .image-container img { transition: none !important; animation: none !important; }
+}

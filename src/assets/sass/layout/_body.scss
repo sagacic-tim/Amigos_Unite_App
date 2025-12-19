@@ -1,1 +1,86 @@
+/* src/assets/sass/layout/_body.scss */
 
+/* ---------------------------------------
+   Page-level knobs (layout-only)
+   --------------------------------------- */
+:root {
+  /* If you use a sticky header, set its block size here so in-page anchors don't hide under it */
+  --header-offset: 64px;
+
+  /* Optional global inline gutters (0 for true full-bleed) */
+  --page-gutter-inline: 0;
+
+  /* Vertical gap between header/main/footer in the app shell */
+  --shell-gap: var(--spacing-md);
+}
+
+/* ---------------------------------------
+   Document states
+   --------------------------------------- */
+body.is-locked {
+  /* Used while a modal or nav drawer is open */
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* Respect motion preferences; enable smooth scroll only when OK */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Ensure hash-link jumps account for sticky header height */
+:root,
+body {
+  scroll-padding-top: var(--header-offset);
+}
+
+/* Safe-area aware page gutters (iOS notch edges) */
+@supports (padding: max(0px)) {
+  body {
+    padding-inline: max(
+      var(--page-gutter-inline),
+      env(safe-area-inset-left),
+      env(safe-area-inset-right)
+    );
+  }
+}
+
+/* ---------------------------------------
+   App shell scaffold
+   header -> main -> footer
+   --------------------------------------- */
+.app-shell {
+  min-block-size: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--shell-gap);
+}
+
+/* Main content region (full-bleed) */
+.app-main {
+  background-color: var(--primary-surface-bg-color-1);
+  container-name: app;
+  container-type: inline-size;
+
+  display: grid;
+  grid-template-columns: 100%;  // clear and explicit intent
+  grid-auto-flow: row;
+  grid-auto-rows: auto;
+
+  justify-content: center;
+
+  inline-size: 100%;
+  max-inline-size: none;
+  margin: 0 0 30px;
+  padding-inline: var(--page-gutter-inline);
+}
+/* Utility: allow a child section to bleed to the edges even if you set a gutter */
+.app-bleed {
+  /* Pull content to the edges by negating the main’s inline padding */
+  margin-inline: calc(var(--page-gutter-inline) * -1);
+}
+
+/* Optional: when using a translucent/sticky header, add some top breathing room */
+.has-translucent-header .app-main {
+  padding-block-start: var(--spacing-sm);
+}

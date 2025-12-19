@@ -1,0 +1,102 @@
+/* src/assets/sass/components/_modals.scss */
+
+/* OVERLAY */
+.modal {
+
+  align-items: center;      /* vertical centering */
+  background: var(--lightbox-bg-color);
+  display: none; /* shown via .is-open */
+  inset: 0;
+  justify-content: center;  /* horizontal centering */
+  padding: 30px 20px;
+  position: fixed;
+  z-index: var(--z-modal);
+  &.is-open { display: flex; }
+}
+
+/* DIALOG */
+.modal__dialog {
+  /* visuals */
+  background: var(--secondary-surface-bg-color-1);
+  color: var(--primary-text-color);
+  border: 1px solid var(--primary-border-color);
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-lg);
+
+  /* layout */
+  display: flex;
+  flex-direction: column;
+
+  /* CONTENT-DRIVEN SIZE */
+  /* shrink-to-fit, but never exceed available viewport after overlay padding */
+  inline-size: max-content;                                /* content width */
+  max-inline-size: calc(100vw - 20px);                     /* account for 20px L/R overlay padding */
+  max-block-size: calc(100dvh - 30px);                     /* account for 30px T/B overlay padding */
+
+  /* no internal clipping (body will scroll if needed) */
+  overflow: hidden;
+}
+
+/* HEADER/FOOTER (fixed height) */
+.modal__header,
+.modal__footer {
+  background: var(--secondary-surface-color-1);
+  border-bottom: 1px solid var(--secondary-border-color);
+  flex: 0 0 auto;
+  padding: 12px 20px; /* keep horizontal padding aligned with body */
+}
+
+.modal__footer {
+  border-bottom: 0;
+  border-top: 1px solid var(--secondary-border-color);
+}
+
+.modal__title {
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+}
+
+/* BODY (scrolls if needed) */
+.modal__body {
+  flex: 0 1 auto; /* allow dialog to size to content; body should NOT force growth */
+  line-height: var(--line-height-base);
+  min-block-size: 0; /* safe for flex overflow */
+  min-inline-size: 320px;
+  overflow: auto; /* scroll only when content exceeds max-block-size */
+  overscroll-behavior: contain;
+  padding: 30px 20px;
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: thin;
+}
+
+/* Close button (unchanged) */
+.modal__close {
+  background: transparent;
+  border: 0;
+  border-radius: var(--border-radius-sm);
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  line-height: 1;
+  padding: var(--spacing-xs);
+  position: absolute;
+  right: var(--spacing-sm);
+  top: var(--spacing-sm);
+
+  &:hover {
+    background: var(--primary-surface-hover-bg-color-1);
+    color: var(--primary-text-color);
+  }
+}
+
+/* WebKit scrollbars for .modal__body (unchanged) */
+.modal__body::-webkit-scrollbar { background: var(--scrollbar-bg-color); height: 16px; width: 16px; }
+.modal__body::-webkit-scrollbar-track { background: var(--scrollbar-track-color); }
+.modal__body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 999px;
+  border: 4px solid var(--scrollbar-track-color);
+}
+.modal__body::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover-color); }
+.modal__body::-webkit-scrollbar-thumb:active { background: var(--scrollbar-thumb-active-color); }
+.modal__body::-webkit-scrollbar-track:hover { background: var(--scrollbar-track-hover-color); }
+.modal__body::-webkit-scrollbar-corner { background: var(--scrollbar-track-color); }

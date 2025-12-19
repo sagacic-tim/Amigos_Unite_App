@@ -1,0 +1,47 @@
+
+/* src/assets/sass/utilities/_spacing.scss */
+@use 'sass:map';
+@use '../abstracts' as tokens;
+
+/* Your scale keys from :root */
+$steps: (xxs, xs, sm, md, lg, xl, xxl);
+
+/* ---- Padding utilities (logical, namespaced) ---- */
+@mixin emit-spacing($prefix, $prop) {
+  @each $s in $steps {
+    .#{$prefix}-#{$s}  { #{$prop}: var(--spacing-#{$s}) !important; }
+    .#{$prefix}x-#{$s} { #{$prop}-inline: var(--spacing-#{$s}) !important; }
+    .#{$prefix}y-#{$s} { #{$prop}-block:  var(--spacing-#{$s}) !important; }
+    .#{$prefix}t-#{$s} { #{$prop}-block-start: var(--spacing-#{$s}) !important; }
+    .#{$prefix}r-#{$s} { #{$prop}-inline-end:  var(--spacing-#{$s}) !important; }
+    .#{$prefix}b-#{$s} { #{$prop}-block-end:   var(--spacing-#{$s}) !important; }
+    .#{$prefix}l-#{$s} { #{$prop}-inline-start:var(--spacing-#{$s}) !important; }
+  }
+}
+@include emit-spacing('p', 'padding');
+@include emit-spacing('m', 'margin');
+
+/* ---- Gap utilities (for flex/grid) ---- */
+@each $s in $steps {
+  .gap-#{$s}     { gap:        var(--spacing-#{$s}) !important; }
+  .row-gap-#{$s} { row-gap:    var(--spacing-#{$s}) !important; }
+  .col-gap-#{$s} { column-gap: var(--spacing-#{$s}) !important; }
+}
+
+/* ---- Optional: negative margins (use sparingly) ---- */
+@each $s in $steps {
+  .-m-#{$s}  { margin:               calc(var(--spacing-#{$s}) * -1) !important; }
+  .-mx-#{$s} { margin-inline:        calc(var(--spacing-#{$s}) * -1) !important; }
+  .-my-#{$s} { margin-block:         calc(var(--spacing-#{$s}) * -1) !important; }
+}
+
+/* ---- Responsive variants (subset to limit bloat) ---- */
+@each $bp, $width in tokens.$breakpoints {
+  @media (min-width: #{$width}) {
+    @each $s in $steps {
+      .#{$bp}\:p-#{$s}   { padding: var(--spacing-#{$s}) !important; }
+      .#{$bp}\:m-#{$s}   { margin:  var(--spacing-#{$s}) !important; }
+      .#{$bp}\:gap-#{$s} { gap:     var(--spacing-#{$s}) !important; }
+    }
+  }
+}

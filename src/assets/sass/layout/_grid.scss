@@ -1,8 +1,75 @@
 // src/assets/sass/layout/_grid.scss
+@use '../abstracts' as tokens;
 
 /* Grid Layout */
-@mixin grid-layout($columns: 1fr, $gap: 20px) {
+@mixin grid-layout(
+  $columns: repeat(auto-fit, minmax(380px, 1fr)),
+  $gap: 20px
+) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  grid-gap: $gap;
+  grid-template-columns: $columns;
+  gap: $gap;
+}
+
+.grid {
+  display: grid;
+  gap: var(--grid-gap);
+}
+
+.grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Cards grid mixin
+   - auto-fit columns based on available width
+   - each track prefers >= $min-card, card itself capped at $ideal-card
+*/
+@mixin cards-grid(
+  $min-card: 340px,
+  $ideal-card: 380px,
+  $gap: 20px
+) {
+  display: grid;
+  gap: $gap;
+  align-items: stretch;
+  justify-content: space-around;
+
+  // ✅ VALID: let the track grow up to 1fr; cap the card itself below.
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax($min-card, 1fr)
+  );
+
+  // Direct .card children
+  > .card {
+    width: 100%;
+    max-width: $ideal-card;   // soft cap around 380px
+    justify-self: center;
+  }
+
+  // Optional: <ul class="cards-grid"><li><article class="card">…</article></li></ul>
+  > li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > .card {
+      width: 100%;
+      max-width: $ideal-card;
+      justify-self: center;
+    }
+  }
+}
+
+/* Default cards grid */
+.cards-grid {
+  @include cards-grid(340px, 380px, 20px);
+}
+
+/* Layout-only tweak for very small viewports */
+@media (max-width: 400px) {
+  .cards-grid {
+    grid-template-columns: minmax(0, 1fr); // force a single column
+    justify-content: stretch;
+  }
 }

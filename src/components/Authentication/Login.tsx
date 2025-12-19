@@ -1,71 +1,29 @@
+// src/components/Authentication/Login.tsx
 import React, { useState } from 'react';
-import axiosInstance from '../../services/api';
-import Modal from '../Common/Modal';
-import '../../assets/sass/components/_authentication.scss';
+import '../../pages/Authentication/Authentication.module.scss';
+import { loginAmigo, LoginParams } from '../../services/auth';
+import { Amigo } from '../../types/amigos/AmigoTypes';
+import AuthFormShell from './AuthFormShell';
 
-const Login: React.FC<{ isOpen: boolean; onClose: () => void; onLoginSuccess: () => void }> = ({
+interface LoginProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onLoginSuccess: (amigo: Amigo) => void;
+  notice?: string;
+}
+
+const Login: React.FC<LoginProps> = ({
   isOpen,
   onClose,
   onLoginSuccess,
+  notice,
 }) => {
   const [loginAttribute, setLoginAttribute] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(null);
-
-    if (!loginAttribute || !password) {
-      setErrorMessage('Please fill in all fields.');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await axiosInstance.post('/api/v1/login', {
-        amigo: {
-          login_attribute: loginAttribute,
-          password: password,
-        },
-      });
-
-      if (response.status === 200) {
-        // Check for the content type of the response
-        const contentType = response.headers['content-type'];
-        if (!contentType || !contentType.includes('application/json')) {
-          setErrorMessage('Unexpected response format');
-          return;
-        }
-        console.log('Login response data:', response.data); // Log the entire response
-        const { csrf_token, jwt } = response.data.data || {};
-        if (jwt && csrf_token) {
-          console.log('JWT and CSRF token successfully extracted.');
-      
-          const secureFlag = window.location.protocol === 'https:' ? 'Secure; ' : '';
-          document.cookie = `jwt=${jwt}; Path=/; ${secureFlag}SameSite=None`;
-          document.cookie = `csrf_token=${csrf_token}; Path=/; ${secureFlag}SameSite=None`;
-          onLoginSuccess();
-          onClose();
-        } else {
-          console.error('Failed to extract tokens:', response.data);
-          setErrorMessage('Failed to retrieve authentication tokens.');
-        }
-      } else {
-        handleErrorResponse(response.status);
-      }           
-      
-    } catch (error: any) {
-      if (error.response) {
-        handleErrorResponse(error.response.status);
-      } else {
-        setErrorMessage('An error occurred during login. Please try again later.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleErrorResponse = (status: number) => {
     switch (status) {
@@ -80,35 +38,75 @@ const Login: React.FC<{ isOpen: boolean; onClose: () => void; onLoginSuccess: ()
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMessage(null);
+
+    if (!loginAttribute || !password) {
+      setErrorMessage('Please fill in both fields.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const params: LoginParams = {
+        login_attribute: loginAttribute,
+        password,
+      };
+      const amigo = await loginAmigo(params);
+      onLoginSuccess(amigo);
+      // Parent (AuthModalsHost) closes the modal; no need to call onClose here.
+    } catch (err: any) {
+      if (err.response) {
+        handleErrorResponse(err.response.status);
+      } else {
+        setErrorMessage(
+          'An error occurred during login. Please try again later.',
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-form__label">
-          Username, Email, or Phone No.
-          <input
-            type="text"
-            className="auth-form__input"
-            value={loginAttribute}
-            onChange={(e) => setLoginAttribute(e.target.value)}
-            disabled={loading}
-          />
-        </label>
-        <label className="auth-form__label">
-          Password
-          <input
-            type="password"
-            className="auth-form__input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
-          />
-        </label>
-        <button type="submit" className="auth-form__button" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-        {errorMessage && <p className="auth-form__error-message">{errorMessage}</p>}
-      </form>
-    </Modal>
+    <AuthFormShell
+      isOpen={isOpen}
+      title="Login"
+      notice={notice}
+      errorMessage={errorMessage}
+      isSubmitting={loading}
+      primaryLabel="Login"
+      submittingLabel="Logging in…"
+      onClose={onClose}
+      onSubmit={handleSubmit}
+    >
+      <label className="form-grid__label">
+        Username, Email, or Phone No.
+        <input
+          type="text"
+          className="form-grid__input"
+          value={loginAttribute}
+          onChange={(e) => setLoginAttribute(e.target.value)}
+          disabled={loading}
+          required
+          autoComplete="username"
+        />
+      </label>
+
+      <label className="form-grid__label">
+        Password
+        <input
+          type="password"
+          className="form-grid__input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
+          required
+          autoComplete="current-password"
+        />
+      </label>
+    </AuthFormShell>
   );
 };
 

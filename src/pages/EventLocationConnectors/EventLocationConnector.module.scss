@@ -1,0 +1,16 @@
+
+@use '../layout/grid' as default-grid;
+
+.event-location-connector-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+  
+    .location-details {
+      margin-top: 10px;
+    }
+  }
+  
+  .event-location-connector-list {
+    @include default-grid.grid-layout(); // Using the grid layout mixin
+  }

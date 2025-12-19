@@ -1,0 +1,33 @@
+/* src/assets/sass/components/_tables.scss */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--primary-surface-bg-color);
+  border: 1px solid var(--primary-border-color);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+
+  thead th {
+    text-align: left;
+    background: var(--secondary-surface-bg-color-1);
+    color: var(--primary-text-color);
+    font-weight: var(--font-weight-medium);
+  }
+
+  th,
+  td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--primary-border-color);
+  }
+
+  tbody tr:hover {
+    /* 10% neutral-white over the current surface, mixed perceptually */
+    background: var(--primary-surface-hover-bg-color-1);
+  }
+
+  &.-zebra tbody tr:nth-child(even) {
+    /* Slightly lighter stripe: 6% neutral-white over surface */
+    background: var(--secondary-surface-bg-color-1);
+  }
+}

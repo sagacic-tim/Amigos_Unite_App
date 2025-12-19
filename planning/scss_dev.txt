@@ -1,0 +1,25 @@
+Component-Scoped Styles
+
+Keep your SASS partials alongside each component (e.g. AmigoForm.module.scss) so it’s easy to see which styles apply where.
+
+Use BEM or a similar naming convention to avoid collisions (e.g. .amigo-form__field, .event-button--primary).
+
+Variables & Mixins
+
+Centralize colors, spacings, breakpoints in _variables.scss.
+
+Write mixins for common patterns (buttons, inputs, cards) so each new form or card can “@include button-base;” and tweak just its modifiers.
+
+Responsive Layouts
+
+If you’re using CSS Grid or Flexbox, make sure your layout scales. A small media query in _form.scss can switch from column to row.
+
+Debugging Tip
+
+Turn on the SASS source maps in your build so you can see exactly which .scss file a style came from in the browser’s inspector.
+
+Iterative Testing
+
+Build each form (add location, create event) one at a time.
+
+Hook up the API calls you already have to those forms and verify in the Network tab that the JSON payload matches Rails’ expectations.

@@ -1,48 +1,84 @@
-/* Reset styles to ensure consistency across browsers */
+// ----------------------------------------------------------------------------
+// Reset (Dart Sass 3.x compliant, no @import)
+// - Pure normalization: no project colors/fonts applied here
+// - Uses CSS variables only when needed (e.g., optional scrollbar)
+// - Emit via mixin so caller controls inclusion order
+// ----------------------------------------------------------------------------
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+@use '../abstracts' as tokens;
+
+@mixin reset() {
+  /* 1) Box sizing & margin reset */
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; }
+
+  /* 2) HTML defaults (agent normalization only) */
+  html {
+    /* Do not set brand fonts/colors here */
+    font-kerning: normal;
+    font-size-adjust: none;
+    letter-spacing: 0; /* leave neutral in reset */
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+
+    @media (prefers-reduced-motion: no-preference) {
+      interpolate-size: allow-keywords;
+    }
+  }
+
+  /* 3) Body baseline (agent normalization only) */
+  body {
     margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-}
+    min-height: 100vh;
+    line-height: 1.5; /* neutral, not your design token */
+    -webkit-font-smoothing: antialiased;
+  }
 
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
+  /* 4) Common element rescues */
+  body, h1, h2, h3, h4, p, figure, blockquote, dl, dd { margin-block-end: 0; }
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+  h1, h2, h3, h4, button, input, label { line-height: 1.1; }
+
+  /* Lists */
+  ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
+
+  /* Media */
+  img, picture, video, canvas, svg {
     display: block;
-}
-body {
-    line-height: 1;
-    padding: 0 !important;
-    margin:0 !important;
-}
-ol, ul {
-    list-style: none;
-}
-blockquote, q {
-    quotes: none;
-}
-blockquote:before, blockquote:after,
-q:before, q:after {
-    content: '';
-    content: none;
-}
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Forms */
+  input, button, textarea, select { font: inherit; color: inherit; }
+  textarea:not([rows]) { min-height: 10em; }
+
+  /* Links without class */
+  a:not([class]) {
+    text-decoration-skip-ink: auto;
+    color: currentColor;
+  }
+
+  /* Anchored scroll margin */
+  :target { scroll-margin-block: 5ex; }
+
+  /* Root stacking isolation (SPA frameworks) */
+  #root, #__next { isolation: isolate; }
+
+  /* 5) Optional: custom scrollbars (uses CSS vars, not Sass tokens) */
+  @if tokens.$include-scrollbar {
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb);
+      border-radius: var(--border-radius, 4px);
+      border: 1px solid var(--scrollbar-track);
+    }
+    /* Firefox */
+    * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+  }
 }

@@ -1,98 +1,57 @@
 // src/services/AmigoService.ts
-import axios from 'axios';
-import { Amigo } from '../types/AmigoTypes';
-import { get, post, put, del } from './api'; // Assuming these functions use axios
-import axiosInstance from './api';
+import privateApi from '@/services/api/privateApi';
+import type { Amigo } from '@/types/amigos/AmigoTypes';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'; // Adjust accordingly
-
-// Define the response interface for fetchAmigos
-interface AmigosResponse {
-  amigos: Amigo[];
+// Helpers mirroring AuthContext’s shape handling
+function unwrapAmigosList(payload: any): Amigo[] {
+  if (Array.isArray(payload)) return payload as Amigo[];
+  if (Array.isArray(payload?.amigos)) return payload.amigos as Amigo[];
+  if (Array.isArray(payload?.data)) return payload.data as Amigo[];
+  return [];
 }
 
-// Fetch all amigos
+function unwrapAmigo(payload: any): Amigo {
+  if (payload?.amigo) return payload.amigo as Amigo;
+  if (payload?.data?.amigo) return payload.data.amigo as Amigo;
+  return payload as Amigo;
+}
+
+// ─── fetch all amigos ───────────────────────
 export const fetchAmigos = async (): Promise<Amigo[]> => {
-  try {
-    // Make the request using axiosInstance
-    const response = await axiosInstance.get('/api/v1/amigos', {
-      withCredentials: true, // Ensure credentials are included
-    });
-
-    // Check if the expected data structure is returned
-    if (response.data && Array.isArray(response.data)) {
-      return response.data; // Return the response data directly if it is an array
-    } else if (response.data && response.data.amigos && Array.isArray(response.data.amigos)) {
-      // If the data structure is different, adjust as needed
-      return response.data.amigos;
-    } else {
-      console.error('Unexpected response structure:', response.data);
-      throw new Error('Failed to fetch amigos: Invalid response structure');
-    }
-  } catch (error) {
-    console.error('Error fetching amigos:', error);
-    throw error; // Rethrow the error for higher-level handling
-  }
+  const res = await privateApi.get('/api/v1/amigos', { withCredentials: true });
+  return unwrapAmigosList(res.data);
 };
 
-// Fetch a single amigo by ID
-export const fetchAmigoById = async (id: number) => {
-  try {
-    return await get(`/api/v1/amigos/${id}`);
-  } catch (error) {
-    console.error(`Error fetching amigo with ID ${id}:`, error);
-    throw error;
-  }
+// ─── fetch single amigo ─────────────────────
+export const fetchAmigoById = async (id: number): Promise<Amigo> => {
+  const res = await privateApi.get(`/api/v1/amigos/${id}`, { withCredentials: true });
+  return unwrapAmigo(res.data);
 };
 
-// Fetch amigo details by amigo ID
-export const fetchAmigoDetails = async (amigoId: number) => {
-  try {
-    const response = await axiosInstance.get(`/api/v1/amigos/${amigoId}/amigo_detail`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching Amigo Details: ', error);
-    throw error; // re-throw to handle in the component if needed
-  }
-};
+// ─── fetch amigo details ────────────────────
+export const fetchAmigoDetails = (amigoId: number) =>
+  privateApi
+    .get(`/api/v1/amigos/${amigoId}/amigo_detail`, { withCredentials: true })
+    .then((res) => res.data);
 
-// Fetch amigo locations by amigo ID
-export const fetchAmigoLocations = async (amigoId: number) => {
-  try {
-    const response = await axiosInstance.get(`/api/v1/amigos/${amigoId}/amigo_locations`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching Amigo Address information: ', error);
-    throw error; // re-throw to handle in the component if needed
-  }
-};
+// ─── fetch amigo locations ──────────────────
+export const fetchAmigoLocations = (amigoId: number) =>
+  privateApi
+    .get(`/api/v1/amigos/${amigoId}/amigo_locations`, { withCredentials: true })
+    .then((res) => res.data);
 
-// Create a new amigo
-export const createAmigo = async (amigoData: any) => {
-  try {
-    return await post('/api/v1/amigos', amigoData);
-  } catch (error) {
-    console.error('Error creating amigo:', error);
-    throw error;
-  }
-};
+// ─── create/update/delete ──────────────────
+export const createAmigo = (data: Partial<Amigo>) =>
+  privateApi
+    .post('/api/v1/amigos', { amigo: data }, { withCredentials: true })
+    .then((res) => unwrapAmigo(res.data));
 
-// Update an amigo by ID
-export const updateAmigo = async (id: number, amigoData: any) => {
-  try {
-    return await put(`/api/v1/amigos/${id}`, amigoData);
-  } catch (error) {
-    console.error(`Error updating amigo with ID ${id}:`, error);
-    throw error;
-  }
-};
+export const updateAmigo = (id: number, data: Partial<Amigo>) =>
+  privateApi
+    .put(`/api/v1/amigos/${id}`, { amigo: data }, { withCredentials: true })
+    .then((res) => unwrapAmigo(res.data));
 
-// Delete an amigo by ID
-export const deleteAmigo = async (id: number) => {
-  try {
-    return await del(`/api/v1/amigos/${id}`);
-  } catch (error) {
-    console.error(`Error deleting amigo with ID ${id}:`, error);
-    throw error;
-  }
-};
+export const deleteAmigo = (id: number) =>
+  privateApi
+    .delete(`/api/v1/amigos/${id}`, { withCredentials: true })
+    .then(() => {});

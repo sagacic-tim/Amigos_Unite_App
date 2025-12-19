@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import axiosInstance from '../../services/api';
-import Modal from '../Common/Modal';
-import '../../assets/sass/components/_authentication.scss';
+// src/components/Authentication/Signup.tsx
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import '../../pages/Authentication/Authentication.module.scss';
+
+import { signupAmigo } from '@/services/auth';
+import { ensureCsrfToken } from '@/services/csrf';
+import AuthFormShell from './AuthFormShell';
 
 interface SignupProps {
   isOpen: boolean;
@@ -9,99 +13,217 @@ interface SignupProps {
   onSignupSuccess: () => void;
 }
 
-const Signup: React.FC<SignupProps> = ({ isOpen, onClose, onSignupSuccess }) => {
+const Signup: React.FC<SignupProps> = ({
+  isOpen,
+  onClose,
+  onSignupSuccess,
+}) => {
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [phone1, setPhone1] = useState(''); // optional
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // To store and display error messages
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Prime CSRF when the modal opens (once per open)
+  useEffect(() => {
+    if (isOpen) {
+      ensureCsrfToken().catch(() => {});
+    }
+  }, [isOpen]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    if (!email || !password) {
+    if (
+      !firstName ||
+      !lastName ||
+      !userName ||
+      !email ||
+      !password ||
+      !passwordConfirmation
+    ) {
       setErrorMessage('Please fill in all fields.');
+      return;
+    }
+    if (!/^[A-Za-z0-9_]+$/.test(userName)) {
+      setErrorMessage(
+        'Username may only contain letters, numbers, and underscore.',
+      );
+      return;
+    }
+    if (password !== passwordConfirmation) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+    if (phone1 && !/^\+\d{6,15}$/.test(phone1)) {
+      setErrorMessage(
+        'Phone number must be in international format (e.g., +14155550123).',
+      );
       return;
     }
 
     try {
-      setLoading(true); // Start loading
-      const response = await axiosInstance.post('/api/v1/signup', {
+      setLoading(true);
+
+      await signupAmigo({
         amigo: {
-          email: email,
-          password: password,
+          first_name: firstName,
+          last_name: lastName,
+          user_name: userName,
+          email,
+          password,
+          password_confirmation: passwordConfirmation,
+          ...(phone1 ? { phone_1: phone1 } : {}),
         },
       });
 
-      if (response.status === 201) { // Check for successful signup
-        // Handle successful signup
-        const { csrf_token } = response.data.status;
+      onSignupSuccess();
+      // Parent will close the modal; no need to call onClose here.
+    } catch (err: any) {
+      const status = err?.response?.status as number | undefined;
+      const errorsArray: string[] = Array.isArray(err?.response?.data?.errors)
+        ? err.response.data.errors
+        : [];
 
-        // Store the CSRF token in a cookie or state
-        if (csrf_token) {
-          document.cookie = `csrf_token=${csrf_token}; Path=/`;
+      const apiMsg =
+        errorsArray.join(', ') ||
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        '';
+
+      if (status === 422) {
+        const text = apiMsg.toString();
+        if (/has already been taken|already exists/i.test(text)) {
+          setErrorMessage(
+            'An account with that email/username already exists.',
+          );
+        } else {
+          setErrorMessage(apiMsg || 'Signup failed. Check your inputs.');
         }
-
-        onSignupSuccess(); // Trigger success handler
-        onClose(); // Close modal on success
+      } else if (status === 401) {
+        setErrorMessage(
+          apiMsg ||
+            'Unauthorized (CSRF or auth). Please reload and try again.',
+        );
+      } else if (status === 404) {
+        setErrorMessage(
+          'Signup endpoint not found. Please check your API routes.',
+        );
       } else {
-        handleErrorResponse(response.status);
-      }
-    } catch (error: any) {
-      if (error.response) {
-        handleErrorResponse(error.response.status);
-      } else {
-        setErrorMessage('An error occurred during signup. Please try again later.');
+        setErrorMessage(apiMsg || 'Something went wrong. Please try again.');
       }
     } finally {
-      setLoading(false); // Stop loading
-    }
-  };
-
-  const handleErrorResponse = (status: number) => {
-    switch (status) {
-      case 400:
-        setErrorMessage('Invalid signup details.');
-        break;
-      case 500:
-        setErrorMessage('Server error. Please try again later.');
-        break;
-      default:
-        setErrorMessage('An error occurred. Please try again.');
+      setLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-form__label">
-          Email:
-          <input
-            type="email"
-            className="auth-form__input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </label>
-        <label className="auth-form__label">
-          Password:
-          <input
-            type="password"
-            className="auth-form__input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </label>
-        <button type="submit" className="auth-form__button" disabled={loading}>
-          {loading ? 'Signing up...' : 'Signup'}
-        </button>
-        {errorMessage && <p className="auth-form__error-message">{errorMessage}</p>} {/* Display any error message */}
-      </form>
-    </Modal>
+    <AuthFormShell
+      isOpen={isOpen}
+      title="Signup"
+      errorMessage={errorMessage}
+      isSubmitting={loading}
+      primaryLabel="Signup"
+      submittingLabel="Signing up…"
+      onClose={onClose}
+      onSubmit={handleSubmit}
+    >
+      <label className="form-grid label">
+        First Name:
+        <input
+          type="text"
+          className="form-grid__fields"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          disabled={loading}
+          autoComplete="given-name"
+          required
+        />
+      </label>
+
+      <label className="form-grid label">
+        Last Name:
+        <input
+          type="text"
+          className="form-grid__fields"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          disabled={loading}
+          autoComplete="family-name"
+          required
+        />
+      </label>
+
+      <label className="form-grid label">
+        Username:
+        <input
+          type="text"
+          className="form-grid__fields"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          disabled={loading}
+          autoComplete="username"
+          required
+        />
+      </label>
+
+      <label className="form-grid label">
+        Email:
+        <input
+          type="email"
+          className="form-grid__fields"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
+          autoComplete="email"
+          required
+        />
+      </label>
+
+      <label className="form-grid label">
+        Phone (optional):
+        <input
+          type="tel"
+          className="form-grid__fields"
+          placeholder="+14155550123"
+          value={phone1}
+          onChange={(e) => setPhone1(e.target.value)}
+          disabled={loading}
+          autoComplete="tel"
+        />
+      </label>
+
+      <label className="form-grid label">
+        Password:
+        <input
+          type="password"
+          className="form-grid__fields"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
+          autoComplete="new-password"
+          required
+        />
+      </label>
+
+      <label className="form-grid label">
+        Confirm Password:
+        <input
+          type="password"
+          className="form-grid__fields"
+          value={passwordConfirmation}
+          onChange={(e) => setPasswordConfirmation(e.target.value)}
+          disabled={loading}
+          autoComplete="new-password"
+          required
+        />
+      </label>
+    </AuthFormShell>
   );
 };
 

@@ -1,0 +1,24 @@
+/* Constrain to 640px and center */
+
+/* optional hook if you want section-level tweaks */
+.contactSection {
+  margin-block: 3rem;
+  max-width: 240px;
+}
+
+/* override only this section’s h2 */
+.contactTitle {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+/* bump text size inside the contact block */
+.contactDetails {
+  :where(p, div, a) {
+    font-size: 1.15rem;
+    line-height: 1.5;
+  }
+}
+.section__title {
+ font-size: 1.75rem;
+}

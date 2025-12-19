@@ -1,0 +1,142 @@
+
+/* utils */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* container aligns to the rightmost column/cell */
+.user-menu {
+  position: relative;
+  justify-self: end; // works with your CSS Grid header
+}
+
+/* icon button */
+.user-menu__toggle {
+  background-color: var(--nav-item-bg-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px; /* good touch target */
+  border: 0;
+  border-radius: 999px;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.5s;
+}
+
+.user-menu__toggle:hover {
+  background-color: var(--nav-item-hover-bg-color);
+}
+
+
+.user-menu__toggle:active,
+.user-menu__toggle:focus-visible {
+  background-color: var(--nav-item-active-bg-color);
+}
+
+/* panel */
+.user-menu__panel {
+  position: absolute;
+  right: 0;                /* right align under icon */
+  top: calc(100% + 8px);   /* slight offset below button */
+  min-width: 320px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid var(--primary-border-color);
+  background: var(--secondary-surface-bg-color-1);
+  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08);
+  z-index: 1000;
+
+  /* entry motion; respects reduced motion */
+  @media (prefers-reduced-motion: no-preference) {
+    animation: usermenu-fade-in 500ms ease-out both;
+    transform-origin: 100% 0%;
+  }
+}
+
+@keyframes usermenu-fade-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.user-menu__divider {
+  border: 0;
+  border-top: 1px solid var(--primary-border-color);
+  margin: 8px 0;
+}
+
+.user-menu__section + .user-menu__section { margin-top: 8px; }
+
+.user-menu__label {
+  color: var(--nav-item-text-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  opacity: .7;
+  margin-bottom: 6px;
+}
+
+.user-menu__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-menu__item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.user-menu__item:hover,
+.user-menu__item:focus-visible {
+  background: var(--secondary-surface-color-2);
+  outline: none;
+}
+
+.user-menu__palette {
+/* lets your ThemeSwitcher breathe */
+  padding: 6px 4px;
+}
+
+.theme-switcher select {
+    appearance: none;
+    background-color: var(--secondary-button-bg-color);
+    border-color: var(--secondary-border-color);
+    color: var(--secondary-button-label-color);
+    padding: 0 6px;
+}
+
+.theme-switcher select:hover,
+.theme-switcher select:focus,
+.theme-switcher select:active {
+  background-color: var(--secondary-button-hover-bg-color);
+  border-color: var(--secondary-border-color);
+  color: var(--secondary-button-hover-label-color);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.fa-user {
+  color: var(--nav-item-text-color);
+}
+.fa-user:hover {
+  color: var(--nav-item-hover-text-color);
+}
+.fa-user:active, .fa-user:focus {
+  color: var(--nav-item-active-text-color);
+}
+
+/* Optional: keep the panel within viewport on very narrow screens */
+@media (max-width: 420px) {
+  .user-menu__panel {
+    right: 8px;
+    min-width: min(280px, 95vw);
+  }
+}

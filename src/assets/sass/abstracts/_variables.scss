@@ -1,0 +1,226 @@
+// src/assets/sass/abstracts/_variables.scss
+@use 'sass:color';
+@use 'sass:map';
+@use 'sass:list';
+
+// Typography
+$font-family-sans: 'Inter', system-ui, sans-serif !default;
+$font-family-serif: Georgia, serif !default;
+
+$font-size-xs: 0.75rem !default;    // 12px
+$font-size-sm: 0.875rem !default;   // 14px
+$font-size-base: 1rem !default;     // 16px
+$font-size-lg: 1.125rem !default;   // 18px
+$font-size-xl: 1.25rem !default;    // 20px
+
+// Typofgrapohy -- Heading font-sizes
+
+$heading-size-xs: 1.0rem !default;    // 16px
+$heading-size-sm: 1.25rem !default;   // 20px
+$heading-size-base: 1.75rem !default; // 28px
+$heading-size-lg: 2.25rem !default;   // 36px
+$heading-size-xl: 3.0rem !default;    // 48px
+
+// Font Weights
+$font-weight-light: 300 !default;
+$font-weight-regular: 400 !default;
+$font-weight-medium: 500 !default;
+$font-weight-semibold: 600 !default;
+$font-weight-bold: 700 !default;
+$font-weight-black: 900 !default;
+
+// Heading scale (compile-time tokens)
+$heading-scale: (
+  h1: (
+    size: clamp(1.75rem, 4.0vw, 2.5rem),
+    weight: $font-weight-black,
+    tracking: -0.01em,
+    lh: 1.10
+  ),
+  h2: (
+    size: clamp(1.5rem, 3.0vw, 2.0rem),
+    weight: $font-weight-bold,
+    tracking: -0.005em,
+    lh: 1.12
+  ),
+  h3: (
+    size: clamp(1.25rem, 2.5vw, 1.75rem),
+    weight: $font-weight-semibold,
+    tracking: 0em,
+    lh: 1.15
+  ),
+  h4: (
+    size: clamp(1.15rem, 2.15vw, 1.5rem),
+    weight: $font-weight-semibold,
+    tracking: 0em,
+    lh: 1.20
+  ),
+  h5: (
+    size: clamp(1.0rem, 2.0vw, 1.25rem),
+    weight: $font-weight-medium,
+    tracking: 0em,
+    lh: 1.25
+  ),
+  h6: (
+    size: clamp(0.8rem, 1.75vw, 1.0rem),
+    weight: $font-weight-medium,
+    tracking: 0.02em,
+    lh: 1.30
+  )
+) !default;
+
+// Line & Letter Spacing
+$line-height-base: 1.5 !default;
+$line-height-heading: 1.2 !default;
+$letter-spacing-base: 0.02em !default;
+
+// Manually set a hue-rotation set from 30 and 45 degree rotations.
+
+$oklch-site-palette: (
+  base-red:                 oklch(0.628 0.258 29),
+  base-red-orange:          oklch(0.656 0.233 35),
+  base-orange:              oklch(0.732 0.186 53),
+  base-yellow-orange:       oklch(0.84 0.172 84),
+  base-yellow:              oklch(0.968 0.211 110),
+  base-chartreuse:          oklch(0.891 0.264 136),
+  base-shamrock-green:      oklch(0.866 0.295 142),
+  base-neon-green:          oklch(0.868 0.278 144),
+  base-malachite-green:     oklch(0.875 0.234 151),
+  base-turquoise-blue:      oklch(0.905 0.155 195),
+  base-sapphire-blue:       oklch(0.615 0.211 256),
+  base-cobalt-blue:         oklch(0.501 0.28 264),
+  base-blue:                oklch(0.452 0.313 264),
+  base-true-purple:         oklch(0.53 0.293 294),
+  base-magenta:             oklch(0.702 0.322 328),
+  base-fuchsia:             oklch(0.668 0.286 344),
+  base-ruby:                oklch(0.645 0.26 2)
+) !default;
+
+$hsla-site-palette: (
+  base-red:                 hsl(0, 100%, 50%),
+  base-red-orange:          hsl(15, 100%, 50%),
+  base-orange:              hsl(30, 100%, 50%),
+  base-yellow-orange:       hsl(45, 100%, 50%),
+  base-yellow:              hsl(60, 100%, 50%),
+  base-chartreuse:          hsl(90, 100%, 50%),
+  base-shamrock-green:      hsl(120, 100%, 50%),
+  base-neon-green:          hsl(135, 100%, 50%),
+  base-malachite-green:     hsl(150, 100%, 50%),
+  base-turquoise-blue:      hsl(180, 100%, 50%),
+  base-sapphire-blue:       hsl(210, 100%, 50%),
+  base-cobalt-blue:         hsl(225, 100%, 50%),
+  base-blue:                hsl(240, 100%, 50%),
+  base-true-purple:         hsl(270, 100%, 50%),
+  base-magenta:             hsl(300, 100%, 50%),
+  base-fuchsia:             hsl(315, 100%, 50%),
+  base-ruby:                hsl(330, 100%, 50%)
+
+) !default;
+
+/* Neutral colors for shading elements */
+
+// Absolute neutrals (OKLCH) — achromatic, no hue bias
+$oklch-neutrals: (
+  neutral-white:          oklch(100%   0 none),
+  neutral-off-white:      oklch(97.6%  0 none),
+  neutral-light-gray:     oklch(92.5%  0 none),
+  neutral-med-light-gray: oklch(76.7%  0 none),
+  neutral-gray:           oklch(60%    0 none),
+  neutral-med-dark-gray:  oklch(42%    0 none),
+  neutral-dark-gray:      oklch(26.9%  0 none),
+  neutral-gray-black:     oklch(0.226  0 none),
+  neutral-off-black:      oklch(18.2%  0 none),
+  neutral-black:          oklch(0%     0 none)
+) !default;
+
+// Absolute neutrals (HSL) — saturation 0% makes hue irrelevant
+$hsla-neutrals: (
+  neutral-white:          hsl(0, 0%, 100%),
+  neutral-off-white:      hsl(0, 0%, 97%),
+  neutral-light-gray:     hsl(0, 0%, 90%),
+  neutral-med-light-gray: hsl(0, 0%, 70%),
+  neutral-gray:           hsl(0, 0%, 50%),
+  neutral-med-dark-gray:  hsl(0, 0%, 30%),
+  neutral-dark-gray:      hsl(0, 0%, 15%),
+  neutral-gray-black:     hsl(0, 0%, 11%),
+  neutral-off-black:      hsl(0, 0%, 7%),
+  neutral-black:          hsl(0, 0%, 0%)
+) !default;
+
+// Transparency (unitless; 0..1)
+$alpha-10: 0.10 !default;
+$alpha-25: 0.25 !default;
+$alpha-50: 0.50 !default;
+$alpha-75: 0.75 !default;
+
+// Spacing Scale
+$spacing-xxs: 0.25rem !default;
+$spacing-xs: 0.5rem !default;
+$spacing-sm: 0.75rem !default;
+$spacing-md: 1rem !default;
+$spacing-lg: 1.5rem !default;
+$spacing-xl: 2rem !default;
+$spacing-xxl: 3rem !default;
+
+$spacing-unit: 1rem !default; // base unit
+
+// Border & Radius
+$radius-sm: 4px !default;
+$radius-md: 6px !default;
+$radius-lg: 10px !default;
+$radius-base: 8px !default;
+$radius-full-circle: 50% !default;
+$border-width: 1px !default;
+
+// Elevation (Shadows)
+$shadow-xs: 0 1px 2px   hsla(0, 0%, 0%, 0.05) !default;
+$shadow-sm: 0 1px 3px   rgba(0, 0%, 0%, 0.1) !default;
+$shadow-md: 0 4px 6px   rgba(0, 0%, 0%, 0.1) !default;
+$shadow-lg: 0 10px 15px rgba(0, 0%, 0%, 0.1) !default;
+$shadow-xl: 0 20px 25px rgba(0, 0%, 0%, 0.15) !default;
+
+// Z-Index Tokens
+$z-header: 100 !default;
+$z-modal: 1000 !default;
+$z-tooltip: 1100 !default;
+$z-overlay: 1200 !default;
+
+// Motion
+$transition-duration-fast: 150ms !default;
+$transition-duration: 300ms !default;
+$transition-ease: ease-in-out !default;
+$transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1) !default;
+
+// Grid & Layout
+$container-max-width: 1200px !default;
+$grid-gap: 1rem !default;
+$grid-columns: 12 !default;
+
+// Focus & Accessibility
+$focus-ring-width: 2px !default;
+
+// Misc
+$backdrop-blur: blur(8px) !default;
+
+// Breakpoints (compile-time)
+$breakpoints: (
+  sm: 640px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+  xxl: 1536px
+) !default;
+
+// Container max-widths (compile-time)
+$container-widths: (
+  sm: 640px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1200px,  // matches your current $container-max-width intent
+  xxl: 1440px
+) !default;
+
+// ——— Feature toggles (compile-time conditionals) ———
+$include-scrollbar: true !default;     // emit custom scrollbar CSS
+$enable-legacy-grid: false !default;   // example: emit older grid fallback
+$emit-debug-outlines: false !default;  // example: dev-only outlines

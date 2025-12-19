@@ -1,0 +1,47 @@
+/* src/assets/sass/abstracts/_colors-helper.scss */
+@use 'sass:map';
+@use 'sass:meta';
+@use 'sass:math';
+@use 'sass:string';
+@use 'sass:color';
+
+@function from-palette($palette, $key-or-color) {
+  @if meta.type-of($key-or-color) == 'string' and map.has-key($palette, $key-or-color) {
+    @return map.get($palette, $key-or-color);
+  }
+  @return $key-or-color;
+}
+
+@function mix-str($space, $a, $aPct, $b, $bPct) {
+  @return string.unquote("color-mix(in #{$space}, #{$a} #{$aPct}%, #{$b} #{$bPct}%)");
+}
+
+@function _to-pct($n) {
+  @return if(math.is-unitless($n), $n * 1%, $n);
+}
+
+@function _alpha-to-unitless($a) {
+  @return if(math.is-unitless($a), $a, math.div($a, 100%));
+}
+
+@function _weight-for-first($firstPct, $secondPct) {
+  $a: if(meta.type-of($firstPct) == 'number', $firstPct, 0);
+  $b: if(meta.type-of($secondPct) == 'number', $secondPct, 0);
+  $sum: $a + $b;
+  @return if($sum == 0, 50%, math.percentage(math.div($a, $sum)));
+}
+
+@function overlay-str($space, $base, $basePct, $tint, $tintPct, $alpha) {
+  @if $space == hsl or $space == "hsl" {
+    $w: _weight-for-first($basePct, $tintPct);
+    $mixed: color.mix($base, $tint, $w, $method: hsl);
+    @return color.change($mixed, $alpha: _alpha-to-unitless($alpha));
+  }
+
+  // OKLCH path
+  $bp: _to-pct($basePct);
+  $tp: _to-pct($tintPct);
+  $ap: if(math.is-unitless($alpha), math.percentage($alpha), $alpha);
+
+  @return string.unquote("color-mix(in oklch, color-mix(in oklch, #{$base} #{$bp}, #{$tint} #{$tp}) #{$ap}, transparent)");
+}

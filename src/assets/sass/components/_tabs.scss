@@ -1,0 +1,31 @@
+/* src/assets/sass/components/_tabs.scss */
+
+.tabs {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.tabs__list {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--primary-border-color);
+}
+
+.tabs__trigger {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  color: var(--primary-text-color);
+  border-bottom: 2px solid transparent;
+  font-weight: var(--font-weight-medium);
+
+  &.is-active {
+    color: var(--primary-hover-button-bg-color);
+    border-color: var(--secondary-button-border-color);
+  }
+}
+
+.tabs__panel { display: none; }
+.tabs__panel.is-active { display: block; }

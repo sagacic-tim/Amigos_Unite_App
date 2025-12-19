@@ -1,0 +1,26 @@
+/* src/assets/sass/utilities/_borders.scss */
+
+/* Radii */
+.radius-sm   { border-radius: var(--border-radius-sm); }
+.radius-md   { border-radius: var(--border-radius-md); }
+.radius-lg   { border-radius: var(--border-radius-lg); }
+.radius      { border-radius: var(--border-radius-base); }
+.rounded,
+.rounded-full { border-radius: var(--radius-full-circle); }
+
+/* Borders (color + width come from tokens; override via custom props if needed) */
+.border      { border: var(--border-width) solid var(--color-border); }
+.border-0    { border: 0; }
+
+/* Per-side helpers (optional, keep only what you use) */
+.border-t    { border-top:    var(--border-width) solid var(--color-border); }
+.border-r    { border-right:  var(--border-width) solid var(--color-border); }
+.border-b    { border-bottom: var(--border-width) solid var(--color-border); }
+.border-l    { border-left:   var(--border-width) solid var(--color-border); }
+
+/* Variant colors (optional, these still consume tokens) */
+.border-divider { border-color: var(--color-divider); }
+.border-primary { border-color: var(--color-primary); }
+
+/* If you need thicker borders while keeping the token as a base: */
+.border-2x  { border-width: calc(var(--border-width) * 2); }

@@ -1,0 +1,106 @@
+
+/* src/themes/admin/scss-palettes/hsla-palette-light.scss
+   - Admin LIGHT palette (HSL)
+   - More gray/neutral backgrounds & surfaces; keep brand/buttons same as public light
+*/
+@use 'abstracts' as tokens; /* adjust path if needed */
+
+:root {
+  /* Base hues (named) + neutrals (HSL values) */
+  @each $k, $v in tokens.$hsla-site-palette { --#{$k}: #{$v}; }
+  @each $k, $v in tokens.$hsla-neutrals     { --#{$k}: #{$v}; }
+
+  /* ───────────────── Backgrounds / Surfaces (more gray) ─────────────────
+     Target: very light neutral grays, minimal blue tint.
+  */
+  --color-background-primary:    color-mix(in hsl, var(--neutral-white) 96%, var(--neutral-black) 4%);  /* ≈ L~96 */
+  --color-background-secondary:  color-mix(in hsl, var(--neutral-white) 92%, var(--neutral-black) 8%);  /* ≈ L~92 */
+
+  --color-background-primary-hover:   color-mix(in hsl, var(--neutral-white) 98%, var(--neutral-black) 2%);
+  --color-background-secondary-hover: color-mix(in hsl, var(--neutral-white) 94%, var(--neutral-black) 6%);
+  --color-background-primary-active:  color-mix(in hsl, var(--neutral-white) 95%, var(--neutral-black) 5%);
+  --color-background-secondary-active:color-mix(in hsl, var(--neutral-white) 90%, var(--neutral-black) 10%);
+
+  --color-background-disabled: color-mix(in hsl, var(--neutral-med-light-gray) 90%, var(--neutral-black) 10%);
+  /* Slightly neutral overlay; keep prior opacity behavior */
+  --color-background-lightbox:  color-mix(in hsl, black 85%, white 15%);
+  --overlay-opacity: 0.75;
+
+  /* Surfaces: just a step off the page background for separation */
+  --color-surface:    color-mix(in hsl, var(--neutral-white) 93%, var(--neutral-black) 7%);
+  /* Text: keep strong contrast; tiny brand influence if you like */
+  --color-foreground: color-mix(in hsl, var(--neutral-black) 90%, var(--base-blue) 10%);
+  --color-muted:      color-mix(in hsl, var(--neutral-gray) 85%,  var(--neutral-black) 15%);
+
+  /* ───────────────── Buttons (Primary) ───────────────── */
+  --primary-button-background:         var(--base-blue);
+  --primary-button-background-hover:   color-mix(in hsl, var(--base-blue) 92%, white 8%);
+  --primary-button-background-active:  color-mix(in hsl, var(--base-blue) 88%, black 12%);
+  --primary-button-background-disabled:color-mix(in hsl, var(--neutral-gray) 65%, var(--base-cobalt-blue) 35%);
+
+  /* ───────────────── Buttons (Secondary) ─────────────────
+     Keep semantics; ensure valid function names & tokens.
+  */
+  --secondary-button-background:          color-mix(in hsl, var(--base-blue) 5%,  var(--neutral-light-gray) 95%);
+  --secondary-button-background-hover:    color-mix(in hsl, var(--base-blue) 8%,  white 92%);
+  --secondary-button-background-active:   color-mix(in hsl, var(--base-blue) 12%, white 88%);
+  --secondary-button-background-disabled: color-mix(in hsl, var(--base-blue) 3%,  var(--neutral-gray) 97%);
+
+  --primary-button-text:            color-mix(in hsl, var(--neutral-light-gray) 95%, var(--base-blue) 5%);
+  --primary-button-text-hover:      var(--neutral-white);
+  --primary-button-text-active:     color-mix(in hsl, var(--neutral-white) 98%, var(--base-blue) 2%);
+  --primary-button-text-disabled:   color-mix(in hsl, var(--neutral-gray) 95%,      var(--base-blue) 5%);
+
+  --secondary-button-text:          color-mix(in hsl, var(--neutral-med-dark-gray) 95%, var(--base-blue) 5%);
+  --secondary-button-text-hover:    var(--neutral-black);
+  --secondary-button-text-active:   color-mix(in hsl, var(--neutral-dark-gray) 98%,     var(--base-blue) 2%);
+  --secondary-button-text-disabled: color-mix(in hsl, var(--neutral-gray) 95%,          var(--base-blue) 5%);
+
+  /* ───────────────── Brand / Accents (unchanged) ───────────────── */
+  --color-primary:        color-mix(in hsl, black 20%, var(--base-blue) 80%);
+  --color-primary-hover:  color-mix(in hsl, black 10%, var(--base-blue) 90%);
+  --color-primary-active: color-mix(in hsl, black 0%,  var(--base-blue) 100%);
+
+  --color-secondary:        color-mix(in hsl, white 35%, var(--base-orange) 65%);
+  --color-secondary-hover:  color-mix(in hsl, white 25%, var(--base-orange) 75%);
+  --color-secondary-active: color-mix(in hsl, white 15%, var(--base-orange) 85%);
+
+  --color-header:        color-mix(in hsl, black 20%,  var(--base-blue) 80%);
+  --color-header-hover:  color-mix(in hsl, black 0%,   var(--base-blue) 100%);
+  --color-header-active: color-mix(in hsl, black 10%,  var(--base-blue) 90%);
+
+  /* ───────────────── Status (unchanged) ───────────────── */
+  --color-disabled:       color-mix(in hsl, var(--base-true-purple) 45%, var(--neutral-gray) 55%);
+  --color-success:        color-mix(in hsl, black 10%, var(--base-malachite-green) 90%);
+  --color-success-hover:  color-mix(in hsl, black 0%,  var(--base-malachite-green) 100%);
+  --color-warning:        color-mix(in hsl, black 5%,  var(--base-orange) 95%);
+  --color-warning-hover:  color-mix(in hsl, black 0%,  var(--base-yellow-orange) 100%);
+  --color-error:          color-mix(in hsl, black 0%,  var(--base-red) 100%);
+  --color-alert:          color-mix(in hsl, white 20%, var(--base-red-orange) 80%);
+  --color-alert-hover:    color-mix(in hsl, white 10%, var(--base-orange) 90%);
+
+  /* ───────────────── Structure (more neutral) ───────────────── */
+  --color-border:   color-mix(in hsl, var(--neutral-light-gray) 88%, var(--neutral-black) 12%);
+  --color-divider:  color-mix(in hsl, var(--neutral-light-gray) 94%, var(--neutral-black) 6%);
+
+  /* ───────────────── Links (unchanged) ───────────────── */
+  --link-color:              color-mix(in hsl, var(--base-blue) 85%, white 15%);
+  --link-color-hover:        color-mix(in hsl, var(--base-blue) 100%, white 0%);
+  --link-color-hover-light:  color-mix(in hsl, var(--base-blue) 75%, white 25%);
+
+  /* ───────────────── Scrollbars (neutralized) ───────────────── */
+  --scrollbar-track: color-mix(in hsl, var(--neutral-light-gray) 96%, var(--neutral-black) 4%);
+  --scrollbar-thumb: color-mix(in hsl, var(--neutral-light-gray) 65%, var(--neutral-black) 35%);
+
+  /* ───────────────── Focus & A11y (keep brand visibility) ───────────────── */
+  --focus-ring-color: color-mix(in hsl, var(--base-blue) 70%, white 30%);
+}
+
+/* Optional light-scheme nudges (already light, so minimal) */
+@media (prefers-color-scheme: light) {
+  :root {
+    /* You can slightly adjust if you want even cooler admin surfaces */
+    --color-background-primary:   color-mix(in hsl, var(--neutral-white) 97%, var(--neutral-black) 3%);
+    --color-background-secondary: color-mix(in hsl, var(--neutral-white) 93%, var(--neutral-black) 7%);
+  }
+}

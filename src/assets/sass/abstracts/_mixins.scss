@@ -1,9 +1,51 @@
 /* SASS Mixins */
 
-@mixin grid-layout($columns, $gap) {
+@mixin grid-layout($columns, $gap: var(--grid-gap)) {
   display: grid;
   grid-template-columns: $columns;
   gap: $gap;
 }
 
-/* Add other mixins here */
+@mixin border-box(
+  $border-color: var(--primary-border-color),
+  $border-width: var(--border-width, 1px),
+  $radius: var(--radius-md),
+  $padding: var(--spacing-md),
+  $margin: var(--spacing-sm) 0
+) {
+  border: $border-width solid $border-color;
+  border-radius: $radius;
+  padding: $padding;
+  margin: $margin;
+}
+
+/* Resets link defaults safely */
+@mixin link-reset() {
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+/* Applies your link color system via CSS variables */
+@mixin link-colors(
+  $hover: var(--link-hover-color),
+  $active: var(--link-active-color),
+  $underline: false
+) {
+
+  @if $underline {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  } @else {
+    text-decoration: none;
+  }
+
+  &:hover { color: $hover; }
+  &:active { color: $active; }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: 2px;
+    text-decoration: none;
+  }
+}

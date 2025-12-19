@@ -1,0 +1,188 @@
+/* src/assets/sass/components/_forms.scss */
+
+.form {
+  background: var(--secondary-surface-bg-color-1);
+  border-radius: var(--border-radius-lg, 12px);
+  box-shadow: 0 1px 2px var(--box-shadow-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0; // rely on parent grid gap
+  padding: var(--spacing-md);
+}
+
+/* Main layout wrapper for the actual <form> element */
+.form-grid {
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-lg);
+  display: block;
+  font-size: var(--font-size-base);
+  margin: 0;
+  max-width: 640px;
+
+  &__title {
+    color: var(--primary-heading-color);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--spacing-sm);
+  }
+
+  &__notice {
+    color: var(--alert-color);
+    font-size: 1.05rem;
+    padding: var(--spacing-xs) 0;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  /* Fields grid container (when used) */
+  &__fields {
+    display: grid;
+    gap: var(--form-gap);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &--one-column {
+    .form-grid__fields {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  fieldset {
+    border: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+  }
+
+  /* Labels + controls */
+  label {
+    display: block;
+    color: var(--input-label-color);
+    font-style: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 6px;
+    width: 100%;
+
+    span {
+      display: block;
+      font-style: var(--font-size-base);
+      margin-bottom: 6px;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    background: var(--input-bg-color);
+    border: 1px solid var(--secondary-border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--input-entry-color);
+    margin: var(--spacing-xxs) 0 0;
+    padding: var(--spacing-xs);
+    width: 100%;
+    line-height: 1.35;
+
+    &:hover {
+      border-color: var(--secondary-border-hover-color);
+    }
+  }
+
+  /* Small explanatory text under inputs */
+  .form-hint {
+    display: block;
+    margin-top: var(--spacing-xxs);
+    font-size: 0.875rem;
+    color: var(--muted-text-color);
+    font-weight: var(--font-weight-regular);
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: translateY(-1px);
+    }
+
+    span {
+      margin: 0;
+      font-weight: var(--font-weight-regular);
+    }
+  }
+
+  .radio {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+
+    input[type="radio"] {
+      width: auto;
+      margin: 0;
+      transform: translateY(-1px);
+    }
+
+    span {
+      margin: 0;
+      font-weight: var(--font-weight-regular);
+    }
+  }
+
+  .textarea textarea {
+    field-sizing: content;
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  legend.formsLegend {
+    color: var(--secondary-heading-color);
+    font-size: 1.75rem;
+    font-weight: 900;
+    margin-bottom: 1.0rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Actions row: layout ONLY (buttons come from _buttons.scss) */
+  &__actions,
+  .form__actions,
+  .form-actions {
+    align-items: stretch;
+    display: grid;
+    gap: var(--spacing-sm);
+    grid-auto-flow: column; // lay out items in a row
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
+    justify-content: start;
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  /* Messages */
+  .form-error {
+    color: var(--error-color);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .form-success {
+    color: var(--success-color);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  @media (max-width: 900px) {
+    &__fields {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+/* Motion safety applies to all forms, not just forms nested in .form-grid */
+@media (prefers-reduced-motion: reduce) {
+  .form,
+  .form * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
