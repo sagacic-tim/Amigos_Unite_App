@@ -1,4 +1,4 @@
-// src/services/EventService.ts //
+// src/services/EventService.ts
 import privateApi from "@/services/api/privateApi";
 import publicApi from "@/services/api/publicApi";
 import type {
@@ -263,8 +263,9 @@ export const EventService = {
     const res = await privateApi.post<JsonApiShowResponse>(
       `${API_PREFIX}/events`,
       {
-      event: params,
-    });
+        event: params,
+      }
+    );
     const included = (res.data.included || []).filter(
       (r: any): r is JsonApiEventLocationResource =>
         r && r.type === "event-locations"
@@ -275,9 +276,11 @@ export const EventService = {
   // Update
   async updateEvent(id: number, params: EventCreateParams): Promise<Event> {
     const res = await privateApi.put<JsonApiShowResponse>(
-      `${API_PREFIX}/events/${id}`, {
-      event: params,
-    });
+      `${API_PREFIX}/events/${id}`,
+      {
+        event: params,
+      }
+    );
     const included = (res.data.included || []).filter(
       (r: any): r is JsonApiEventLocationResource =>
         r && r.type === "event-locations"
@@ -288,6 +291,10 @@ export const EventService = {
   /**
    * Register the given amigo as a participant on an event.
    * Hits: POST /api/v1/events/:event_id/event_amigo_connectors
+   *
+   * AMS `:attributes` adapter for a single record typically returns:
+   *   { event_amigo_connector: { ... } }
+   * but this helper is defensive and will also tolerate legacy shapes.
    */
   async registerForEvent(
     eventId: number,
@@ -302,7 +309,18 @@ export const EventService = {
         },
       }
     );
-    return res.data;
+
+    const payload: any = res.data;
+
+    if (payload && payload.event_amigo_connector) {
+      return payload.event_amigo_connector as EventAmigoConnector;
+    }
+
+    if (payload && payload.data) {
+      return payload.data as EventAmigoConnector;
+    }
+
+    return payload as EventAmigoConnector;
   },
 
   /**
@@ -321,21 +339,41 @@ export const EventService = {
     return res.data;
   },
 
-  async fetchEventAmigoConnectors(eventId: number): Promise<EventAmigoConnector[]> {
+  /**
+   * Fetch connectors for a specific event.
+   *
+   * With AMS :attributes adapter, the index action commonly returns:
+   *   { event_amigo_connectors: [ {...}, {...} ] }
+   *
+   * but this function is tolerant of several shapes:
+   *   - [ {...}, {...} ]
+   *   - { event_amigo_connectors: [ ... ] }
+   *   - { data: [ ... ] }  (legacy JSON:API style)
+   */
+  async fetchEventAmigoConnectors(
+    eventId: number
+  ): Promise<EventAmigoConnector[]> {
     const res = await privateApi.get(
       `${API_PREFIX}/events/${eventId}/event_amigo_connectors`
     );
     const payload: any = res.data;
 
-    if (Array.isArray(payload)) return payload;
-    if (payload && Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload)) {
+      return payload as EventAmigoConnector[];
+    }
+    if (payload && Array.isArray(payload.event_amigo_connectors)) {
+      return payload.event_amigo_connectors as EventAmigoConnector[];
+    }
+    if (payload && Array.isArray(payload.data)) {
+      return payload.data as EventAmigoConnector[];
+    }
+
     return [];
   },
 
   /**
    * Global/debug listing of ALL EventAmigoConnectors.
    * Hits: GET /api/v1/event_amigo_connectors
-   * (You need a matching top-level route in Rails for this to work.)
    */
   async fetchAllEventAmigoConnectors(): Promise<EventAmigoConnector[]> {
     const res = await privateApi.get(
@@ -343,8 +381,16 @@ export const EventService = {
     );
     const payload: any = res.data;
 
-    if (Array.isArray(payload)) return payload;
-    if (payload && Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload)) {
+      return payload as EventAmigoConnector[];
+    }
+    if (payload && Array.isArray(payload.event_amigo_connectors)) {
+      return payload.event_amigo_connectors as EventAmigoConnector[];
+    }
+    if (payload && Array.isArray(payload.data)) {
+      return payload.data as EventAmigoConnector[];
+    }
+
     return [];
   },
 
@@ -354,17 +400,25 @@ export const EventService = {
     );
     const payload: any = res.data;
 
-    if (Array.isArray(payload)) return payload;
-    if (payload && Array.isArray(payload.data)) return payload.data;
+    if (Array.isArray(payload)) {
+      return payload;
+    }
+    if (payload && Array.isArray(payload.event_location_connectors)) {
+      return payload.event_location_connectors;
+    }
+    if (payload && Array.isArray(payload.data)) {
+      return payload.data;
+    }
+
     return [];
   },
 
   /**
-   * Global/debug listing of ALL EventAmigoConnectors.
-   * Hits: GET /api/v1/event_amigo_connectors
-   * (You will need a matching top-level route in Rails.)
+   * Update a connector's role.
+   *
+   * With AMS :attributes adapter, the update action typically returns:
+   *   { event_amigo_connector: { ... } }
    */
-
   async updateEventAmigoConnectorRole(
     eventId: number,
     connectorId: number,
@@ -376,9 +430,18 @@ export const EventService = {
         event_amigo_connector: { role },
       }
     );
-    return res.data;
-  },
 
+    const payload: any = res.data;
+
+    if (payload && payload.event_amigo_connector) {
+      return payload.event_amigo_connector as EventAmigoConnector;
+    }
+    if (payload && payload.data) {
+      return payload.data as EventAmigoConnector;
+    }
+
+    return payload as EventAmigoConnector;
+  },
 
   async leave(eventId: number): Promise<any> {
     // Example: DELETE /events/:id/leave

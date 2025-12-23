@@ -1,3 +1,5 @@
+// src/themes/public/_theme_builder.scss //
+
 @use 'sass:map';
 @use '../assets/sass/abstracts/variables' as tokens;
 @use '../assets/sass/abstracts/colors-helper' as ch;
@@ -11,7 +13,7 @@
   --info-color:     #{$info};
   --alert-color:    #{$alert};
   --accent-color:   #{$accent};
-  --cancel-coloro:  #{cancel};
+  --cancel-color:   #{$cancel};
 }
 
 @mixin _emit-semantic-hover-vars($space, $neutrals, $success, $warning, $danger, $error, $info, $alert, $cancel) {
@@ -147,7 +149,7 @@
     --button-spotlight-bg-color:             #{ch.mix-str($space, map.get($neutrals, neutral-black), 20, $spotlight-color, 80)};
     --button-spotlight-hover-bg-color:       #{ch.mix-str($space, map.get($neutrals, neutral-off-black), 15, $spotlight-color, 85)};
     --button-spotlight-disabled-bg-color:    #{ch.mix-str($space, map.get($neutrals, neutral-black), 5, $spotlight-color, 95)};
-    --button-spotlight--label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $spotlight-color, 2)};
+    --button-spotlight-label-color:          #{ch.mix-str($space, map.get($neutrals, neutral-white), 98, $spotlight-color, 2)};
     --button-spotlight-hover-label-color:    #{map.get($neutrals, neutral-white)};
     --button-spotlight-disabled-label-color: #{ch.mix-str($space, map.get($neutrals, neutral-black), 98, $spotlight-color, 2)};
 
@@ -345,6 +347,6 @@
     @include _emit-semantic-vars($success-color, $warning-color, $danger-color, $error-color, $info-color, $alert-color, $accent-color, $cancel-color);
 
     /* semantic hover colors */
-    @include _emit-semantic-hover-vars($space, $neutrals, $success-color, $warning-color, $danger-color, $error-color, $info-color, $alert-color, $cancel_color);
+    @include _emit-semantic-hover-vars($space, $neutrals, $success-color, $warning-color, $danger-color, $error-color, $info-color, $alert-color, $cancel-color);
   }
 }

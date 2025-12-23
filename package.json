@@ -1,3 +1,4 @@
+
 {
   "name": "amigos_unite_app",
   "private": true,
@@ -8,16 +9,22 @@
     "dev": "npm-run-all -p -l watch:themes dev:ts dev:vite",
     "dev:vite": "vite",
     "dev:ts": "tsc -p tsconfig.dev.json --watch",
+
     "build": "npm run build:themes && tsc -p tsconfig.app.json && vite build",
     "preview": "vite preview",
+
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
+
     "build:themes": "npm-run-all build:themes:public build:themes:admin",
     "build:themes:public": "sass --style=compressed --no-source-map --load-path src/assets/sass src/themes/public/scss-palettes:public/themes/public/css-palettes",
     "build:themes:admin": "sass --style=compressed --no-source-map --load-path src/assets/sass src/themes/admin/scss-palettes:public/themes/admin/css-palettes",
     "watch:themes": "npm-run-all -p -l watch:themes:public watch:themes:admin",
     "watch:themes:public": "sass --watch --load-path src/assets/sass src/themes/public/scss-palettes:public/themes/public/css-palettes",
     "watch:themes:admin": "sass --watch --load-path src/assets/sass src/themes/admin/scss-palettes:public/themes/admin/css-palettes",
-    "clean:themes": "rimraf public/themes/*/css-palettes"
+    "clean:themes": "rimraf public/themes/*/css-palettes",
+
+    "test": "npm run lint && npm run typecheck"
   },
   "dependencies": {
     "axios": "^1.7.3",

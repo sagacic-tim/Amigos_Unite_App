@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import type {
   EventCreateParams,
   EventStatus,
+  EventRole,
 } from "@/types/events/EventTypes";
 import type { EventLocationCreatePayload } from "@/types/events/EventLocationTypes";
 import type { PlaceResult, PlacePhoto } from "@/services/PlacesService";
@@ -30,7 +31,8 @@ interface EventFormProps {
   managementParticipants?: {
     amigoId: number;
     displayName: string;
-    currentRole?: string; // e.g. "participant", "assistant_coordinator"
+    currentRole?: EventRole;   // "participant" | "assistant_coordinator" | "lead_coordinator"
+    willingToHelp?: boolean;   // from amigo_detail.willing_to_help
   }[];
 
   /**
@@ -463,6 +465,37 @@ const EventForm: React.FC<EventFormProps> = ({
     values.event_speakers_performers.length
       ? values.event_speakers_performers.join(", ")
       : "";
+
+    // ───────────────────────────────────────────────────────────────────────────
+  // Derived role lists for the "Manage Event" step
+  // ───────────────────────────────────────────────────────────────────────────
+
+  const allManagement = managementParticipants ?? [];
+
+  // Lead coordinators: display-only list (no checkboxes)
+  const leadCoordinators = allManagement.filter(
+    (p) => p.currentRole === "lead_coordinator",
+  );
+
+  // Assistant coordinators: existing + newly selected participants
+  const assistantCoordinators = allManagement.filter(
+    (p) =>
+      p.currentRole === "assistant_coordinator" ||
+      (p.currentRole === "participant" &&
+        assistantCoordinatorIds.includes(p.amigoId)),
+  );
+
+  // Participants eligible to be promoted:
+  //  - currently role "participant"
+  //  - flagged as willingToHelp
+  //  - not already in the selected assistant list
+  const eligibleParticipants = allManagement.filter(
+    (p) =>
+      p.currentRole === "participant" &&
+      p.willingToHelp === true &&
+      !assistantCoordinatorIds.includes(p.amigoId),
+  );
+
 
   // ───────────────────────────────────────────────────────────────────────────
   // Render (multi-step)
@@ -918,60 +951,119 @@ const EventForm: React.FC<EventFormProps> = ({
           </fieldset>
         )}
 
+        
         {/* ───────────── Manage Event (Step 3) ───────────── */}
         {includeManagementStep && currentStep === 3 && (
           <fieldset>
             <legend className="formsLegend">Manage Event</legend>
 
-            {!managementParticipants ||
-            managementParticipants.length === 0 ? (
+            {!managementParticipants || managementParticipants.length === 0 ? (
               <p className="form-hint">
                 There are no registered participants yet. Participants can be
                 promoted to assistant coordinators after they register for this
-                event.
+                event and indicate they are willing to help.
               </p>
             ) : (
               <>
-                <p className="form-hint">
-                  Select one or more participants to assign as assistant
-                  coordinators.
-                </p>
-
-                <ul className="roles-list">
-                  {managementParticipants.map((p) => {
-                    const checked =
-                      assistantCoordinatorIds.includes(p.amigoId);
-
-                    return (
-                      <li
-                        key={p.amigoId}
-                        className="roles-list__item"
-                      >
-                        <label className="checkbox">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() =>
-                              setAssistantCoordinatorIds((prev) =>
-                                checked
-                                  ? prev.filter(
-                                      (id) => id !== p.amigoId,
-                                    )
-                                  : [...prev, p.amigoId],
-                              )
-                            }
-                          />
-                          <span>
+                {/* Lead coordinator list (no checkboxes) */}
+                {leadCoordinators.length > 0 && (
+                  <>
+                    <h3 className="roles-list__heading">Lead Coordinator</h3>
+                    <ul className="roles-list roles-list--static">
+                      {leadCoordinators.map((p) => (
+                        <li
+                          key={p.amigoId}
+                          className="roles-list__item"
+                        >
+                          <span className="roles-list__label">
                             {p.displayName}
-                            {p.currentRole ===
-                              "assistant_coordinator" &&
-                              " (already assistant coordinator)"}
                           </span>
-                        </label>
-                      </li>
-                    );
-                  })}
-                </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {/* Assistant coordinators list (no checkboxes) */}
+                {assistantCoordinators.length > 0 && (
+                  <>
+                    <h3 className="roles-list__heading">
+                      Assistant Coordinators
+                    </h3>
+                    <ul className="roles-list roles-list--static">
+                      {assistantCoordinators.map((p) => {
+                        const isPromotedParticipant =
+                          p.currentRole === "participant" &&
+                          assistantCoordinatorIds.includes(p.amigoId);
+
+                        return (
+                          <li
+                            key={p.amigoId}
+                            className="roles-list__item"
+                          >
+                            <span className="roles-list__label">
+                              {p.displayName}
+                              {p.currentRole === "assistant_coordinator"}
+                              {isPromotedParticipant &&
+                                " (will be promoted on save)"}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+
+                {/* Eligible participants list (checkboxes) */}
+                <h3 className="roles-list__heading">Eligible Participants</h3>
+
+                {eligibleParticipants.length === 0 ? (
+                  <p className="form-hint">
+                    There are no additional participants who have indicated
+                    they are willing to help.
+                  </p>
+                ) : (
+                  <>
+                    <p className="form-hint">
+                      Select one or more participants to assign as assistant
+                      coordinators. Only participants who checked{" "}
+                      <strong>&quot;Willing to help&quot;</strong> in their
+                      profile appear here.
+                    </p>
+
+                    <ul className="roles-list">
+                      {eligibleParticipants.map((p) => {
+                        const checked = assistantCoordinatorIds.includes(
+                          p.amigoId,
+                        );
+
+                        return (
+                          <li
+                            key={p.amigoId}
+                            className="roles-list__item"
+                          >
+                            <label className="checkbox">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() =>
+                                  setAssistantCoordinatorIds((prev) =>
+                                    checked
+                                      ? prev.filter(
+                                          (id) => id !== p.amigoId,
+                                        )
+                                      : [...prev, p.amigoId],
+                                  )
+                                }
+                              />
+                              <span>{p.displayName}</span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
               </>
             )}
           </fieldset>

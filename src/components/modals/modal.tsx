@@ -1,5 +1,4 @@
-
-// src/components/modals/modal.tsx
+// src/components/modals/Modal.tsx
 import React, { useEffect } from "react";
 import "../../assets/sass/components/_modals.scss";
 
@@ -11,23 +10,29 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, titleId }) => {
-  if (!isOpen) return null;
-
-  // Optional: close on Escape
+  // Optional: close on Escape – hook must be unconditional
   useEffect(() => {
+    if (!isOpen || typeof window === "undefined") return;
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
+
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen, onClose]);
+
+  // Render nothing when closed
+  if (!isOpen) return null;
 
   return (
     <div
       className={`modal ${isOpen ? "is-open" : ""}`}
       role="dialog"
       aria-modal="true"
-      aria-labelledby={titleId}
+      aria-labelledby={titleId || undefined}
       onClick={onClose} // click backdrop to close
     >
       <div

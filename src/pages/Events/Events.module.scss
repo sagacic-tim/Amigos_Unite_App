@@ -38,3 +38,7 @@
 .event-list {
   @include default-grid.grid-layout(); // Using the grid layout mixin
 }
+
+.roles-list__item {
+  list-style-type: none;
+}

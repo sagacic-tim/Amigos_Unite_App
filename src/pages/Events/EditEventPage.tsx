@@ -7,6 +7,7 @@ import type { EventAmigoConnector } from "@/types/events";
 import type {
   Event,
   EventCreateParams,
+  EventRole,
 } from "@/types/events/EventTypes";
 import type {
   EventLocation,
@@ -17,8 +18,9 @@ import styles from "@/pages/Events/Events.module.scss";
 type ManagementParticipant = {
   amigoId: number;
   displayName: string;
-  currentRole?: string; // "participant" | "assistant_coordinator" | other
+  currentRole?: EventRole;
   connectorId: number;
+  willingToHelp?: boolean;
 };
 
 // Map a full EventLocation (from API) to the slimmer EventLocationCreatePayload
@@ -55,12 +57,19 @@ function mapEventLocationToCreatePayload(
 }
 
 const EditEventPage: React.FC = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const params = useParams();
+  // Support either :eventId or :id (defensive)
+  const eventIdParam = params.eventId ?? params.id;
+  const eventId = eventIdParam ? Number(eventIdParam) : null;
+
   const navigate = useNavigate();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // NEW: keep the raw connectors so we can update roles later
+  const [connectors, setConnectors] = useState<EventAmigoConnector[]>([]);
 
   // Participants displayed in the "Manage Event" step
   const [managementParticipants, setManagementParticipants] = useState<
@@ -76,15 +85,24 @@ const EditEventPage: React.FC = () => {
   // ───────────────────────────────────────────────────────────────────────────
   // Effect 1: load the event itself
   // ───────────────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!eventId) return;
 
+
+  useEffect(() => {
     let mounted = true;
 
-    (async () => {
+    const load = async () => {
+      if (!eventId) {
+        // No valid ID in the URL → stop loading and show an error instead of spinning forever
+        if (mounted) {
+          setLoading(false);
+          setError("Missing event ID in the URL.");
+        }
+        return;
+      }
+
       try {
         setLoading(true);
-        const data = await EventService.fetchEvent(Number(eventId));
+        const data = await EventService.fetchEvent(eventId);
         if (mounted) {
           setEvent(data);
           setError(null);
@@ -95,7 +113,9 @@ const EditEventPage: React.FC = () => {
       } finally {
         if (mounted) setLoading(false);
       }
-    })();
+    };
+
+    void load();
 
     return () => {
       mounted = false;
@@ -105,6 +125,7 @@ const EditEventPage: React.FC = () => {
   // ───────────────────────────────────────────────────────────────────────────
   // Effect 2: load connectors → managementParticipants for this event
   // ───────────────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     if (!eventId) return;
 
@@ -112,15 +133,18 @@ const EditEventPage: React.FC = () => {
 
     (async () => {
       try {
-        const connectors: EventAmigoConnector[] =
-          await EventService.fetchEventAmigoConnectors(Number(eventId));
+        const fetchedConnectors: EventAmigoConnector[] =
+          await EventService.fetchEventAmigoConnectors(eventId);
 
         if (!mounted) return;
+
+        // Optionally retain them in local state if you want them elsewhere
+        setConnectors(fetchedConnectors);
 
         const participants: ManagementParticipant[] = [];
         const assistantIds: number[] = [];
 
-        connectors.forEach((conn) => {
+        fetchedConnectors.forEach((conn) => {
           // Only treat these as “attendees” for management purposes
           if (
             conn.role !== "participant" &&
@@ -137,11 +161,14 @@ const EditEventPage: React.FC = () => {
             a?.user_name ||
             `Amigo #${conn.amigo_id}`;
 
+          const willingToHelp = a?.willing_to_help === true;
+
           participants.push({
             amigoId: conn.amigo_id,
             displayName,
             currentRole: conn.role,
             connectorId: conn.id,
+            willingToHelp,
           });
 
           if (conn.role === "assistant_coordinator") {
@@ -169,14 +196,11 @@ const EditEventPage: React.FC = () => {
   // Save event core + location only
   const handleSubmit = async (values: EventCreateParams) => {
     if (!eventId) return;
-    await EventService.updateEvent(Number(eventId), values);
-    // Do not navigate yet; we want to run management updates too (if any)
+    await EventService.updateEvent(eventId, values);
   };
 
   // Persist assistant_coordinator changes
-  const handleSubmitManagement = async (
-    assistantCoordinatorIds: number[],
-  ) => {
+  const handleSubmitManagement = async (assistantCoordinatorIds: number[]) => {
     if (!eventId) return;
 
     // Compute which connectors need a role change
@@ -213,7 +237,7 @@ const EditEventPage: React.FC = () => {
       await Promise.all(
         changes.map((change) =>
           EventService.updateEventAmigoConnectorRole(
-            Number(eventId),
+            eventId,
             change.connectorId,
             change.newRole,
           ),

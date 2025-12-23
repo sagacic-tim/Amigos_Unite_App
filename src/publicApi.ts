@@ -5,11 +5,23 @@ export type ThemeMode = 'light' | 'dark';
 export interface ThemeOptions {
   area: ThemeArea;
   mode?: ThemeMode;
-  palette?: string; // only used for public (e.g. "blue", "earth-tones")
+  palette?: string; // only used for public (e.g. "blue-tones", "earth-tones")
 }
 
 type Stored = { mode: ThemeMode; palette?: string };
 const STORAGE_KEY = (area: ThemeArea) => `theme:${area}`;
+
+/** Detect system preference for dark mode. */
+function prefersDark(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-color-scheme: dark)').matches === true
+  );
+}
+
+/** Global defaults, aligned with your loader / palette file naming. */
+const DEFAULT_PUBLIC_PALETTE: string = 'blue-tones';
+const DEFAULT_MODE: ThemeMode = prefersDark() ? 'dark' : 'light';
 
 function getStored(area: ThemeArea): Stored | null {
   try {
@@ -28,11 +40,6 @@ function store(area: ThemeArea, value: Stored): void {
   }
 }
 
-function prefersDark(): boolean {
-  return typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-color-scheme: dark)').matches === true;
-}
-
 function ensureLinkEl(): HTMLLinkElement | null {
   if (typeof document === 'undefined') return null;
   let link = document.getElementById('theme-loader') as HTMLLinkElement | null;
@@ -45,32 +52,39 @@ function ensureLinkEl(): HTMLLinkElement | null {
   return link;
 }
 
-function getLoaderHref(args: { area: ThemeArea; mode: ThemeMode; palette: string }): string {
+function getLoaderHref(args: {
+  area: ThemeArea;
+  mode: ThemeMode;
+  palette: string;
+}): string {
   const { area, mode, palette } = args;
   if (area === 'admin') {
-    // matches: /public/themes/admin/loaders/{light|dark}-theme.loader.css
+    // matches: /themes/admin/loaders/{light|dark}-theme.loader.css
     return `/themes/admin/loaders/${mode}-theme.loader.css`;
   }
-  // matches: /public/themes/public/loaders/{palette}-{light|dark}.loader.css
+  // matches: /themes/public/loaders/{palette}-{light|dark}.loader.css
   return `/themes/public/loaders/${palette}-${mode}.loader.css`;
 }
 
 /** Read the currently effective theme (area, mode, palette) with sane defaults. */
-export function getTheme(): Required<Pick<ThemeOptions, 'area' | 'mode'>> & { palette?: string } {
+export function getTheme(): Required<
+  Pick<ThemeOptions, 'area' | 'mode'>
+> & { palette?: string } {
   // Determine current area from <html data-theme-area>, else default 'public'
   const attrArea =
     (typeof document !== 'undefined' &&
-      (document.documentElement.getAttribute('data-theme-area') as ThemeArea | null)) || null;
+      (document.documentElement.getAttribute(
+        'data-theme-area',
+      ) as ThemeArea | null)) || null;
 
   const area: ThemeArea = attrArea === 'admin' ? 'admin' : 'public';
   const stored = getStored(area);
 
-  const mode: ThemeMode =
-    stored?.mode ?? (prefersDark() ? 'dark' : 'light');
+  const mode: ThemeMode = stored?.mode ?? DEFAULT_MODE;
 
   const palette =
     area === 'public'
-      ? (stored?.palette ?? 'blue')
+      ? stored?.palette ?? DEFAULT_PUBLIC_PALETTE
       : undefined;
 
   return { area, mode, palette };
@@ -84,12 +98,11 @@ export function setTheme(opts: ThemeOptions): void {
   const area: ThemeArea = opts.area;
 
   // Merge with stored/current + defaults
-  const mode: ThemeMode =
-    opts.mode ?? current.mode ?? (prefersDark() ? 'dark' : 'light');
+  const mode: ThemeMode = opts.mode ?? current.mode ?? DEFAULT_MODE;
 
   const palette: string =
     area === 'public'
-      ? (opts.palette ?? current.palette ?? 'blue-tones')
+      ? opts.palette ?? current.palette ?? DEFAULT_PUBLIC_PALETTE
       : 'admin'; // dummy for href builder; not stored for admin
 
   // Persist (admin does not store a palette)
@@ -117,12 +130,22 @@ export function setTheme(opts: ThemeOptions): void {
   if (typeof document === 'undefined') return;
   // If the page already marked an area on <html>, respect it; otherwise default public
   const htmlArea =
-    (document.documentElement.getAttribute('data-theme-area') as ThemeArea | null) || 'public';
+    (document.documentElement.getAttribute(
+      'data-theme-area',
+    ) as ThemeArea | null) || 'public';
   const stored = getStored(htmlArea);
+
   const initial: ThemeOptions =
     htmlArea === 'public'
-      ? { area: 'public', mode: stored?.mode ?? (prefersDark() ? 'dark' : 'light'), palette: stored?.palette ?? 'blue' }
-      : { area: 'admin', mode: stored?.mode ?? (prefersDark() ? 'dark' : 'light') };
+      ? {
+          area: 'public',
+          mode: stored?.mode ?? DEFAULT_MODE,
+          palette: stored?.palette ?? DEFAULT_PUBLIC_PALETTE,
+        }
+      : {
+          area: 'admin',
+          mode: stored?.mode ?? DEFAULT_MODE,
+        };
 
   setTheme(initial);
 })();
