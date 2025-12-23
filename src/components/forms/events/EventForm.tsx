@@ -1040,7 +1040,7 @@ const EventForm: React.FC<EventFormProps> = ({
                         return (
                           <li
                             key={p.amigoId}
-                            className="roles-list__item"
+                            className={styles["roles-list__item"]}   
                           >
                             <label className="checkbox">
                               <input

@@ -74,13 +74,13 @@
   select,
   textarea {
     background: var(--input-bg-color);
-    border: 1px solid var(--secondary-border-color);
     border-radius: var(--border-radius-sm);
+    border: 1px solid var(--secondary-border-color);
     color: var(--input-entry-color);
+    line-height: 1.35;
     margin: var(--spacing-xxs) 0 0;
     padding: var(--spacing-xs);
     width: 100%;
-    line-height: 1.35;
 
     &:hover {
       border-color: var(--secondary-border-hover-color);
@@ -89,44 +89,45 @@
 
   /* Small explanatory text under inputs */
   .form-hint {
-    display: block;
-    margin-top: var(--spacing-xxs);
-    font-size: 0.875rem;
     color: var(--muted-text-color);
+    display: block;
+    font-size: 0.95rem;
     font-weight: var(--font-weight-regular);
+    margin-bottom: 0.5rem;
+    margin-top: var(--spacing-xxs);
   }
 
   .checkbox {
-    display: flex;
     align-items: center;
+    display: flex;
     gap: var(--spacing-xs);
 
     input[type="checkbox"] {
-      width: auto;
       margin: 0;
       transform: translateY(-1px);
+      width: auto;
     }
 
     span {
-      margin: 0;
       font-weight: var(--font-weight-regular);
+      margin: 0;
     }
   }
 
   .radio {
-    display: flex;
     align-items: center;
+    display: flex;
     gap: var(--spacing-xs);
 
     input[type="radio"] {
-      width: auto;
       margin: 0;
       transform: translateY(-1px);
+      width: auto;
     }
 
     span {
-      margin: 0;
       font-weight: var(--font-weight-regular);
+      margin: 0;
     }
   }
 
@@ -181,8 +182,8 @@
 @media (prefers-reduced-motion: reduce) {
   .form,
   .form * {
-    transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
