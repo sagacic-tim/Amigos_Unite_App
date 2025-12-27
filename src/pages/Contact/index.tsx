@@ -1,6 +1,6 @@
 // src/pages/Contact/index.tsx
-import { useState, useRef } from 'react';
-import logo from '@/assets/images/home_page/amigos-unite-logo-128.png';
+import { useState, useRef } from "react";
+import logo from "@/assets/images/home_page/amigos-unite-logo-128.png";
 import styles from "./Contact.module.scss";
 
 type FormData = {
@@ -14,17 +14,23 @@ type FormData = {
 
 function getCookie(name: string) {
   // Optional CSRF helper; safe if you skip CSRF in the controller.
-  const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([$?*|{}\]\\^])/g, '\\$1') + '=([^;]*)'));
+  const match = document.cookie.match(
+    new RegExp(
+      "(?:^|; )" +
+        name.replace(/([$?*|{}\\\]^])/g, "\\$1") +
+        "=([^;]*)",
+    ),
+  );
   return match ? decodeURIComponent(match[1]) : null;
 }
 
 export default function ContactPage() {
   const [form, setForm] = useState<FormData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    message: '',
-    website: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    message: "",
+    website: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -32,16 +38,20 @@ export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   function validate(): string | null {
-    if (!form.firstName.trim()) return 'First name is required.';
-    if (!form.lastName.trim()) return 'Last name is required.';
-    if (!form.email.trim()) return 'Email is required.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return 'Please enter a valid email.';
+    if (!form.firstName.trim()) return "First name is required.";
+    if (!form.lastName.trim()) return "Last name is required.";
+    if (!form.email.trim()) return "Email is required.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      return "Please enter a valid email.";
+    }
     return null;
   }
 
@@ -51,10 +61,16 @@ export default function ContactPage() {
     setSuccess(null);
 
     // Honeypot: if filled, treat as spam and quietly succeed
-    if (form.website && form.website.trim() !== '') {
-      setSuccess('Thanks! Your message has been sent.'); // pretend success for bots
+    if (form.website && form.website.trim() !== "") {
+      setSuccess("Thanks! Your message has been sent."); // pretend success for bots
       formRef.current?.reset();
-      setForm({ firstName: '', lastName: '', email: '', message: '', website: '' });
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        message: "",
+        website: "",
+      });
       return;
     }
 
@@ -66,18 +82,18 @@ export default function ContactPage() {
 
     setSubmitting(true);
     try {
-      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "";
       const url = `${apiBase}/api/v1/contact_messages`;
 
       // If your API enforces CSRF, include token (else, the controller can use null_session).
-      const csrf = getCookie('CSRF-TOKEN');
+      const csrf = getCookie("CSRF-TOKEN");
 
       const res = await fetch(url, {
-        method: 'POST',
-        credentials: 'include', // include cookies/session
+        method: "POST",
+        credentials: "include", // include cookies/session
         headers: {
-          'Content-Type': 'application/json',
-          ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
+          "Content-Type": "application/json",
+          ...(csrf ? { "X-CSRF-Token": csrf } : {}),
         },
         body: JSON.stringify({
           contact_message: {
@@ -90,23 +106,40 @@ export default function ContactPage() {
       });
 
       if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        throw new Error(`API ${res.status}: ${text || 'Failed to send message'}`);
+        const text = await res.text().catch(() => "");
+        throw new Error(
+          `API ${res.status}: ${text || "Failed to send message"}`,
+        );
       }
 
-      setSuccess('Thanks! Your message has been sent.'); // ✅ green banner
+      setSuccess("Thanks! Your message has been sent."); // ✅ green banner
       formRef.current?.reset();
-      setForm({ firstName: '', lastName: '', email: '', message: '', website: '' });
-    } catch (err: any) {
-      console.error('Contact submit failed:', err);
-      setError('Sorry—there was a problem sending your message.');
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        message: "",
+        website: "",
+      });
+    } catch (err: unknown) {
+      // Keep console logging for debugging; narrow if we ever want to surface details
+      console.error("Contact submit failed:", err);
+
+      // Optionally, if you ever want to inspect the error:
+      // if (err instanceof Error) {
+      //   console.error(err.message);
+      // }
+
+      setError("Sorry—there was a problem sending your message.");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className={`page-container page-container--single ${styles.pageContainer}`}>
+    <div
+      className={`page-container page-container--single ${styles.pageContainer}`}
+    >
       <main className="container container--center page-container__inner">
         {/* Logo */}
         <section className="section">
@@ -114,7 +147,11 @@ export default function ContactPage() {
             <img
               src={logo}
               alt="Amigos Unite logo"
-              style={{ display: 'block', marginInline: 'auto', maxWidth: 320 }}
+              style={{
+                display: "block",
+                marginInline: "auto",
+                maxWidth: 320,
+              }}
             />
           </div>
         </section>
@@ -133,7 +170,11 @@ export default function ContactPage() {
             noValidate
           >
             {/* Status region at the very top */}
-            <div role="status" aria-live="polite" style={{ marginBottom: '0.5rem' }}>
+            <div
+              role="status"
+              aria-live="polite"
+              style={{ marginBottom: "0.5rem" }}
+            >
               {success && <div className="form-success">{success}</div>}
               {error && <div className="form-error">{error}</div>}
             </div>
@@ -141,7 +182,10 @@ export default function ContactPage() {
             <h2 className="form-grid__title">Send us a message</h2>
 
             {/* Honeypot (hidden from users) */}
-            <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+            <div
+              style={{ position: "absolute", left: "-9999px" }}
+              aria-hidden="true"
+            >
               <label htmlFor="website">Website</label>
               <input
                 id="website"
@@ -216,14 +260,24 @@ export default function ContactPage() {
             </div>
 
             <div className="form-grid__actions">
-              <button className="button button--primary" type="submit" disabled={submitting}>
-                {submitting ? 'Sending…' : 'Send Message'}
+              <button
+                className="button button--primary"
+                type="submit"
+                disabled={submitting}
+              >
+                {submitting ? "Sending…" : "Send Message"}
               </button>
               <button
                 className="button button--secondary"
                 type="button"
                 onClick={() =>
-                  setForm({ firstName: '', lastName: '', email: '', message: '', website: '' })
+                  setForm({
+                    firstName: "",
+                    lastName: "",
+                    email: "",
+                    message: "",
+                    website: "",
+                  })
                 }
                 disabled={submitting}
               >

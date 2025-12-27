@@ -6,11 +6,17 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  titleId?: string; // optional aria-labelledby target
+  /** Optional id of a heading inside the modal for aria-labelledby */
+  titleId?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, titleId }) => {
-  // Optional: close on Escape – hook must be unconditional
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+  titleId,
+}) => {
+  // Close on Escape – hook must be unconditional, but only attaches when open
   useEffect(() => {
     if (!isOpen || typeof window === "undefined") return;
 
@@ -28,17 +34,28 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, titleId }) => 
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`modal ${isOpen ? "is-open" : ""}`}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId || undefined}
-      onClick={onClose} // click backdrop to close
-    >
+    <div className={`modal ${isOpen ? "is-open" : ""}`}>
+      {/* Backdrop: interactive & keyboard-accessible for a11y */}
+      <div
+        className="modal__backdrop"
+        role="button"
+        tabIndex={0}
+        aria-label="Close modal"
+        onClick={onClose}
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClose();
+          }
+        }}
+      />
+
+      {/* Dialog content */}
       <div
         className="modal__dialog"
-        role="document"
-        onClick={(e) => e.stopPropagation()} // don’t close when clicking inside dialog
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId || undefined}
       >
         <button
           type="button"

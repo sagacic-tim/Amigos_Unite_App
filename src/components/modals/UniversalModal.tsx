@@ -33,17 +33,28 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`modal ${isOpen ? "is-open" : ""}`}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      onClick={onClose} // click backdrop to close
-    >
+    <div className={`modal ${isOpen ? "is-open" : ""}`}>
+      {/* Backdrop: clickable + keyboard accessible */}
+      <div
+        className="modal__backdrop"
+        role="button"
+        aria-label="Close modal"
+        tabIndex={0}
+        onClick={onClose}
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClose();
+          }
+        }}
+      />
+
+      {/* Dialog content */}
       <div
         className="modal__dialog"
-        role="document"
-        onClick={(e) => e.stopPropagation()} // don’t close when clicking inside dialog
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
       >
         <button
           type="button"

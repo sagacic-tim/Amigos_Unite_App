@@ -1,7 +1,6 @@
 // src/layout/navigation/main-nav-bar.tsx
 import React, { useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { useManagedEventsFlag } from "@/hooks/useManagedEventsFlag";
 
 export type NavItem = { to: string; label: string };
 
@@ -23,19 +22,15 @@ const MainNavBar: React.FC<MainNavBarProps> = ({
   const isEventsSectionActive = location.pathname.startsWith("/events");
 
   const handleClick = useCallback(
-    (
-      e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-      label: string,
-      to: string
-    ) => {
+    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, label: string) => {
       if (label === "Events") {
         // Treat "Events" as a dropdown trigger instead of navigation
         e.preventDefault();
         onEventsToggle?.();
       }
-      // all other items behave as usual
+      // All other items behave as usual via NavLink
     },
-    [onEventsToggle]
+    [onEventsToggle],
   );
 
   return (
@@ -52,7 +47,7 @@ const MainNavBar: React.FC<MainNavBarProps> = ({
               href="#events"
               ref={eventsAnchorRef}
               className={className}
-              onClick={(e) => handleClick(e, label, to)}
+              onClick={(e) => handleClick(e, label)}
             >
               {label}
             </a>

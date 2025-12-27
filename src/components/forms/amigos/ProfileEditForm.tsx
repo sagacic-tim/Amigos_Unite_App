@@ -1,11 +1,11 @@
-// src/components/forms/amigos/ProfileForm.tsx
+// src/components/forms/amigos/ProfileEditForm.tsx
 import { useEffect, useMemo, useState, useCallback } from "react";
 import md5 from "blueimp-md5";
 import privateApi from "@/services/api/privateApi";
 import type { Amigo } from "@/types/amigos/AmigoTypes";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Types (lifted from the original Profile page)
+// Types
 // ─────────────────────────────────────────────────────────────────────────────
 
 type AmigoCorePayload = {
@@ -27,7 +27,19 @@ type AmigoDetailsPayload = {
   personal_bio?: string | null;
 };
 
-const buildAmigoDetailsPayload = (src: any): AmigoDetailsPayload => ({
+type AvatarSource = "upload" | "gravatar" | "url" | "default";
+
+type AvatarDetailsExtras = {
+  avatar_source?: AvatarSource;
+  avatar_remote_url?: string | null;
+  _avatar_file?: File | null;
+};
+
+type AmigoDetailsState = AmigoDetailsPayload & AvatarDetailsExtras;
+
+const buildAmigoDetailsPayload = (
+  src: Partial<AmigoDetailsState>
+): AmigoDetailsPayload => ({
   date_of_birth: src.date_of_birth ?? null,
   member_in_good_standing: !!src.member_in_good_standing,
   available_to_host: !!src.available_to_host,
@@ -89,6 +101,19 @@ const buildAmigoLocationPayloadForSave = (
     latitude: src.latitude ?? null,
     longitude: src.longitude ?? null,
     time_zone: src.time_zone ?? null,
+  };
+};
+
+type ApiErrorData = {
+  errors?: string[];
+  error?: string;
+  message?: string;
+};
+
+type ApiError = {
+  response?: {
+    status?: number;
+    data?: ApiErrorData;
   };
 };
 
@@ -171,14 +196,14 @@ const CA_PROVINCES = [
   { short: "YT", long: "Yukon" },
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
 function gravatarIdenticon(email: string, size = 80) {
   const hash = md5(email.trim().toLowerCase());
   return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 function composeAddress(loc: Partial<AmigoLocationPayload>): string {
   const parts = [
@@ -195,6 +220,26 @@ function composeAddress(loc: Partial<AmigoLocationPayload>): string {
   ].filter(Boolean);
   return parts.join(", ");
 }
+
+const getFirstErrorMessage = (error: unknown, fallback: string): string => {
+  const maybeError = error as ApiError;
+  const data = maybeError.response?.data;
+  if (!data) return fallback;
+
+  if (Array.isArray(data.errors) && data.errors.length > 0) {
+    return String(data.errors[0]);
+  }
+
+  if (typeof data.error === "string" && data.error.trim() !== "") {
+    return data.error;
+  }
+
+  if (typeof data.message === "string" && data.message.trim() !== "") {
+    return data.message;
+  }
+
+  return fallback;
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -215,7 +260,7 @@ export default function ProfileForm({
 }: ProfileFormProps) {
   const [loading, setLoading] = useState(true);
   const [amigoCore, setAmigoCore] = useState<AmigoCorePayload | null>(null);
-  const [details, setDetails] = useState<AmigoDetailsPayload>({});
+  const [details, setDetails] = useState<AmigoDetailsState>({});
   const [location, setLocation] = useState<AmigoLocationPayload | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -235,7 +280,9 @@ export default function ProfileForm({
   const apiOrigin = import.meta.env.VITE_API_ORIGIN as string;
 
   const initialAvatarSrc = useMemo(() => {
-    if (currentAmigo.avatar_url) return `${apiOrigin}${currentAmigo.avatar_url}`;
+    if (currentAmigo.avatar_url) {
+      return `${apiOrigin}${currentAmigo.avatar_url}`;
+    }
     const email = (currentAmigo.email || "").trim().toLowerCase();
     if (email) return gravatarIdenticon(email, 80);
     return "/images/default-amigo-avatar.png";
@@ -252,7 +299,7 @@ export default function ProfileForm({
       const a = await privateApi.get(`/api/v1/amigos/${amigoId}`, {
         withCredentials: true,
       });
-      const raw = (a?.data ?? {}) as any;
+      const raw = (a?.data ?? {}) as Partial<AmigoCorePayload>;
 
       setAmigoCore({
         first_name: raw.first_name ?? currentAmigo.first_name ?? "",
@@ -278,13 +325,10 @@ export default function ProfileForm({
 
     // Amigo Details
     try {
-      const d = await privateApi.get(
-        `/api/v1/amigos/${amigoId}/amigo_detail`,
-        {
-          withCredentials: true,
-        }
-      );
-      const rawDetails = d?.data ?? {};
+      const d = await privateApi.get(`/api/v1/amigos/${amigoId}/amigo_detail`, {
+        withCredentials: true,
+      });
+      const rawDetails = (d?.data ?? {}) as Partial<AmigoDetailsState>;
       setDetails(buildAmigoDetailsPayload(rawDetails));
     } catch {
       setDetails({});
@@ -298,12 +342,23 @@ export default function ProfileForm({
           withCredentials: true,
         }
       );
-      const list = Array.isArray(l?.data) ? l.data : l?.data?.data ?? [];
-      const first = list?.[0] ?? null;
+
+      const data = l?.data as
+        | AmigoLocationPayload[]
+        | { data?: AmigoLocationPayload[] }
+        | undefined;
+
+      const list: AmigoLocationPayload[] = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data ?? []
+        : [];
+
+      const first = list[0] ?? null;
 
       if (first) {
-        const { amigo, ...rest } = first; // drop nested amigo
-        setLocation(rest as AmigoLocationPayload);
+        // keep extra keys (like nested amigo) – state type only cares about known fields
+        setLocation(first);
       } else {
         setLocation(null);
       }
@@ -339,21 +394,24 @@ export default function ProfileForm({
     }));
   };
 
-  const handleDetailsChange = (
-    field: keyof AmigoDetailsPayload,
-    value: any
+  const handleDetailsChange = <K extends keyof AmigoDetailsState>(
+    field: K,
+    value: AmigoDetailsState[K]
   ) => {
-    setDetails((prev) => ({ ...(prev ?? {}), [field]: value }));
+    setDetails((prev) => ({
+      ...(prev ?? {}),
+      [field]: value,
+    }));
   };
 
-  const handleLocationChange = (
-    field: keyof AmigoLocationPayload,
-    value: any
+  const handleLocationChange = <K extends keyof AmigoLocationPayload>(
+    field: K,
+    value: AmigoLocationPayload[K]
   ) => {
     setLocation((prev) => ({
       ...(prev ?? {}),
       [field]: value,
-    } as AmigoLocationPayload));
+    }));
   };
 
   const saveAll = async () => {
@@ -366,7 +424,7 @@ export default function ProfileForm({
       // Core Amigo
       if (amigoCore) {
         const core = amigoCore;
-        const amigoPayload: any = {
+        const amigoPayload: Partial<AmigoCorePayload> = {
           first_name: (core.first_name || "").trim(),
           last_name: (core.last_name || "").trim(),
           user_name: (core.user_name || "").trim(),
@@ -399,7 +457,7 @@ export default function ProfileForm({
           { amigo_detail: cleanDetails },
           { withCredentials: true }
         )
-        .catch(async (err) => {
+        .catch(async (err: ApiError) => {
           if (err?.response?.status === 404) {
             await privateApi.post(
               `/api/v1/amigos/${amigoId}/amigo_detail`,
@@ -432,10 +490,42 @@ export default function ProfileForm({
 
       await loadAll();
       setSaved(true);
-    } catch (e: any) {
-      setError(
-        e?.response?.data?.errors?.[0] ?? "Failed to save profile."
-      );
+    } catch (error: unknown) {
+      setError(getFirstErrorMessage(error, "Failed to save profile."));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateAvatar = async () => {
+    if (!amigoId) return;
+    setSaving(true);
+    setError(null);
+
+    try {
+      const data = new FormData();
+
+      const source: AvatarSource = details.avatar_source ?? "default";
+      data.append("amigo[avatar_source]", source);
+
+      if (source === "url" && details.avatar_remote_url) {
+        data.append("amigo[avatar_remote_url]", details.avatar_remote_url);
+      }
+
+      if (source === "upload" && details._avatar_file) {
+        data.append("amigo[avatar]", details._avatar_file);
+      }
+
+      await privateApi.patch(`/api/v1/amigos/${amigoId}`, data, {
+        withCredentials: true,
+        headers: { Accept: "application/json" },
+      });
+
+      await refreshAuth();
+      await loadAll();
+      setSaved(true);
+    } catch (error: unknown) {
+      setError(getFirstErrorMessage(error, "Failed to update avatar."));
     } finally {
       setSaving(false);
     }
@@ -443,9 +533,7 @@ export default function ProfileForm({
 
   const countryCode = (location?.country_short || "").toUpperCase();
   const regions = regionOptions[countryCode] ?? [];
-  const address = location
-    ? location.address || composeAddress(location)
-    : "";
+  const address = location ? location.address || composeAddress(location) : "";
 
   if (!amigoId) {
     return <p>Loading your profile…</p>;
@@ -517,10 +605,7 @@ export default function ProfileForm({
                     type="email"
                     value={amigoCore?.secondary_email ?? ""}
                     onChange={(e) =>
-                      handleCoreChange(
-                        "secondary_email",
-                        e.target.value
-                      )
+                      handleCoreChange("secondary_email", e.target.value)
                     }
                   />
                 </label>
@@ -536,7 +621,8 @@ export default function ProfileForm({
                     placeholder="+1 (626) 998-2531"
                   />
                   <small className="form-hint">
-                    Enter any format; we&apos;ll store it in international format.
+                    Enter any format; we&apos;ll store it in international
+                    format.
                   </small>
                 </label>
 
@@ -551,7 +637,8 @@ export default function ProfileForm({
                     placeholder="+1 (626) 998-2531"
                   />
                   <small className="form-hint">
-                    Enter any format; we&apos;ll store it in international format.
+                    Enter any format; we&apos;ll store it in international
+                    format.
                   </small>
                 </label>
               </fieldset>
@@ -667,10 +754,7 @@ export default function ProfileForm({
                   type="text"
                   value={location?.street_number ?? ""}
                   onChange={(e) =>
-                    handleLocationChange(
-                      "street_number",
-                      e.target.value
-                    )
+                    handleLocationChange("street_number", e.target.value)
                   }
                 />
               </label>
@@ -681,10 +765,7 @@ export default function ProfileForm({
                   type="text"
                   value={location?.street_name ?? ""}
                   onChange={(e) =>
-                    handleLocationChange(
-                      "street_name",
-                      e.target.value
-                    )
+                    handleLocationChange("street_name", e.target.value)
                   }
                 />
               </label>
@@ -731,10 +812,7 @@ export default function ProfileForm({
                   type="text"
                   value={location?.city_sublocality ?? ""}
                   onChange={(e) =>
-                    handleLocationChange(
-                      "city_sublocality",
-                      e.target.value
-                    )
+                    handleLocationChange("city_sublocality", e.target.value)
                   }
                 />
               </label>
@@ -810,10 +888,7 @@ export default function ProfileForm({
                   type="text"
                   value={location?.postal_code ?? ""}
                   onChange={(e) =>
-                    handleLocationChange(
-                      "postal_code",
-                      e.target.value
-                    )
+                    handleLocationChange("postal_code", e.target.value)
                   }
                 />
               </label>
@@ -824,10 +899,7 @@ export default function ProfileForm({
                   type="text"
                   value={location?.postal_code_suffix ?? ""}
                   onChange={(e) =>
-                    handleLocationChange(
-                      "postal_code_suffix",
-                      e.target.value
-                    )
+                    handleLocationChange("postal_code_suffix", e.target.value)
                   }
                 />
               </label>
@@ -851,6 +923,7 @@ export default function ProfileForm({
                   readOnly
                 />
               </label>
+
               <label>
                 <span>Longitude</span>
                 <input
@@ -859,6 +932,7 @@ export default function ProfileForm({
                   readOnly
                 />
               </label>
+
               <label>
                 <span>Time Zone</span>
                 <input
@@ -875,7 +949,8 @@ export default function ProfileForm({
             <h2>Avatar</h2>
 
             <div className="form-grid form-grid--one-column">
-              <label>
+              {/* CHANGED: was <label> with no control; now a simple div */}
+              <div>
                 <span>Current</span>
                 <div
                   style={{
@@ -910,7 +985,7 @@ export default function ProfileForm({
                   />
                   <span>Shown across the app</span>
                 </div>
-              </label>
+              </div>
 
               <fieldset>
                 <legend>Choose source</legend>
@@ -921,8 +996,8 @@ export default function ProfileForm({
                     name="avatar_source"
                     value="upload"
                     onChange={() =>
-                      setDetails((d: any) => ({
-                        ...d,
+                      setDetails((prev) => ({
+                        ...prev,
                         avatar_source: "upload",
                       }))
                     }
@@ -936,8 +1011,8 @@ export default function ProfileForm({
                     name="avatar_source"
                     value="gravatar"
                     onChange={() =>
-                      setDetails((d: any) => ({
-                        ...d,
+                      setDetails((prev) => ({
+                        ...prev,
                         avatar_source: "gravatar",
                       }))
                     }
@@ -951,8 +1026,8 @@ export default function ProfileForm({
                     name="avatar_source"
                     value="url"
                     onChange={() =>
-                      setDetails((d: any) => ({
-                        ...d,
+                      setDetails((prev) => ({
+                        ...prev,
                         avatar_source: "url",
                       }))
                     }
@@ -966,23 +1041,23 @@ export default function ProfileForm({
                     type="url"
                     placeholder="https://example.com/avatar.jpg"
                     onChange={(e) =>
-                      setDetails((d: any) => ({
-                        ...d,
+                      setDetails((prev) => ({
+                        ...prev,
                         avatar_remote_url: e.target.value,
                       }))
                     }
                   />
                 </label>
 
-                {(details as any)?.avatar_source === "upload" && (
+                {details.avatar_source === "upload" && (
                   <label>
                     <span>Upload image (PNG/JPG/SVG, ~200×200)</span>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={(e) =>
-                        setDetails((d: any) => ({
-                          ...d,
+                        setDetails((prev) => ({
+                          ...prev,
                           _avatar_file: e.target.files?.[0] ?? null,
                         }))
                       }
@@ -994,55 +1069,7 @@ export default function ProfileForm({
               <button
                 className="button button--secondary"
                 disabled={saving}
-                onClick={async () => {
-                  if (!amigoId) return;
-                  setSaving(true);
-                  setError(null);
-                  try {
-                    const data: any = new FormData();
-                    data.append(
-                      "amigo[avatar_source]",
-                      (details as any)?.avatar_source || "default"
-                    );
-                    if (
-                      (details as any)?.avatar_source === "url" &&
-                      (details as any)?.avatar_remote_url
-                    ) {
-                      data.append(
-                        "amigo[avatar_remote_url]",
-                        (details as any).avatar_remote_url
-                      );
-                    }
-                    if (
-                      (details as any)?.avatar_source === "upload" &&
-                      (details as any)?._avatar_file
-                    ) {
-                      data.append(
-                        "amigo[avatar]",
-                        (details as any)._avatar_file
-                      );
-                    }
-
-                    await privateApi.patch(
-                      `/api/v1/amigos/${amigoId}`,
-                      data,
-                      {
-                        withCredentials: true,
-                        headers: { Accept: "application/json" },
-                      }
-                    );
-                    await refreshAuth();
-                    await loadAll();
-                    setSaved(true);
-                  } catch (e: any) {
-                    setError(
-                      e?.response?.data?.errors?.[0] ??
-                        "Failed to update avatar."
-                    );
-                  } finally {
-                    setSaving(false);
-                  }
-                }}
+                onClick={handleUpdateAvatar}
               >
                 Update Avatar
               </button>

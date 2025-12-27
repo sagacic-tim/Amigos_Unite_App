@@ -107,18 +107,36 @@ interface JsonApiEventLocationResource {
   attributes: JsonApiEventLocationAttributes;
 }
 
+type JsonApiIncludedResource =
+  | JsonApiEventLocationResource
+  | {
+      type?: string;
+      id?: string;
+      [key: string]: unknown;
+    };
+
 interface JsonApiIndexResponse {
   data: JsonApiEventResource[];
 }
 
 interface JsonApiShowResponse {
   data: JsonApiEventResource;
-  included?: (JsonApiEventLocationResource | any)[];
+  included?: JsonApiIncludedResource[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Normalizers
+// Type guards & normalizers
 // ─────────────────────────────────────────────────────────────────────────────
+
+function isEventLocationResource(
+  resource: unknown
+): resource is JsonApiEventLocationResource {
+  return (
+    !!resource &&
+    typeof resource === "object" &&
+    (resource as JsonApiEventLocationResource).type === "event-locations"
+  );
+}
 
 function normalizeEventLocation(
   resource: JsonApiEventLocationResource
@@ -225,6 +243,85 @@ function normalizeEvent(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Connector payload helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+type EventAmigoConnectorSinglePayload =
+  | EventAmigoConnector
+  | { event_amigo_connector?: EventAmigoConnector }
+  | { data?: EventAmigoConnector };
+
+type EventAmigoConnectorListPayload =
+  | EventAmigoConnector[]
+  | { event_amigo_connectors?: EventAmigoConnector[] }
+  | { data?: EventAmigoConnector[] };
+
+function unwrapEventAmigoConnector(payload: unknown): EventAmigoConnector {
+  if (!payload || typeof payload !== "object") {
+    return payload as EventAmigoConnector;
+  }
+
+  const obj = payload as EventAmigoConnectorSinglePayload;
+
+  // { event_amigo_connector: { ... } }
+  if (
+    "event_amigo_connector" in obj &&
+    (obj as { event_amigo_connector?: EventAmigoConnector })
+      .event_amigo_connector
+  ) {
+    return (obj as { event_amigo_connector: EventAmigoConnector })
+      .event_amigo_connector;
+  }
+
+  // { data: { ... } }
+  if ("data" in obj && (obj as { data?: EventAmigoConnector }).data) {
+    return (obj as { data: EventAmigoConnector }).data;
+  }
+
+  // Fallback: assume the payload itself is a connector
+  return obj as EventAmigoConnector;
+}
+
+function unwrapEventAmigoConnectorList(
+  payload: unknown
+): EventAmigoConnector[] {
+  // Bare array
+  if (Array.isArray(payload)) {
+    return payload as EventAmigoConnector[];
+  }
+
+  if (!payload || typeof payload !== "object") {
+    return [];
+  }
+
+  const obj = payload as EventAmigoConnectorListPayload;
+
+  // { event_amigo_connectors: [ ... ] }
+  if (
+    "event_amigo_connectors" in obj &&
+    Array.isArray(
+      (obj as { event_amigo_connectors?: EventAmigoConnector[] })
+        .event_amigo_connectors
+    )
+  ) {
+    return (
+      (obj as { event_amigo_connectors: EventAmigoConnector[] })
+        .event_amigo_connectors
+    );
+  }
+
+  // { data: [ ... ] }
+  if (
+    "data" in obj &&
+    Array.isArray((obj as { data?: EventAmigoConnector[] }).data)
+  ) {
+    return (obj as { data: EventAmigoConnector[] }).data;
+  }
+
+  return [];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Service API
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -243,10 +340,7 @@ export const EventService = {
     const res = await publicApi.get<JsonApiShowResponse>(
       `${API_PREFIX}/events/${id}`
     );
-    const included = (res.data.included || []).filter(
-      (r: any): r is JsonApiEventLocationResource =>
-        r && r.type === "event-locations"
-    );
+    const included = (res.data.included || []).filter(isEventLocationResource);
     return normalizeEvent(res.data.data, included);
   },
 
@@ -266,10 +360,7 @@ export const EventService = {
         event: params,
       }
     );
-    const included = (res.data.included || []).filter(
-      (r: any): r is JsonApiEventLocationResource =>
-        r && r.type === "event-locations"
-    );
+    const included = (res.data.included || []).filter(isEventLocationResource);
     return normalizeEvent(res.data.data, included);
   },
 
@@ -281,10 +372,7 @@ export const EventService = {
         event: params,
       }
     );
-    const included = (res.data.included || []).filter(
-      (r: any): r is JsonApiEventLocationResource =>
-        r && r.type === "event-locations"
-    );
+    const included = (res.data.included || []).filter(isEventLocationResource);
     return normalizeEvent(res.data.data, included);
   },
 
@@ -292,9 +380,10 @@ export const EventService = {
    * Register the given amigo as a participant on an event.
    * Hits: POST /api/v1/events/:event_id/event_amigo_connectors
    *
-   * AMS `:attributes` adapter for a single record typically returns:
+   * Tolerates:
    *   { event_amigo_connector: { ... } }
-   * but this helper is defensive and will also tolerate legacy shapes.
+   *   { data: { ... } }
+   *   { ...connector fields... }
    */
   async registerForEvent(
     eventId: number,
@@ -310,45 +399,35 @@ export const EventService = {
       }
     );
 
-    const payload: any = res.data;
-
-    if (payload && payload.event_amigo_connector) {
-      return payload.event_amigo_connector as EventAmigoConnector;
-    }
-
-    if (payload && payload.data) {
-      return payload.data as EventAmigoConnector;
-    }
-
-    return payload as EventAmigoConnector;
+    return unwrapEventAmigoConnector(res.data as unknown);
   },
 
   /**
    * Register the current amigo for an event via the /events/:id/register_self
    * endpoint (if you keep this route). This is more “semantic”, whereas
    * registerForEvent works directly with the connectors endpoint.
-   * legacy; no matching route defined yet.
+   * (Currently marked legacy.)
    */
-  async registerSelf(eventId: number, options?: any): Promise<any> {
+  async registerSelf(
+    eventId: number,
+    options?: Record<string, unknown>
+  ): Promise<unknown> {
     const res = await privateApi.post(
       `${API_PREFIX}/events/${eventId}/register_self`,
       {
         ...(options || {}),
       }
     );
-    return res.data;
+    return res.data as unknown;
   },
 
   /**
    * Fetch connectors for a specific event.
    *
-   * With AMS :attributes adapter, the index action commonly returns:
-   *   { event_amigo_connectors: [ {...}, {...} ] }
-   *
-   * but this function is tolerant of several shapes:
+   * Accepts:
    *   - [ {...}, {...} ]
    *   - { event_amigo_connectors: [ ... ] }
-   *   - { data: [ ... ] }  (legacy JSON:API style)
+   *   - { data: [ ... ] }
    */
   async fetchEventAmigoConnectors(
     eventId: number
@@ -356,19 +435,8 @@ export const EventService = {
     const res = await privateApi.get(
       `${API_PREFIX}/events/${eventId}/event_amigo_connectors`
     );
-    const payload: any = res.data;
 
-    if (Array.isArray(payload)) {
-      return payload as EventAmigoConnector[];
-    }
-    if (payload && Array.isArray(payload.event_amigo_connectors)) {
-      return payload.event_amigo_connectors as EventAmigoConnector[];
-    }
-    if (payload && Array.isArray(payload.data)) {
-      return payload.data as EventAmigoConnector[];
-    }
-
-    return [];
+    return unwrapEventAmigoConnectorList(res.data as unknown);
   },
 
   /**
@@ -379,35 +447,42 @@ export const EventService = {
     const res = await privateApi.get(
       `${API_PREFIX}/event_amigo_connectors`
     );
-    const payload: any = res.data;
 
-    if (Array.isArray(payload)) {
-      return payload as EventAmigoConnector[];
-    }
-    if (payload && Array.isArray(payload.event_amigo_connectors)) {
-      return payload.event_amigo_connectors as EventAmigoConnector[];
-    }
-    if (payload && Array.isArray(payload.data)) {
-      return payload.data as EventAmigoConnector[];
-    }
-
-    return [];
+    return unwrapEventAmigoConnectorList(res.data as unknown);
   },
 
-  async fetchAllEventLocationConnectors(): Promise<any[]> {
+  /**
+   * Fetch all event-location connectors (debug / admin use).
+   * Kept flexible: returns unknown[] as this is rarely used and schema may vary.
+   */
+  async fetchAllEventLocationConnectors(): Promise<unknown[]> {
     const res = await privateApi.get(
       `${API_PREFIX}/event_location_connectors`
     );
-    const payload: any = res.data;
+    const payload: unknown = res.data;
 
     if (Array.isArray(payload)) {
       return payload;
     }
-    if (payload && Array.isArray(payload.event_location_connectors)) {
-      return payload.event_location_connectors;
+
+    if (
+      payload &&
+      typeof payload === "object" &&
+      Array.isArray(
+        (payload as { event_location_connectors?: unknown[] })
+          .event_location_connectors
+      )
+    ) {
+      return (payload as { event_location_connectors: unknown[] })
+        .event_location_connectors;
     }
-    if (payload && Array.isArray(payload.data)) {
-      return payload.data;
+
+    if (
+      payload &&
+      typeof payload === "object" &&
+      Array.isArray((payload as { data?: unknown[] }).data)
+    ) {
+      return (payload as { data: unknown[] }).data;
     }
 
     return [];
@@ -431,24 +506,15 @@ export const EventService = {
       }
     );
 
-    const payload: any = res.data;
-
-    if (payload && payload.event_amigo_connector) {
-      return payload.event_amigo_connector as EventAmigoConnector;
-    }
-    if (payload && payload.data) {
-      return payload.data as EventAmigoConnector;
-    }
-
-    return payload as EventAmigoConnector;
+    return unwrapEventAmigoConnector(res.data as unknown);
   },
 
-  async leave(eventId: number): Promise<any> {
+  async leave(eventId: number): Promise<unknown> {
     // Example: DELETE /events/:id/leave
     const res = await privateApi.delete(
       `${API_PREFIX}/events/${eventId}/leave`
     );
-    return res.data;
+    return res.data as unknown;
   },
 
   /**

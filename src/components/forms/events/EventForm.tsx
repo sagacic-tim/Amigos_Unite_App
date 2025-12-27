@@ -1,5 +1,6 @@
 // src/components/forms/events/EventForm.tsx
 import React, { useState } from "react";
+import axios from "axios";
 import type {
   EventCreateParams,
   EventStatus,
@@ -31,8 +32,8 @@ interface EventFormProps {
   managementParticipants?: {
     amigoId: number;
     displayName: string;
-    currentRole?: EventRole;   // "participant" | "assistant_coordinator" | "lead_coordinator"
-    willingToHelp?: boolean;   // from amigo_detail.willing_to_help
+    currentRole?: EventRole; // "participant" | "assistant_coordinator" | "lead_coordinator"
+    willingToHelp?: boolean; // from amigo_detail.willing_to_help
   }[];
 
   /**
@@ -210,8 +211,7 @@ function buildLocationPayload(
   };
 }
 
-// NEW: build a LocationDraft from a preexisting EventLocationCreatePayload
-// (used for pre-populating the edit form)
+// Build a LocationDraft from a preexisting EventLocationCreatePayload
 function buildLocationDraftFromPayload(
   payload: EventLocationCreatePayload,
 ): LocationDraft {
@@ -264,7 +264,6 @@ const EventForm: React.FC<EventFormProps> = ({
     event_speakers_performers:
       initialValues?.event_speakers_performers ?? [],
     description: initialValues?.description ?? "",
-    // `location` is optional and injected at submit-time from LocationDraft
   });
 
   // ── Location state (front-end only) ───────────────────────────────────────
@@ -275,7 +274,7 @@ const EventForm: React.FC<EventFormProps> = ({
     return defaultLocation;
   });
 
-  // NEW: management state (assistant coordinators)
+  // Management state (assistant coordinators)
   const [assistantCoordinatorIds, setAssistantCoordinatorIds] =
     useState<number[]>(() => initialAssistantCoordinatorIds ?? []);
 
@@ -371,6 +370,7 @@ const EventForm: React.FC<EventFormProps> = ({
       setSelectedPlace(null);
       setPlacePhotos([]);
     } catch (err) {
+      // Only log; user-facing message is generic
       console.error(err);
       setSearchError("Could not load places from Google.");
     } finally {
@@ -448,12 +448,31 @@ const EventForm: React.FC<EventFormProps> = ({
       if (includeManagementStep && onSubmitManagement) {
         await onSubmitManagement(assistantCoordinatorIds);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      const msg =
-        err?.response?.data?.errors?.join(", ") ||
-        err?.response?.data?.error ||
-        "An error occurred while saving the event.";
+
+      let msg = "An error occurred while saving the event.";
+
+      if (axios.isAxiosError(err)) {
+        const data = err.response?.data as
+          | { errors?: unknown; error?: unknown }
+          | undefined;
+
+        if (data?.errors && Array.isArray(data.errors)) {
+          const textErrors = data.errors
+            .map((item) =>
+              typeof item === "string" ? item : String(item),
+            )
+            .filter((s) => s.trim().length > 0);
+
+          if (textErrors.length > 0) {
+            msg = textErrors.join(", ");
+          }
+        } else if (typeof data?.error === "string" && data.error.trim()) {
+          msg = data.error.trim();
+        }
+      }
+
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -466,7 +485,7 @@ const EventForm: React.FC<EventFormProps> = ({
       ? values.event_speakers_performers.join(", ")
       : "";
 
-    // ───────────────────────────────────────────────────────────────────────────
+  // ───────────────────────────────────────────────────────────────────────────
   // Derived role lists for the "Manage Event" step
   // ───────────────────────────────────────────────────────────────────────────
 
@@ -495,7 +514,6 @@ const EventForm: React.FC<EventFormProps> = ({
       p.willingToHelp === true &&
       !assistantCoordinatorIds.includes(p.amigoId),
   );
-
 
   // ───────────────────────────────────────────────────────────────────────────
   // Render (multi-step)
@@ -866,48 +884,50 @@ const EventForm: React.FC<EventFormProps> = ({
 
               {/* Scrollable gallery of photos for the selected place */}
               {selectedPlace && placePhotos.length > 0 && (
-                <div className="places-gallery" role="list">
+                <ul className="places-gallery">
                   {placePhotos.map((photo, idx) => {
                     const isSelected =
                       location.imageUrl === photo.photo_url;
 
                     return (
-                      <button
-                        type="button"
+                      <li
                         key={
                           photo.photo_url ||
                           `${photo.place_id}-${idx}`
                         }
-                        role="listitem"
                         className={
                           "places-gallery__item" +
                           (isSelected
                             ? " places-gallery__item--selected"
                             : "")
                         }
-                        onClick={() => handleSelectPlaceImage(photo)}
                       >
-                        {photo.photo_url && (
-                          <img
-                            src={photo.photo_url}
-                            alt={
-                              selectedPlace.name || "Location photo"
-                            }
-                            className="places-gallery__image"
-                          />
-                        )}
-                        {photo.photo_attribution && (
-                          <span
-                            className="places-gallery__attribution"
-                            dangerouslySetInnerHTML={{
-                              __html: photo.photo_attribution,
-                            }}
-                          />
-                        )}
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectPlaceImage(photo)}
+                        >
+                          {photo.photo_url && (
+                            <img
+                              src={photo.photo_url}
+                              alt={
+                                selectedPlace.name || "Location photo"
+                              }
+                              className="places-gallery__image"
+                            />
+                          )}
+                          {photo.photo_attribution && (
+                            <span
+                              className="places-gallery__attribution"
+                              dangerouslySetInnerHTML={{
+                                __html: photo.photo_attribution,
+                              }}
+                            />
+                          )}
+                        </button>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               )}
 
               {/* Manual override / fallback */}
@@ -951,11 +971,10 @@ const EventForm: React.FC<EventFormProps> = ({
           </fieldset>
         )}
 
-        
         {/* ───────────── Manage Event (Step 3) ───────────── */}
         {includeManagementStep && currentStep === 3 && (
           <fieldset>
-            <legend className="formsLegend">Manage Event</legend>
+            <legend className="formsLegend">Manage Staff</legend>
 
             {!managementParticipants || managementParticipants.length === 0 ? (
               <p className="form-hint">
@@ -1040,7 +1059,7 @@ const EventForm: React.FC<EventFormProps> = ({
                         return (
                           <li
                             key={p.amigoId}
-                            className={styles["roles-list__item"]}   
+                            className={styles["roles-list__item"]}
                           >
                             <label className="checkbox">
                               <input

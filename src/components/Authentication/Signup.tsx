@@ -6,6 +6,7 @@ import '../../pages/Authentication/Authentication.module.scss';
 import { signupAmigo } from '@/services/auth';
 import { ensureCsrfToken } from '@/services/csrf';
 import AuthFormShell from './AuthFormShell';
+import axios from 'axios';
 
 interface SignupProps {
   isOpen: boolean;
@@ -84,38 +85,54 @@ const Signup: React.FC<SignupProps> = ({
 
       onSignupSuccess();
       // Parent will close the modal; no need to call onClose here.
-    } catch (err: any) {
-      const status = err?.response?.status as number | undefined;
-      const errorsArray: string[] = Array.isArray(err?.response?.data?.errors)
-        ? err.response.data.errors
-        : [];
+    } catch (err: unknown) {
+      // Axios-aware error handling without `any`
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        const data = err.response?.data;
 
-      const apiMsg =
-        errorsArray.join(', ') ||
-        err?.response?.data?.error ||
-        err?.response?.data?.message ||
-        '';
+        let errorsArray: string[] = [];
+        let apiMsg = '';
 
-      if (status === 422) {
-        const text = apiMsg.toString();
-        if (/has already been taken|already exists/i.test(text)) {
+        if (data && typeof data === 'object') {
+          const maybeErrors = (data as { errors?: unknown }).errors;
+          if (Array.isArray(maybeErrors)) {
+            errorsArray = maybeErrors.map((e) => String(e));
+          }
+
+          const maybeError = (data as { error?: unknown }).error;
+          const maybeMessage = (data as { message?: unknown }).message;
+
+          apiMsg =
+            errorsArray.join(', ') ||
+            (typeof maybeError === 'string' ? maybeError : '') ||
+            (typeof maybeMessage === 'string' ? maybeMessage : '');
+        }
+
+        if (status === 422) {
+          const text = apiMsg.toString();
+          if (/has already been taken|already exists/i.test(text)) {
+            setErrorMessage(
+              'An account with that email/username already exists.',
+            );
+          } else {
+            setErrorMessage(apiMsg || 'Signup failed. Check your inputs.');
+          }
+        } else if (status === 401) {
           setErrorMessage(
-            'An account with that email/username already exists.',
+            apiMsg ||
+              'Unauthorized (CSRF or auth). Please reload and try again.',
+          );
+        } else if (status === 404) {
+          setErrorMessage(
+            'Signup endpoint not found. Please check your API routes.',
           );
         } else {
-          setErrorMessage(apiMsg || 'Signup failed. Check your inputs.');
+          setErrorMessage(apiMsg || 'Something went wrong. Please try again.');
         }
-      } else if (status === 401) {
-        setErrorMessage(
-          apiMsg ||
-            'Unauthorized (CSRF or auth). Please reload and try again.',
-        );
-      } else if (status === 404) {
-        setErrorMessage(
-          'Signup endpoint not found. Please check your API routes.',
-        );
       } else {
-        setErrorMessage(apiMsg || 'Something went wrong. Please try again.');
+        // Non-Axios or unexpected error type
+        setErrorMessage('Something went wrong. Please try again.');
       }
     } finally {
       setLoading(false);
