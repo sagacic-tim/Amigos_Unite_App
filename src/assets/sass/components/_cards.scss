@@ -10,7 +10,7 @@
   flex-direction: column;
   height: 100%;
   margin: 0; /* rely on grid gap only */
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm);
 
   /* Optional interactive affordance for keyboard users */
   &.card--interactive {
@@ -30,6 +30,11 @@
   flex-direction: column;
   flex: 1 1 auto;
   margin-bottom: var(--spacing-sm);
+}
+
+.card__avatar-block {
+  display: grid;
+  margin-bottom: var(--spacing-md);
 }
 
 .card__title  {

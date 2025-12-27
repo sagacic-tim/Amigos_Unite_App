@@ -2,19 +2,20 @@
 @use '../abstracts' as tokens;
 
 .avatar {
-  --_size: 40px;
+  --_size: 80px;
 
-  inline-size: var(--_size);
+  background: var(--secondary-surface-color);
   block-size: var(--_size);
   border-radius: 50%;
-  overflow: hidden;
-  display: inline-block;
   border: 1px solid var(--primary-bordere-color);
   box-shadow: var(--shadow-xs);
-  background: var(--secondary-surface-color);
+  display: inline-block;
+  inline-size: var(--_size);
+  margin: var(--spacing-md);
+  overflow: hidden;
 
-  &--sm { --_size: 28px; }
-  &--lg { --_size: 64px; }
+  &--sm { --_size: 40px; }
+  &--lg { --_size: 80px; }
 
   img {
     inline-size: 100%;
