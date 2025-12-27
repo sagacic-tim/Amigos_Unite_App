@@ -1,7 +1,7 @@
 
 // src/components/Authentication/AuthFormShell.tsx
 import type React from 'react';
-import Modal from '../Common/Modal';
+import Modal from '../modals/UniversalModal';
 import '../../pages/Authentication/Authentication.module.scss';
 
 interface AuthFormShellProps {

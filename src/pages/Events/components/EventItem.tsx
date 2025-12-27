@@ -32,6 +32,7 @@ const EventItem: React.FC<EventItemProps> = ({
   onDelete,
 }) => {
   const { isLoggedIn, amigo } = useAuthStatus();
+  const amigoId = amigo?.id ?? null;
 
   // Base event from the index (no location hydrated)
   const baseEvent = event as EventWithLocation;
@@ -50,7 +51,7 @@ const EventItem: React.FC<EventItemProps> = ({
   // Derived: is this amigo associated with this event in any role?
   const isRegistered = !!eventRole;
 
-  // NEW: are they a coordinator on this event?
+  // Are they a coordinator on this event?
   const isCoordinatorRole =
     eventRole === "lead_coordinator" || eventRole === "assistant_coordinator";
 
@@ -103,7 +104,7 @@ const EventItem: React.FC<EventItemProps> = ({
    * plus the event.lead_coordinator_id as a fallback for lead coordinator.
    */
   useEffect(() => {
-    if (!amigo || !isLoggedIn) {
+    if (!amigoId || !isLoggedIn) {
       setEventRole(null);
       return;
     }
@@ -113,7 +114,7 @@ const EventItem: React.FC<EventItemProps> = ({
     const pickRoleFromConnectors = (
       connectors: EventAmigoConnector[]
     ): EventRole => {
-      const mine = connectors.filter((c) => c.amigo_id === amigo.id);
+      const mine = connectors.filter((c) => c.amigo_id === amigoId);
       if (mine.length === 0) return null;
 
       if (mine.some((c) => c.role === "lead_coordinator")) {
@@ -133,7 +134,7 @@ const EventItem: React.FC<EventItemProps> = ({
 
       // Fallback: if the event has lead_coordinator_id pointing at this amigo,
       // treat them as lead even if no connector came back with that role.
-      if (!role && event.lead_coordinator_id === amigo.id) {
+      if (!role && event.lead_coordinator_id === amigoId) {
         role = "lead_coordinator";
       }
 
@@ -171,7 +172,7 @@ const EventItem: React.FC<EventItemProps> = ({
       cancelled = true;
     };
   }, [
-    amigo?.id,
+    amigoId,
     isLoggedIn,
     event.id,
     event.event_amigo_connectors,
@@ -249,7 +250,7 @@ const EventItem: React.FC<EventItemProps> = ({
     return "Register For This Event";
   })();
 
-  // NEW: choose spotlight vs primary styles based on coordinator role.
+  // Choose spotlight vs primary styles based on coordinator role.
   const registerButtonClassName = [
     "button",
     isCoordinatorRole ? "button--spotlight" : "button--primary",

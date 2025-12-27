@@ -8,7 +8,7 @@
   display: none; /* shown via .is-open */
   inset: 0;
   justify-content: center;  /* horizontal centering */
-  padding: 30px 20px;
+  padding: 15px;
   position: fixed;
   z-index: var(--z-modal);
   &.is-open { display: flex; }
@@ -64,7 +64,7 @@
   min-inline-size: 320px;
   overflow: auto; /* scroll only when content exceeds max-block-size */
   overscroll-behavior: contain;
-  padding: 30px 20px;
+  padding: 15px;
   scrollbar-gutter: stable both-edges;
   scrollbar-width: thin;
 }
@@ -76,6 +76,7 @@
   border-radius: var(--border-radius-sm);
   color: var(--secondary-text-color);
   cursor: pointer;
+  font-size: 2.5rem;
   line-height: 1;
   padding: var(--spacing-xs);
   position: absolute;

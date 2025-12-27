@@ -13,6 +13,8 @@ interface EventListProps {
 
 const EventList: React.FC<EventListProps> = ({ variant = "public" }) => {
   const { currentAmigo } = useAuth();
+  const currentAmigoId = currentAmigo?.id ?? null;
+
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,18 +30,15 @@ const EventList: React.FC<EventListProps> = ({ variant = "public" }) => {
         // For "manage" view, ask the API for only the events the current amigo can manage.
         // For public view (or when not logged in), fall back to the public events index.
         const data =
-          variant === "manage" && currentAmigo
+          variant === "manage" && currentAmigoId
             ? await EventService.fetchMyEvents()
             : await EventService.fetchEvents();
 
         console.log("Raw events from API", data);
 
-        // At this point, data is already appropriately scoped:
-        // - "manage" → only manageable events (handled by the backend)
-        // - "public" → all public events
-        const filtered = data;
-
-        if (mounted) setEvents(filtered);
+        if (mounted) {
+          setEvents(data);
+        }
       } catch (err) {
         console.error(err);
         if (mounted) setError("Error fetching events.");
@@ -51,7 +50,7 @@ const EventList: React.FC<EventListProps> = ({ variant = "public" }) => {
     return () => {
       mounted = false;
     };
-  }, [variant, currentAmigo?.id]);
+  }, [variant, currentAmigoId]);
 
   const handleDelete = async (event: Event) => {
     if (!window.confirm(`Delete event "${event.event_name}"?`)) return;

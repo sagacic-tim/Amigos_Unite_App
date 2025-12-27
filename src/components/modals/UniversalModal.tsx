@@ -16,8 +16,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   children,
   titleId,
 }) => {
-  // Close on Escape – hook is ALWAYS called,
-  // but only attaches a listener while the modal is open.
+  // Close on Escape (global) – hook always runs, listener only when open
   useEffect(() => {
     if (!isOpen) return;
 
@@ -29,8 +28,22 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
-  // Now that hooks have run, we can safely bail out when closed.
   if (!isOpen) return null;
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close when clicking the overlay itself, not the dialog contents
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleOverlayKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // a11y: provide a keyboard interaction on the same element that has onClick
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onClose();
+    }
+  };
 
   return (
     <div
@@ -38,12 +51,15 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      onClick={onClose} // click backdrop to close
+      tabIndex={-1}
+      onClick={handleOverlayClick}
+      onKeyDown={handleOverlayKeyDown}
     >
       <div
         className="modal__dialog"
         role="document"
-        onClick={(e) => e.stopPropagation()} // don’t close when clicking inside dialog
+        // Prevent overlay click handler from firing when user clicks inside the card
+        onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"

@@ -1,85 +1,86 @@
 // src/context/AuthContext.tsx
-import { createContext, useEffect, useState, useCallback } from 'react';
-import type { ReactNode, Dispatch, SetStateAction } from 'react';
-import privateApi from '@/services/api/privateApi';
-import type { Amigo } from '@/types/amigos/AmigoTypes';
+import { useEffect, useState, useCallback } from "react";
+import type { ReactNode } from "react";
+import privateApi from "@/services/api/privateApi";
+import type { Amigo } from "@/types/amigos/AmigoTypes";
+import { AuthContext, type AuthState } from "./auth-context";
 
-export type AuthState = {
-  isLoggedIn: boolean;
-  loading: boolean;
-  error: string | null;
-  amigos: Amigo[];
-  currentAmigo: Amigo | null;
-  refreshAuth: () => Promise<void>;
-  refreshCurrentAmigo: () => Promise<void>;
-  setCurrentAmigo: Dispatch<SetStateAction<Amigo | null>>;
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// Normalizers: tolerate different backend response shapes without `any`
+// ─────────────────────────────────────────────────────────────────────────────
 
+type MeResponseShape =
+  | { data?: { amigo?: Amigo } }
+  | { amigo?: Amigo }
+  | Amigo
+  | null
+  | undefined;
 
-export const AuthContext = createContext<AuthState | undefined>(undefined);
+type AmigosListResponseShape =
+  | Amigo[]
+  | { amigos?: Amigo[] }
+  | { data?: Amigo[] }
+  | null
+  | undefined;
 
-/* ────────────────────────────────────────────────────────────────────────────
-   Normalizers so the FE tolerates different backend response shapes
-──────────────────────────────────────────────────────────────────────────── */
-
-
-// src/context/AuthContext.tsx
-function normalizeMePayload(data: any): Amigo | null {
-  // Current /me shape: { status: {...}, data: { amigo: {...} } }
-  const fromNested = data?.data?.amigo;
-  if (fromNested && typeof fromNested === 'object') {
-    return fromNested as Amigo;
+function normalizeMePayload(data: MeResponseShape): Amigo | null {
+  const nested = (data as { data?: { amigo?: Amigo } })?.data?.amigo;
+  if (nested && typeof nested === "object") {
+    return nested;
   }
 
-  // Just in case you ever change /me to return { amigo: {...} }
-  const fromKey = data?.amigo;
-  if (fromKey && typeof fromKey === 'object') {
-    return fromKey as Amigo;
+  const fromKey = (data as { amigo?: Amigo })?.amigo;
+  if (fromKey && typeof fromKey === "object") {
+    return fromKey;
   }
 
-  // Fallback: already an amigo-shaped object
-  if (data && typeof data === 'object' && 'id' in data) {
+  if (data && typeof data === "object" && "id" in data) {
     return data as Amigo;
   }
 
   return null;
 }
 
-function normalizeAmigosList(data: any): Amigo[] {
-  // If controller ever returns a bare array
-  if (Array.isArray(data)) return data as Amigo[];
+function normalizeAmigosList(data: AmigosListResponseShape): Amigo[] {
+  if (Array.isArray(data)) return data;
 
-  // Current /api/v1/amigos shape with AMS + :attributes adapter:
-  // { amigos: [ {...}, {...} ] }
-  if (Array.isArray(data?.amigos)) return data.amigos as Amigo[];
+  if (data && typeof data === "object") {
+    const withAmigos = data as { amigos?: Amigo[] };
+    if (Array.isArray(withAmigos.amigos)) return withAmigos.amigos;
 
-  // Fallback: if some controller still sends { data: [...] }
-  if (Array.isArray(data?.data)) return data.data as Amigo[];
+    const withData = data as { data?: Amigo[] };
+    if (Array.isArray(withData.data)) return withData.data;
+  }
 
   return [];
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Provider
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn]   = useState(false);
-  const [loading, setLoading]         = useState(true);
-  const [amigos, setAmigos]             = useState<Amigo[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [amigos, setAmigos] = useState<Amigo[]>([]);
   const [currentAmigo, setCurrentAmigo] = useState<Amigo | null>(null);
-  const [error, setError]             = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const loadAmigos = useCallback(async () => {
     try {
-      const res = await privateApi.get('/api/v1/amigos', { withCredentials: true });
+      const res = await privateApi.get("/api/v1/amigos", {
+        withCredentials: true,
+      });
       setAmigos(normalizeAmigosList(res.data));
     } catch {
-      setError('Error fetching amigos.');
+      setError("Error fetching amigos.");
       setAmigos([]);
     }
   }, []);
 
-
   const loadMe = useCallback(async (): Promise<boolean> => {
     try {
-      const res = await privateApi.get('/api/v1/me', {
+      const res = await privateApi.get("/api/v1/me", {
         withCredentials: true,
         validateStatus: (s) => s === 200 || s === 401,
       });
@@ -129,9 +130,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Re-check on auth changes (login/logout)
   useEffect(() => {
-    const onAuthChanged = () => { void refreshAuth(); };
-    document.addEventListener('auth:changed', onAuthChanged as EventListener);
-    return () => document.removeEventListener('auth:changed', onAuthChanged as EventListener);
+    const onAuthChanged = () => {
+      void refreshAuth();
+    };
+
+    document.addEventListener(
+      "auth:changed",
+      onAuthChanged as EventListener
+    );
+    return () =>
+      document.removeEventListener(
+        "auth:changed",
+        onAuthChanged as EventListener
+      );
   }, [refreshAuth]);
 
   const value: AuthState = {

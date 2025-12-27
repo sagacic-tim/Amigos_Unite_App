@@ -4,6 +4,7 @@ import '../../pages/Authentication/Authentication.module.scss';
 import { loginAmigo, LoginParams } from '../../services/auth';
 import { Amigo } from '../../types/amigos/AmigoTypes';
 import AuthFormShell from './AuthFormShell';
+import axios from 'axios';
 
 interface LoginProps {
   isOpen: boolean;
@@ -20,9 +21,7 @@ const Login: React.FC<LoginProps> = ({
 }) => {
   const [loginAttribute, setLoginAttribute] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    null,
-  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleErrorResponse = (status: number) => {
@@ -56,12 +55,21 @@ const Login: React.FC<LoginProps> = ({
       const amigo = await loginAmigo(params);
       onLoginSuccess(amigo);
       // Parent (AuthModalsHost) closes the modal; no need to call onClose here.
-    } catch (err: any) {
-      if (err.response) {
-        handleErrorResponse(err.response.status);
+    } catch (err: unknown) {
+      // Narrow the error to AxiosError so we can safely inspect response/status
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        if (typeof status === 'number') {
+          handleErrorResponse(status);
+        } else {
+          setErrorMessage(
+            'An error occurred during login. Please try again later.',
+          );
+        }
       } else {
+        // Non-Axios error (unexpected)
         setErrorMessage(
-          'An error occurred during login. Please try again later.',
+          'An unexpected error occurred. Please try again later.',
         );
       }
     } finally {

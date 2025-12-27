@@ -1,4 +1,4 @@
-
+// src/ui/Inputs/Tabs/Tabs.tsx
 import React, { useMemo, useRef, useState } from "react";
 
 type Tab = {
@@ -21,37 +21,41 @@ export function Tabs({
   className,
   defaultActiveId,
   activeId,
-  onChange
+  onChange,
 }: TabsProps) {
   const isControlled = activeId !== undefined && onChange;
   const [internalActive, setInternalActive] = useState<string>(
-    defaultActiveId ?? tabs.find(t => !t.disabled)?.id ?? tabs[0]?.id
+    defaultActiveId ?? tabs.find((t) => !t.disabled)?.id ?? tabs[0]?.id
   );
   const current = isControlled ? activeId! : internalActive;
   const listRef = useRef<HTMLDivElement>(null);
 
   const enabledTabs = useMemo(
-    () => tabs.filter(t => !t.disabled),
+    () => tabs.filter((t) => !t.disabled),
     [tabs]
   );
 
   const focusTabButton = (id: string) => {
-    const idx = tabs.findIndex(t => t.id === id);
-    const btn = listRef.current?.querySelectorAll<HTMLButtonElement>("[role=tab]")[idx];
+    const idx = tabs.findIndex((t) => t.id === id);
+    const btn =
+      listRef.current?.querySelectorAll<HTMLButtonElement>("[role=tab]")[idx];
     btn?.focus();
   };
 
   const setActive = (id: string) => {
-    if (isControlled) onChange!(id);
-    else setInternalActive(id);
+    if (isControlled) {
+      onChange!(id);
+    } else {
+      setInternalActive(id);
+    }
   };
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    const idx = enabledTabs.findIndex(t => t.id === current);
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const idx = enabledTabs.findIndex((t) => t.id === current);
     if (idx < 0) return;
 
-    const goto = (i: number) => {
-      const id = enabledTabs[i].id;
+    const goto = (nextIndex: number) => {
+      const id = enabledTabs[nextIndex].id;
       setActive(id);
       requestAnimationFrame(() => focusTabButton(id));
     };
@@ -73,6 +77,8 @@ export function Tabs({
         e.preventDefault();
         goto(enabledTabs.length - 1);
         break;
+      default:
+        break;
     }
   };
 
@@ -82,10 +88,11 @@ export function Tabs({
         className="tabs__list"
         role="tablist"
         aria-label="Tabs"
+        tabIndex={0}              // <- make tablist focusable for a11y rule
         onKeyDown={onKeyDown}
         ref={listRef}
       >
-        {tabs.map((t, i) => {
+        {tabs.map((t) => {
           const isActive = t.id === current;
           return (
             <button
@@ -106,7 +113,7 @@ export function Tabs({
         })}
       </div>
 
-      {tabs.map(t => {
+      {tabs.map((t) => {
         const isActive = t.id === current;
         return (
           <div

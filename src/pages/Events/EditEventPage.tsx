@@ -68,9 +68,6 @@ const EditEventPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // NEW: keep the raw connectors so we can update roles later
-  const [connectors, setConnectors] = useState<EventAmigoConnector[]>([]);
-
   // Participants displayed in the "Manage Event" step
   const [managementParticipants, setManagementParticipants] = useState<
     ManagementParticipant[]
@@ -85,7 +82,6 @@ const EditEventPage: React.FC = () => {
   // ───────────────────────────────────────────────────────────────────────────
   // Effect 1: load the event itself
   // ───────────────────────────────────────────────────────────────────────────
-
 
   useEffect(() => {
     let mounted = true;
@@ -137,9 +133,6 @@ const EditEventPage: React.FC = () => {
           await EventService.fetchEventAmigoConnectors(eventId);
 
         if (!mounted) return;
-
-        // Optionally retain them in local state if you want them elsewhere
-        setConnectors(fetchedConnectors);
 
         const participants: ManagementParticipant[] = [];
         const assistantIds: number[] = [];

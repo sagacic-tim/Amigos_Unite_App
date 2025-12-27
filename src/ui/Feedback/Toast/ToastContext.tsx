@@ -1,9 +1,21 @@
+// src/ui/Feedback/Toast/ToastContext.tsx
 
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ToastItem, ToastPosition, ToastVariant } from "./ToastTypes";
 
 type ToastContextValue = {
-  addToast: (msg: React.ReactNode, opts?: { variant?: ToastVariant; duration?: number }) => string;
+  addToast: (
+    msg: React.ReactNode,
+    opts?: { variant?: ToastVariant; duration?: number }
+  ) => string;
   removeToast: (id: string) => void;
 };
 
@@ -26,21 +38,14 @@ export function ToastProvider({
   children,
   position = "top-right",
   defaultDuration = 4000,
-  className
+  className,
 }: ProviderProps) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const timers = useRef(new Map<string, number>());
+  const timers = useRef<Map<string, number>>(new Map());
 
-  const addToast = useCallback((message: React.ReactNode, opts?: { variant?: ToastVariant; duration?: number }) => {
-    const id = crypto.randomUUID();
-    const item: ToastItem = { id, message, variant: opts?.variant, duration: opts?.duration };
-    setToasts(prev => [item, ...prev]); // newest first (top stack)
-    scheduleRemove(id, opts?.duration ?? defaultDuration);
-    return id;
-  }, [defaultDuration]);
-
+  // Remove a toast and clear any outstanding timer
   const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
     const t = timers.current.get(id);
     if (t) {
       window.clearTimeout(t);
@@ -48,10 +53,34 @@ export function ToastProvider({
     }
   }, []);
 
-  const scheduleRemove = (id: string, ms: number) => {
-    const t = window.setTimeout(() => removeToast(id), ms);
-    timers.current.set(id, t);
-  };
+  // Memoized scheduler so it can be safely used in other hooks
+  const scheduleRemove = useCallback(
+    (id: string, ms: number) => {
+      const t = window.setTimeout(() => removeToast(id), ms);
+      timers.current.set(id, t);
+    },
+    [removeToast]
+  );
+
+  const addToast = useCallback(
+    (
+      message: React.ReactNode,
+      opts?: { variant?: ToastVariant; duration?: number }
+    ) => {
+      const id = crypto.randomUUID();
+      const item: ToastItem = {
+        id,
+        message,
+        variant: opts?.variant,
+        duration: opts?.duration,
+      };
+
+      setToasts((prev) => [item, ...prev]); // newest first (top stack)
+      scheduleRemove(id, opts?.duration ?? defaultDuration);
+      return id;
+    },
+    [defaultDuration, scheduleRemove]
+  );
 
   const pause = (id: string) => {
     const t = timers.current.get(id);
@@ -65,23 +94,38 @@ export function ToastProvider({
     scheduleRemove(id, ms);
   };
 
-  const value = useMemo(() => ({ addToast, removeToast }), [addToast, removeToast]);
+  const value = useMemo(
+    () => ({ addToast, removeToast }),
+    [addToast, removeToast]
+  );
 
   const containerClass =
     `toast-container ${className ?? ""} ` +
-    (position === "top-right" ? "is-top-right" :
-     position === "top-left" ? "is-top-left" :
-     position === "bottom-right" ? "is-bottom-right" : "is-bottom-left");
+    (position === "top-right"
+      ? "is-top-right"
+      : position === "top-left"
+      ? "is-top-left"
+      : position === "bottom-right"
+      ? "is-bottom-right"
+      : "is-bottom-left");
 
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className={containerClass.trim()} aria-live="polite" aria-atomic="false">
-        {toasts.map(t => {
+      <div
+        className={containerClass.trim()}
+        aria-live="polite"
+        aria-atomic="false"
+      >
+        {toasts.map((t) => {
           const variantClass =
-            t.variant === "success" ? "-success" :
-            t.variant === "error"   ? "-error"   :
-            t.variant === "warning" ? "-warning" : "-info";
+            t.variant === "success"
+              ? "-success"
+              : t.variant === "error"
+              ? "-error"
+              : t.variant === "warning"
+              ? "-warning"
+              : "-info";
 
           const remaining = t.duration ?? defaultDuration;
 
@@ -94,7 +138,13 @@ export function ToastProvider({
               role="status"
             >
               <p className="toast__content">{t.message}</p>
-              <button className="toast__close" aria-label="Dismiss" onClick={() => removeToast(t.id)}>✕</button>
+              <button
+                className="toast__close"
+                aria-label="Dismiss"
+                onClick={() => removeToast(t.id)}
+              >
+                ✕
+              </button>
             </div>
           );
         })}

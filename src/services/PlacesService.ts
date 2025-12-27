@@ -18,6 +18,51 @@ export type PlaceResult = {
   photo_attribution?: string | null;
 };
 
+export type PlacePhoto = {
+  place_id: string;
+  photo_reference?: string | null;
+  photo_url?: string | null;
+  photo_attribution?: string | null;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers to unwrap flexible backend payload shapes
+// ─────────────────────────────────────────────────────────────────────────────
+
+function unwrapPlaceResults(payload: unknown): PlaceResult[] {
+  if (Array.isArray(payload)) {
+    return payload as PlaceResult[];
+  }
+
+  if (payload && typeof payload === "object") {
+    const results = (payload as { results?: unknown }).results;
+    if (Array.isArray(results)) {
+      return results as PlaceResult[];
+    }
+  }
+
+  return [];
+}
+
+function unwrapPlacePhotos(payload: unknown): PlacePhoto[] {
+  if (Array.isArray(payload)) {
+    return payload as PlacePhoto[];
+  }
+
+  if (payload && typeof payload === "object") {
+    const photos = (payload as { photos?: unknown }).photos;
+    if (Array.isArray(photos)) {
+      return photos as PlacePhoto[];
+    }
+  }
+
+  return [];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Service functions
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Canonical function name going forward.
 // You can use this directly in new code.
 export async function searchPlaces(
@@ -31,10 +76,8 @@ export async function searchPlaces(
     withCredentials: true,
   });
 
-  const data = response.data;
-  if (Array.isArray(data)) return data as PlaceResult[];
-  if (Array.isArray((data as any)?.results)) return (data as any).results as PlaceResult[];
-  return [];
+  const data: unknown = response.data;
+  return unwrapPlaceResults(data);
 }
 
 // Backwards-compatible alias for existing call sites.
@@ -45,13 +88,6 @@ export async function searchPlacesWithPhotos(
   return searchPlaces(query, type);
 }
 
-export type PlacePhoto = {
-  place_id: string;
-  photo_reference?: string | null;
-  photo_url?: string | null;
-  photo_attribution?: string | null;
-};
-
 export async function fetchPlacePhotos(placeId: string): Promise<PlacePhoto[]> {
   if (!placeId) return [];
 
@@ -59,8 +95,6 @@ export async function fetchPlacePhotos(placeId: string): Promise<PlacePhoto[]> {
     withCredentials: true,
   });
 
-  const data = response.data;
-  if (Array.isArray(data)) return data as PlacePhoto[];
-  if (Array.isArray((data as any)?.photos)) return (data as any).photos as PlacePhoto[];
-  return [];
+  const data: unknown = response.data;
+  return unwrapPlacePhotos(data);
 }

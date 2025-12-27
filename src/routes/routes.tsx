@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AppLayout from "@/layout/app-layout";
 import RequireAuth from "./RequireAuth";
 
+// Lazy-loaded pages
 const Home = lazy(() => import("@pages/Home"));
 const Amigos = lazy(() => import("@pages/Amigos"));
 const Events = lazy(() => import("@pages/Events"));
@@ -12,9 +13,7 @@ const About = lazy(() => import("@pages/About"));
 const Contact = lazy(() => import("@pages/Contact"));
 const Profile = lazy(() => import("@pages/Profile"));
 const NotFound = lazy(() => import("@pages/NotFound"));
-const EventAmigoConnectors = lazy(
-  () => import("@pages/EventAmigoConnectors")
-);
+// NOTE: EventAmigoConnectors lazy import removed because it was unused
 const ConfirmAccount = lazy(
   () => import("@pages/Authentication/ConfirmAccount")
 );
@@ -22,7 +21,7 @@ const ResendConfirmation = lazy(
   () => import("@pages/Authentication/ResendConfirmation")
 );
 
-// NEW:
+// Events CRUD pages
 const CreateEvent = lazy(
   () => import("@pages/Events/CreateEventPage")
 );
@@ -41,7 +40,8 @@ const RouteError: React.FC = () => (
   <div className="container content-section">Something went wrong.</div>
 );
 
-export const router = createBrowserRouter([
+// Keep router internal to this module so the file only exports components
+const router = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
@@ -49,33 +49,47 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: withSuspense(<Home />) },
 
-      // public routes
+      // Public routes
       { path: "confirm", element: withSuspense(<ConfirmAccount />) },
-      { path: "confirm/resend", element: withSuspense(<ResendConfirmation />) },
+      {
+        path: "confirm/resend",
+        element: withSuspense(<ResendConfirmation />),
+      },
       { path: "about", element: withSuspense(<About />) },
       { path: "contact", element: withSuspense(<Contact />) },
       { path: "events", element: withSuspense(<Events />) },
 
-      // protected routes
+      // Protected routes
       {
         element: <RequireAuth />,
         children: [
           { path: "amigos", element: withSuspense(<Amigos />) },
           { path: "user-profile", element: withSuspense(<Profile />) },
 
-          // NEW events CRUD routes
-          { path: "events/new", element: withSuspense(<CreateEvent />) },
-          { path: "events/manage", element: withSuspense(<ManageEvents />) },
-          { path: "events/:eventId/edit", element: withSuspense(<EditEvent />) },
+          // Events CRUD routes
+          {
+            path: "events/new",
+            element: withSuspense(<CreateEvent />),
+          },
+          {
+            path: "events/manage",
+            element: withSuspense(<ManageEvents />),
+          },
+          {
+            path: "events/:eventId/edit",
+            element: withSuspense(<EditEvent />),
+          },
         ],
       },
 
-      // keep this last
+      // Keep this last
       { path: "*", element: withSuspense(<NotFound />) },
     ],
   },
 ]);
 
-export default function AppRouter() {
+const AppRouter: React.FC = () => {
   return <RouterProvider router={router} />;
-}
+};
+
+export default AppRouter;
