@@ -30,23 +30,36 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className={`modal ${isOpen ? "is-open" : ""}`}>
-      {/* Backdrop: covers the entire viewport and closes on click */}
-      <button
-        type="button"
-        className="modal__backdrop"
-        aria-label="Close modal"
-        onClick={onClose}
-      />
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close when clicking the overlay itself, not the dialog contents
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
-      {/* Dialog content */}
+  const handleOverlayKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // a11y: provide a keyboard interaction on the same element that has onClick
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className={`modal ${isOpen ? "is-open" : ""}`}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      tabIndex={-1}
+      onClick={handleOverlayClick}
+      onKeyDown={handleOverlayKeyDown}
+    >
       <div
         className="modal__dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
+        role="document"
+        // Prevent overlay click handler from firing when user clicks inside the card
+        onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
