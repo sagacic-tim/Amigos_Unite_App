@@ -1,0 +1,42 @@
+
+# Node / Vite artifacts
+node_modules
+dist
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# Test / coverage output
+coverage
+.vitest
+jest-*
+*.lcov
+
+# Build cache / temp
+.tmp
+.tmp_*
+.cache
+.eslintcache
+
+# Editor / OS cruft
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Git metadata
+.git
+.gitignore
+
+# Local env / secrets (only used on host)
+.env
+.env.*
+*.pem
+*.key
+
+# Logs
+logs
+*.log
+
+# Do NOT ignore docker/ because nginx.conf is needed
+# docker/
