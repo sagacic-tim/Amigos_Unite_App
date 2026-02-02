@@ -35,10 +35,27 @@ export function resetAuthModalOpen() {
   authModalOpen = false;
 }
 
-// IMPORTANT: this should be just the origin, e.g. "https://localhost:3001"
-const RAW_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? "https://localhost:3001";
-const API_BASE = RAW_BASE.replace(/\/+$/, "");
+/**
+ * Resolve API base per environment.
+ *
+ * - Dev: default to https://localhost:3001 (unless VITE_API_BASE_URL provided)
+ * - Prod: default to same-origin (""), so requests go to https://amigosunite.org/api/...
+ *
+ * This prevents the classic "localhost in production" failure mode.
+ */
+function resolveApiBase(): string {
+  const envBase = (import.meta.env.VITE_API_BASE_URL ?? "").trim();
+
+  if (envBase) return envBase.replace(/\/+$/, "");
+
+  // IMPORTANT: in production, use same-origin to avoid CORS entirely (Option A).
+  if (import.meta.env.PROD) return "";
+
+  // Dev fallback
+  return "https://localhost:3001";
+}
+
+const API_BASE = resolveApiBase();
 
 const privateApi: AxiosInstance = axios.create({
   baseURL: API_BASE,
@@ -55,7 +72,6 @@ const privateApi: AxiosInstance = axios.create({
 
 type CommonAuthHeaders = {
   Authorization?: string;
-  // Allow other dynamic keys
   [key: string]: unknown;
 };
 
@@ -64,7 +80,6 @@ type PrivateAxiosHeaders = AxiosHeaders & {
 };
 
 function getMutableDefaultHeaders(): PrivateAxiosHeaders {
-  // Axios' typing here is loose; we safely re-interpret as our extended type.
   return privateApi.defaults.headers as unknown as PrivateAxiosHeaders;
 }
 
@@ -84,7 +99,6 @@ try {
     }
   }
 } catch {
-  // ignore storage access errors (private mode, etc.)
   void 0;
 }
 
@@ -166,11 +180,6 @@ privateApi.interceptors.response.use(
     const status = error.response?.status;
     const url = original?.url;
 
-    // Don’t try to refresh on:
-    // - no config
-    // - not 401
-    // - already retried
-    // - auth endpoints themselves (login/logout/refresh/verify/csrf)
     if (!original || status !== 401 || original._retry || isAuthEndpoint(url)) {
       return Promise.reject(error);
     }
@@ -223,32 +232,26 @@ privateApi.interceptors.response.use(
                 localStorage.setItem("authToken", value);
               }
             } catch {
-              // ignore storage write errors
               void 0;
             }
           }
 
-          // retry original request with refreshed credentials
           return privateApi.request(original);
         }
       } else {
-        // if another request is already refreshing, wait briefly and retry
         await new Promise((resolve) => setTimeout(resolve, 200));
         return privateApi.request(original);
       }
     } catch {
-      // refresh flow failed; fall through to forcing re-login
       isRefreshing = false;
     }
 
-    // Refresh failed → clear local auth hints and force re-login
     try {
       const mutable = getMutableDefaultHeaders();
       if (mutable.common && "Authorization" in mutable.common) {
         delete mutable.common.Authorization;
       }
     } catch {
-      // ignore header cleanup errors
       void 0;
     }
 
@@ -257,7 +260,6 @@ privateApi.interceptors.response.use(
         localStorage.removeItem("authToken");
       }
     } catch {
-      // ignore storage cleanup errors
       void 0;
     }
 

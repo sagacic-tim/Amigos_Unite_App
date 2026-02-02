@@ -14,11 +14,69 @@ interface SignupProps {
   onSignupSuccess: () => void;
 }
 
-const Signup: React.FC<SignupProps> = ({
-  isOpen,
-  onClose,
-  onSignupSuccess,
-}) => {
+type ApiErrorPayload = {
+  errors?: unknown;
+  error?: unknown;
+  message?: unknown;
+  status?: {
+    errors?: unknown;
+    message?: unknown;
+    code?: unknown;
+  };
+};
+
+function coerceString(v: unknown): string {
+  return typeof v === 'string' ? v : '';
+}
+
+function extractErrors(payload: unknown): string[] {
+  if (!payload || typeof payload !== 'object') return [];
+
+  const p = payload as ApiErrorPayload;
+
+  // Prefer arrays of errors
+  const candidates: unknown[] = [];
+
+  // Common shapes:
+  // { errors: [...] }
+  if (Array.isArray(p.errors)) candidates.push(...p.errors);
+
+  // Your current Rails shape:
+  // { status: { errors: [...] } }
+  if (p.status && Array.isArray(p.status.errors)) candidates.push(...p.status.errors);
+
+  // Some APIs return { status: { message: "..." } } or { message: "..." }
+  // We'll handle messages separately below.
+
+  return candidates.map((e) => (typeof e === 'string' ? e : String(e))).filter(Boolean);
+}
+
+function extractMessage(payload: unknown): string {
+  if (!payload || typeof payload !== 'object') return '';
+
+  const p = payload as ApiErrorPayload;
+
+  const fromStatusMessage = coerceString(p.status?.message);
+  if (fromStatusMessage) return fromStatusMessage;
+
+  const fromTopMessage = coerceString(p.message);
+  if (fromTopMessage) return fromTopMessage;
+
+  const fromError = coerceString(p.error);
+  if (fromError) return fromError;
+
+  return '';
+}
+
+function friendly422Message(raw: string): string {
+  // Keep your “already exists” UX, but otherwise surface the server truth.
+  if (/has already been taken|already exists/i.test(raw)) {
+    return 'An account with that email/username already exists.';
+  }
+  return raw;
+}
+
+const Signup: React.FC<SignupProps> = ({ isOpen, onClose, onSignupSuccess }) => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -40,31 +98,33 @@ const Signup: React.FC<SignupProps> = ({
     e.preventDefault();
     setErrorMessage(null);
 
-    if (
-      !firstName ||
-      !lastName ||
-      !userName ||
-      !email ||
-      !password ||
-      !passwordConfirmation
-    ) {
+    if (!firstName || !lastName || !userName || !email || !password || !passwordConfirmation) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
+
     if (!/^[A-Za-z0-9_]+$/.test(userName)) {
-      setErrorMessage(
-        'Username may only contain letters, numbers, and underscore.',
-      );
+      setErrorMessage('Username may only contain letters, numbers, and underscore.');
       return;
     }
+
+    // Match Devise config: config.password_length = 10..64
+    if (password.length < 10) {
+      setErrorMessage('Password must be at least 10 characters.');
+      return;
+    }
+    if (password.length > 64) {
+      setErrorMessage('Password must be 64 characters or fewer.');
+      return;
+    }
+
     if (password !== passwordConfirmation) {
       setErrorMessage('Passwords do not match.');
       return;
     }
+
     if (phone1 && !/^\+\d{6,15}$/.test(phone1)) {
-      setErrorMessage(
-        'Phone number must be in international format (e.g., +14155550123).',
-      );
+      setErrorMessage('Phone number must be in international format (e.g., +14155550123).');
       return;
     }
 
@@ -86,52 +146,24 @@ const Signup: React.FC<SignupProps> = ({
       onSignupSuccess();
       // Parent will close the modal; no need to call onClose here.
     } catch (err: unknown) {
-      // Axios-aware error handling without `any`
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
         const data = err.response?.data;
 
-        let errorsArray: string[] = [];
-        let apiMsg = '';
-
-        if (data && typeof data === 'object') {
-          const maybeErrors = (data as { errors?: unknown }).errors;
-          if (Array.isArray(maybeErrors)) {
-            errorsArray = maybeErrors.map((e) => String(e));
-          }
-
-          const maybeError = (data as { error?: unknown }).error;
-          const maybeMessage = (data as { message?: unknown }).message;
-
-          apiMsg =
-            errorsArray.join(', ') ||
-            (typeof maybeError === 'string' ? maybeError : '') ||
-            (typeof maybeMessage === 'string' ? maybeMessage : '');
-        }
+        const errors = extractErrors(data);
+        const msg = extractMessage(data);
+        const combined = errors.join(', ') || msg;
 
         if (status === 422) {
-          const text = apiMsg.toString();
-          if (/has already been taken|already exists/i.test(text)) {
-            setErrorMessage(
-              'An account with that email/username already exists.',
-            );
-          } else {
-            setErrorMessage(apiMsg || 'Signup failed. Check your inputs.');
-          }
+          setErrorMessage(friendly422Message(combined || 'Signup failed. Check your inputs.'));
         } else if (status === 401) {
-          setErrorMessage(
-            apiMsg ||
-              'Unauthorized (CSRF or auth). Please reload and try again.',
-          );
+          setErrorMessage(combined || 'Unauthorized (CSRF or auth). Please reload and try again.');
         } else if (status === 404) {
-          setErrorMessage(
-            'Signup endpoint not found. Please check your API routes.',
-          );
+          setErrorMessage('Signup endpoint not found. Please check your API routes.');
         } else {
-          setErrorMessage(apiMsg || 'Something went wrong. Please try again.');
+          setErrorMessage(combined || 'Something went wrong. Please try again.');
         }
       } else {
-        // Non-Axios or unexpected error type
         setErrorMessage('Something went wrong. Please try again.');
       }
     } finally {
