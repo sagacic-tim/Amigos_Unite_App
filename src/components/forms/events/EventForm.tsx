@@ -10,7 +10,7 @@ import type { EventLocationCreatePayload } from "@/types/events/EventLocationTyp
 import type { PlaceResult, PlacePhoto } from "@/services/PlacesService";
 import styles from "@/components/forms/events/EventForm.module.scss";
 import {
-  searchPlacesWithPhotos,
+  searchPlacesWithRetry,
   fetchPlacePhotos,
 } from "@/services/PlacesService";
 
@@ -365,7 +365,7 @@ const EventForm: React.FC<EventFormProps> = ({
     setSearchError(null);
 
     try {
-      const results = await searchPlacesWithPhotos(searchQuery);
+      const results = await searchPlacesWithRetry(searchQuery);
       setPlaceResults(results);
       setSelectedPlace(null);
       setPlacePhotos([]);
