@@ -1,11 +1,9 @@
-/* Empty */
 /* src/assets/sass/layout/_footer.scss */
 
 /* ---------------------------------------
    Site Footer (page shell)
    --------------------------------------- */
 .site-footer {
-  /* Footer-scoped knobs (default to your design tokens) */
   --footer-bg: var(--secondary-surface-bg-color-1);
   --footer-fg: var(--secondary-text-color);
   --footer-border-color: var(--secondary-border-color);
@@ -18,18 +16,40 @@
   padding-block: var(--spacing-lg);
   position: relative;
 
-  &__nav {
-    font-size: var(--font-size-lg);
-
-    &__item {
-      margin-right: 6px;
-      text-decoration: none !important;
-      outline: none;
-    }
-  }
-
   &__copy {
     font-size: var(--font-size-lg);
+    margin: 0;
+  }
+
+  &__nav {
+    /* NAV is the grid container (as requested) */
+    display: grid;
+    gap: var(--grid-gap);
+    align-items: start;
+
+    /* Mobile-first: 1 column */
+    grid-template-columns: 1fr;
+
+    font-size: var(--font-size-xl);
+  }
+
+  &__nav__item {
+    display: inline-block;
+    margin-right: 6px;
+    text-decoration: none !important;
+    outline: none;
+
+    color: var(--link-color);
+
+    &:hover {
+      color: var(--link-hover-color);
+      text-decoration: none !important;
+
+    }
+    &:focus-visible {
+      color: var(--link-active-color);
+      text-decoration: underline !important;
+    }
   }
 }
 
@@ -38,27 +58,48 @@
   max-inline-size: var(--container-max-width);
   margin-inline: auto;
   padding-inline: var(--spacing-md);
+}
 
+/* Column blocks: make items stack nicely */
+.site-footer__column-1,
+.site-footer__column-2,
+.site-footer__column-3 {
   display: grid;
-  gap: var(--grid-gap);
-  grid-template-columns: 1fr; /* mobile-first */
+  gap: var(--spacing-sm);
 }
 
-/* Increase columns as space allows */
-@media (min-width: 768px) {    /* md */
-  .site-footer__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (min-width: 1024px) {   /* lg */
-  .site-footer__inner { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Tablet: 2 columns, copy spans full width beneath */
+@media (min-width: 768px) {
+  .site-footer__nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-footer__column-3 {
+    grid-column: 1 / -1;
+  }
 }
 
-/* Generic section block */
+/* Desktop: 3 columns, copy returns to column 3 and aligns right */
+@media (min-width: 1024px) {
+  .site-footer__nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .site-footer__column-3 {
+    grid-column: auto;
+    justify-self: end;
+    text-align: right;
+  }
+}
+
+/* ---------------------------------------
+   Optional legacy helpers (kept if you use them elsewhere)
+   --------------------------------------- */
 .site-footer__section {
   display: grid;
   gap: var(--spacing-sm);
 }
 
-/* Section headings */
 .site-footer__heading {
   margin: 0;
   font-size: var(--font-size-sm);
@@ -66,7 +107,6 @@
   color: var(--secondary-heading-color);
 }
 
-/* Lists inside sections */
 .footer-list {
   list-style: none;
   margin: 0;
@@ -75,7 +115,6 @@
   gap: var(--spacing-xs);
 }
 
-/* Social icons (optional) */
 .footer-social {
   list-style: none;
   margin: 0;
@@ -83,6 +122,7 @@
   display: inline-flex;
   gap: var(--spacing-sm);
 }
+
 .footer-social a {
   display: inline-grid;
   place-items: center;
@@ -91,11 +131,11 @@
   border-radius: var(--border-radius-sm);
   background: color-mix(in oklab, var(--footer-bg), var(--neutral-white) 6%);
 }
+
 .footer-social a:hover {
   background: color-mix(in oklab, var(--footer-bg), var(--neutral-white) 12%);
 }
 
-/* Bottom bar: legal/meta row */
 .site-footer__bottom {
   margin: var(--spacing-lg) var(--spacing-md) 0;
   padding-top: var(--spacing-sm);
@@ -110,34 +150,33 @@
   color: var(--color-muted);
 }
 
-/* Back-to-top (optional) */
 .footer-back-to-top {
   text-decoration: none;
   padding: var(--spacing-xxs) var(--spacing-xs);
   border-radius: var(--border-radius-sm);
 }
+
 .footer-back-to-top:hover {
   background: color-mix(in oklab, var(--footer-bg), var(--neutral-white) 10%);
 }
 
-/* ---------------------------------------
-   Variants
-   --------------------------------------- */
-
-/* More compact footer */
+/* Variants */
 .site-footer--compact {
   padding-block: var(--spacing-md);
-  .site-footer__bottom { margin-top: var(--spacing-md); }
+
+  .site-footer__bottom {
+    margin-top: var(--spacing-md);
+  }
 }
 
-/* Inverse/dark variant using your header/brand tokens */
 .site-footer--inverse {
   --footer-bg: var(--color-header);
   --footer-fg: var(--neutral-white);
   --footer-border-color: color-mix(in oklab, var(--color-header), black 20%);
-  --footer-link: var(--neutral-white);
-  --footer-link-hover: var(--link-color-hover-light);
+  --footer-link-color: var(--neutral-white);
+  --footer-link-hover-color: var(--link-color-hover-light);
 }
 
-/* Remove the divider if the design calls for a seamless edge */
-.site-footer--no-divider { border-top: 0; }
+.site-footer--no-divider {
+  border-top: 0;
+}
