@@ -1,144 +1,156 @@
-Amigos Unite App
+*** Amigos Unite App ***
 
-React + TypeScript frontend for community coordination
+    React + TypeScript frontend for community coordination
 
-Overview
+** Overview
 
-Amigos Unite App is a modern, single-page application built with React, TypeScript, and Vite.
-It consumes the Amigos Unite API and provides a responsive UI for managing events, locations, and participation.
+    Amigos Unite App is a modern, single-page application built with React, TypeScript, and Vite.
+    
+    It consumes the Amigos Unite API and provides a responsive UI for managing events, locations, and participation.
 
-The application emphasizes clarity, maintainability, and strong typing over framework complexity.
+    The application emphasizes clarity, maintainability, and strong typing over framework complexity.
+________________________________
 
-Core Features
+** Core Features
 
-User authentication (JWT + cookies)
+    * User authentication (JWT + cookies)
 
-Event creation and editing
+    * Event creation and editing
 
-Location search with Google Places
+    * Location search with Google Places
 
-Role-aware UI (coordinator vs participant)
+    * Role-aware UI (coordinator vs participant)
 
-Multi-step event forms
+    * Multi-step event forms
 
-Responsive layout (mobile → desktop)
+    * Responsive layout (mobile → desktop)
+________________________________
 
-Tech Stack
+** Tech Stack
 
-Framework: React 18
+    * Framework: React 18
 
-Language: TypeScript
+    * Language: TypeScript
 
-Build tool: Vite
+    * Build tool: Vite
 
-Styling: SCSS with design tokens
+    * Styling: SCSS with design tokens
 
-HTTP client: Axios
+    * HTTP client: Axios
 
-Routing: React Router
+    * Routing: React Router
 
-State management: React hooks + context
+    * State management: React hooks + context
 
-Linting: ESLint (TypeScript-aware)
+    * Linting: ESLint (TypeScript-aware)
+________________________________
 
-Development Setup
-npm install
-npm run dev
+** Development Setup
 
-
-The app runs locally with hot module replacement (HMR) via Vite.
-
-Environment Configuration
-
-API base URL is resolved automatically:
-
-Development: https://localhost:3001
-
-Production: same-origin (/api/...)
-
-Optional override:
-
-VITE_API_BASE_URL=https://api.example.com
+    npm install
+    npm run dev
 
 
-This avoids common “localhost in production” deployment issues.
+    The app runs locally with hot module replacement (HMR) via Vite.
+________________________________
 
-Authentication Model
+** Environment Configuration
 
-JWT tokens stored in memory and localStorage
+    API base URL is resolved automatically:
 
-CSRF tokens via secure cookies
+        * Development: https://localhost:3001
 
-Automatic token refresh on 401 responses
+        * Production: same-origin (/api/...)
 
-Centralized Axios interceptors for auth handling
+    Optional override:
 
-Linting & Code Quality
+        VITE_API_BASE_URL=https://api.example.com
+
+        This avoids common “localhost in production” deployment issues.
+________________________________
+
+** Authentication Model
+
+    * JWT tokens stored in memory and localStorage
+
+    * CSRF tokens via secure cookies
+
+    * Automatic token refresh on 401 responses
+
+    * Centralized Axios interceptors for auth handling
+________________________________
+
+** Linting & Code Quality
 
 The project is configured for type-aware linting:
 
-Strict TypeScript rules
+    * Strict TypeScript rules
 
-Explicit typing of API responses
+    * Explicit typing of API responses
 
-No any in service layers
+    * No any in service layers
 
-Clear separation of concerns:
+    * Clear separation of concerns:
 
-services/ → API logic
+        * services/ → API logic
 
-components/ → UI
+        * components/ → UI
 
-pages/ → route composition
+        * pages/ → route composition
+________________________________
 
-Build
+** Build
+
 npm run build
-
 
 Outputs a static production bundle suitable for:
 
-Nginx
+    * Nginx
 
-CDN hosting
+    * CDN hosting
 
-Docker containers
+    * Docker containers
+________________________________
 
-Deployment
+** Deployment
 
-Built automatically via GitHub Actions
+    * Built automatically via GitHub Actions
 
-Published as a container image (GHCR)
+    * Published as a container image (GHCR)
 
-Deployed behind Nginx on a VPS
+    * Deployed behind Nginx on a VPS
 
-Uses same-origin API routing in production
+    * Uses same-origin API routing in production
+________________________________
 
-Design Philosophy
+** Design Philosophy
 
-This frontend demonstrates:
+    * This frontend demonstrates:
 
-Real-world React architecture (not a demo toy)
+    * Real-world React architecture (not a demo toy)
 
-Strong TypeScript discipline
+    * Strong TypeScript discipline
 
-Clean separation between UI and data access
+    * Clean separation between UI and data access
 
-Practical handling of auth, errors, and retries
+    * Practical handling of auth, errors, and retries
 
-Production-oriented deployment mindset
+    * Production-oriented deployment mindset
+________________________________
 
-Why This Matters
+** Why This Matters
 
 Together, Amigos Unite App + API showcase:
 
-Full-stack system design
+    * Full-stack system design
 
-Secure auth flows
+    * Secure auth flows
 
-CI/CD pipelines
+    * CI/CD pipelines
 
-Docker-based deployments
+    * Docker-based deployments
 
-Maintainable frontend architecture
+    * Maintainable frontend architecture
 
 They are intentionally structured for evaluation by engineers, not just end users.
+________________________________
