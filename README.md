@@ -64,7 +64,7 @@ ________________________________
 
     Optional override:
 
-        VITE_API_BASE_URL=https://api.example.com
+        VITE_API_BASE_URL=https://api.amigosunite.org
 
         This avoids common “localhost in production” deployment issues.
 ________________________________
